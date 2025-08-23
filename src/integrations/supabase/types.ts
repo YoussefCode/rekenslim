@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      quiz_submissions: {
+        Row: {
+          answers: Json
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          parent_name: string | null
+          percentage: number
+          phone_number: string
+          score: number
+          submitted_at: string
+          total_questions: number
+        }
+        Insert: {
+          answers: Json
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          parent_name?: string | null
+          percentage: number
+          phone_number: string
+          score: number
+          submitted_at?: string
+          total_questions: number
+        }
+        Update: {
+          answers?: Json
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          parent_name?: string | null
+          percentage?: number
+          phone_number?: string
+          score?: number
+          submitted_at?: string
+          total_questions?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
