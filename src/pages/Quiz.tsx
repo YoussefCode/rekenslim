@@ -5,7 +5,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import Header from "@/components/Header";
+import UserInfoForm, { UserInfo } from "@/components/UserInfoForm";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const dummyQuestions = [
   {
@@ -131,16 +134,19 @@ const dummyQuestions = [
 ];
 
 const Quiz = () => {
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<number[]>([]);
   const [showResults, setShowResults] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const handleAnswerSelect = (value: string) => {
     setSelectedAnswer(value);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     const answerIndex = parseInt(selectedAnswer);
     const newAnswers = [...selectedAnswers];
     newAnswers[currentQuestion] = answerIndex;
@@ -150,7 +156,83 @@ const Quiz = () => {
     if (currentQuestion < dummyQuestions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
     } else {
+      await submitQuizResults(newAnswers);
       setShowResults(true);
+    }
+  };
+
+  const submitQuizResults = async (answers: number[]) => {
+    if (!userInfo) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      const score = answers.reduce((score, answer, index) => {
+        return score + (answer === dummyQuestions[index].correct ? 1 : 0);
+      }, 0);
+      
+      const percentage = Math.round((score / dummyQuestions.length) * 100);
+      
+      // Save to database
+      const { data, error } = await supabase
+        .from('quiz_submissions')
+        .insert({
+          first_name: userInfo.firstName,
+          last_name: userInfo.lastName,
+          email: userInfo.email,
+          phone_number: userInfo.phoneNumber,
+          parent_name: userInfo.parentName || null,
+          score: score,
+          total_questions: dummyQuestions.length,
+          percentage: percentage,
+          answers: answers.map((answer, index) => ({
+            question_id: dummyQuestions[index].id,
+            question: dummyQuestions[index].question,
+            selected_answer: answer,
+            correct_answer: dummyQuestions[index].correct,
+            is_correct: answer === dummyQuestions[index].correct
+          }))
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error saving quiz results:', error);
+        toast({
+          title: "Fout bij opslaan",
+          description: "Er is een fout opgetreden bij het opslaan van je resultaten.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Send email notification
+      try {
+        const emailResponse = await supabase.functions.invoke('send-quiz-results', {
+          body: data
+        });
+
+        if (emailResponse.error) {
+          console.error('Error sending email:', emailResponse.error);
+        }
+      } catch (emailError) {
+        console.error('Error sending email notification:', emailError);
+      }
+
+      toast({
+        title: "Quiz voltooid!",
+        description: "Je resultaten zijn opgeslagen en verstuurd.",
+      });
+      
+    } catch (error) {
+      console.error('Error submitting quiz results:', error);
+      toast({
+        title: "Fout",
+        description: "Er is een fout opgetreden. Probeer het opnieuw.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -169,6 +251,20 @@ const Quiz = () => {
 
   const progress = ((currentQuestion + 1) / dummyQuestions.length) * 100;
 
+  // Show user info form if no user info collected yet
+  if (!userInfo) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-2xl mx-auto">
+            <UserInfoForm onSubmit={setUserInfo} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (showResults) {
     const score = calculateScore();
     const percentage = Math.round((score / dummyQuestions.length) * 100);
@@ -183,6 +279,9 @@ const Quiz = () => {
                 <CardTitle className="text-2xl text-foreground">
                   Quiz Resultaten
                 </CardTitle>
+                <p className="text-muted-foreground">
+                  Bedankt {userInfo.firstName}! Je resultaten zijn verzonden.
+                </p>
               </CardHeader>
               <CardContent className="text-center space-y-6">
                 <div className="text-6xl font-bold text-primary">
@@ -205,8 +304,8 @@ const Quiz = () => {
                   ))}
                 </div>
 
-                <Button onClick={handleRestart} className="w-full">
-                  Opnieuw beginnen
+                <Button onClick={() => { setUserInfo(null); handleRestart(); }} className="w-full">
+                  Nieuwe Quiz Starten
                 </Button>
               </CardContent>
             </Card>
@@ -224,7 +323,7 @@ const Quiz = () => {
           <div className="mb-6">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm text-muted-foreground">
-                Vraag {currentQuestion + 1} van {dummyQuestions.length}
+                {userInfo.firstName} - Vraag {currentQuestion + 1} van {dummyQuestions.length}
               </span>
               <span className="text-sm text-muted-foreground">
                 {Math.round(progress)}%
@@ -253,10 +352,11 @@ const Quiz = () => {
 
               <Button 
                 onClick={handleNext} 
-                disabled={selectedAnswer === ""} 
+                disabled={selectedAnswer === "" || isSubmitting} 
                 className="w-full mt-6"
               >
-                {currentQuestion === dummyQuestions.length - 1 ? "Afronden" : "Volgende"}
+                {isSubmitting ? "Bezig met opslaan..." : 
+                 currentQuestion === dummyQuestions.length - 1 ? "Afronden" : "Volgende"}
               </Button>
             </CardContent>
           </Card>
