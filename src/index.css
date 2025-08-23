@@ -2,41 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* Rekenslim.nl Design System - Educational & Professional
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Rekenslim.nl Color Palette */
+    --background: 40 15% 97%; /* Warm cream background */
+    --foreground: 213 45% 23%; /* Deep navy text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%; /* Pure white cards */
+    --card-foreground: 213 45% 23%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 213 45% 23%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary blue/teal from Rekenslim branding */
+    --primary: 200 85% 40%; /* Main blue */
+    --primary-foreground: 0 0% 98%;
+    
+    /* Secondary warm cream */
+    --secondary: 40 25% 94%;
+    --secondary-foreground: 213 45% 23%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 40 20% 92%;
+    --muted-foreground: 213 25% 45%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Orange accent color */
+    --accent: 25 85% 55%; /* Warm orange for highlights */
+    --accent-foreground: 0 0% 98%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Success green for checkmarks */
+    --success: 145 65% 45%;
+    --success-foreground: 0 0% 98%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 40 15% 88%;
+    --input: 40 15% 88%;
+    --ring: 200 85% 40%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
     --sidebar-background: 0 0% 98%;
 
