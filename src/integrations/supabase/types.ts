@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          role: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          role?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          correct_answer: number
+          created_at: string
+          id: string
+          options: Json
+          question_text: string
+          updated_at: string
+        }
+        Insert: {
+          correct_answer: number
+          created_at?: string
+          id?: string
+          options: Json
+          question_text: string
+          updated_at?: string
+        }
+        Update: {
+          correct_answer?: number
+          created_at?: string
+          id?: string
+          options?: Json
+          question_text?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       quiz_submissions: {
         Row: {
           answers: Json
