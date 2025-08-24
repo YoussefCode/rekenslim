@@ -39,7 +39,7 @@ const Index = () => {
                   Test je rekenvaardigheden
                 </h3>
                 <p className="text-muted-foreground">
-                  Log in om de quiz te maken of als beheerder in te loggen
+                  Log in om de quiz te maken
                 </p>
                 <Button onClick={() => navigate('/auth')} size="lg">
                   Inloggen
