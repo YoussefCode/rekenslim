@@ -1,11 +1,54 @@
 import { Check, Calculator, Users, BookOpen, Target, Award } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { user, profile } = useAuth();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      
+      {/* Login/Quiz Section */}
+      <section className="py-8 bg-primary/5">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            {user ? (
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold text-foreground">
+                  Welkom terug{profile?.role === 'admin' ? ', Beheerder' : ''}!
+                </h3>
+                <div className="flex justify-center gap-4">
+                  <Button onClick={() => navigate('/quiz')} size="lg">
+                    Start Quiz
+                  </Button>
+                  {profile?.role === 'admin' && (
+                    <Button onClick={() => navigate('/admin')} variant="outline" size="lg">
+                      Quiz Beheer
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <h3 className="text-2xl font-bold text-foreground">
+                  Test je rekenvaardigheden
+                </h3>
+                <p className="text-muted-foreground">
+                  Log in om de quiz te maken of als beheerder in te loggen
+                </p>
+                <Button onClick={() => navigate('/auth')} size="lg">
+                  Inloggen
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
       
       {/* Hero Section */}
       <section className="py-16 bg-gradient-to-b from-primary/10 to-background">
