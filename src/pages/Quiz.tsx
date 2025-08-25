@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import UserInfoForm, { UserInfo } from "@/components/UserInfoForm";
+import { useContent } from "@/hooks/useContent";
 
 interface Question {
   id: string;
@@ -29,6 +30,7 @@ const Quiz = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { user, profile } = useAuth();
+  const { getContent } = useContent();
 
   useEffect(() => {
     // Redirect if not logged in
@@ -259,7 +261,7 @@ const Quiz = () => {
       <div className="max-w-2xl mx-auto">
         <div className="mb-6 space-y-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">Rekenquiz</h1>
+            <h1 className="text-2xl font-bold">{getContent('quiz_title', 'Rekenquiz')}</h1>
             <span className="text-sm text-muted-foreground">
               Vraag {currentQuestion + 1} van {questions.length}
             </span>

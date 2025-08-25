@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
+import { useContent } from "@/hooks/useContent";
 
 const Index = () => {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
+  const { getContent, loading } = useContent();
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,10 +38,10 @@ const Index = () => {
             ) : (
               <div className="space-y-4">
                 <h3 className="text-2xl font-bold text-foreground">
-                  Test je rekenvaardigheden
+                  {loading ? 'Test je rekenvaardigheden' : getContent('home_subtitle', 'Test je rekenvaardigheden')}
                 </h3>
                 <p className="text-muted-foreground">
-                  Log in om de quiz te maken
+                  {loading ? 'Log in om de quiz te maken' : getContent('home_description', 'Log in om de quiz te maken')}
                 </p>
                 <Button onClick={() => navigate('/auth')} size="lg">
                   Inloggen
