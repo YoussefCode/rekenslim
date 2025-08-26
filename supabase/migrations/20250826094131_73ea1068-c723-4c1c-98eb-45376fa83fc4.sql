@@ -1,0 +1,26 @@
+-- Insert all homepage content that should be editable
+INSERT INTO public.content (key, value, description) VALUES
+  ('hero_title', 'Waarom Rekenslim.nl voor uw school?', 'Hero section hoofdtitel'),
+  ('hero_description', 'Veel leerlingen ervaren moeite met rekenen of kampen met dyscalculie. Dit heeft niet alleen gevolgen voor hun schoolprestaties, maar ook voor hun zelfvertrouwen en motivatie.', 'Hero section beschrijving'),
+  ('services_title', 'Wat wij voor scholen doen', 'Diensten sectie titel'),
+  ('service_1', 'Persoonlijke begeleiding bij dyscalculie en rekenproblemen', 'Dienst 1'),
+  ('service_2', 'Leren rekenen met stap-voor-stap methodes', 'Dienst 2'),
+  ('service_3', 'Trainingen en workshops voor leerkrachten en interne begeleiders', 'Dienst 3'),
+  ('service_4', 'Ontwikkelen voor ouders en apsses onmekenen', 'Dienst 4'),
+  ('service_5', 'Samenwerking voor ouders en leernd', 'Dienst 5'),
+  ('benefits_title', 'Voordelen voor uw school', 'Voordelen sectie titel'),
+  ('benefit_1', 'Ervaren begeleiders met expertise in dyscalculie en rekenproblemen', 'Voordeel 1'),
+  ('benefit_2', 'Verlichting van de werkdruk van leraren', 'Voordeel 2'),
+  ('benefit_3', 'Verbetering van rekenresultaten bij riscieerends leerlingen', 'Voordeel 3'),
+  ('benefit_4', 'Positieve bijdrage aan het schoolklimaat en oudertevreeden', 'Voordeel 4'),
+  ('benefit_5', 'Flexibel inzetbaar: op locatie en onto locatie of online', 'Voordeel 5'),
+  ('for_who_title', 'Voor wie?', 'Voor wie kaart titel'),
+  ('for_who_description', 'Basisscholen die hun zorgstructuur willen versterken', 'Voor wie beschrijving'),
+  ('mission_title', 'Onze missie', 'Missie kaart titel'),
+  ('mission_description', 'Rekenslim.nl gelooven er aridern rekenen náam ééno andere mónier va leren.', 'Missie beschrijving'),
+  ('results_title', 'Resultaten', 'Resultaten kaart titel'),
+  ('results_description', 'Bewezen methodes voor betere rekenprestaties', 'Resultaten beschrijving'),
+  ('website_url', 'www.rekenslim.nl', 'Website URL in footer'),
+  ('contact_email', 'info@rekenslim.nl', 'Contact email in footer'),
+  ('contact_phone', '0 - 12447030', 'Contact telefoon in footer')
+ON CONFLICT (key) DO NOTHING;

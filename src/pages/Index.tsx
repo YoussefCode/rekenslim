@@ -59,12 +59,10 @@ const Index = () => {
             <div className="flex items-center justify-between">
               <div className="flex-1">
                 <h2 className="text-4xl font-bold text-foreground mb-6">
-                  Waarom Rekenslim.nl voor uw school?
+                  {loading ? 'Waarom Rekenslim.nl voor uw school?' : getContent('hero_title', 'Waarom Rekenslim.nl voor uw school?')}
                 </h2>
                 <p className="text-lg text-muted-foreground leading-relaxed">
-                  Veel leerlingen ervaren moeite met rekenen of kampen met dyscalculie. 
-                  Dit heeft niet alleen gevolgen voor hun schoolprestaties, maar ook 
-                  voor hun zelfvertrouwen en motivatie.
+                  {loading ? 'Veel leerlingen ervaren moeite met rekenen of kampen met dyscalculie. Dit heeft niet alleen gevolgen voor hun schoolprestaties, maar ook voor hun zelfvertrouwen en motivatie.' : getContent('hero_description', 'Veel leerlingen ervaren moeite met rekenen of kampen met dyscalculie. Dit heeft niet alleen gevolgen voor hun schoolprestaties, maar ook voor hun zelfvertrouwen en motivatie.')}
                 </p>
               </div>
               <div className="ml-8 hidden lg:block">
@@ -87,19 +85,15 @@ const Index = () => {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <h2 className="text-3xl font-bold text-foreground mb-8">
-                  Wat wij voor scholen doen
+                  {loading ? 'Wat wij voor scholen doen' : getContent('services_title', 'Wat wij voor scholen doen')}
                 </h2>
                 <div className="space-y-4">
-                  {[
-                    "Persoonlijke begeleiding bij dyscalculie en rekenproblemen",
-                    "Leren rekenen met stap-voor-stap methodes",
-                    "Trainingen en workshops voor leerkrachten en interne begeleiders",
-                    "Ontwikkelen voor ouders en apsses onmekenen",
-                    "Samenwerking voor ouders en leernd"
-                  ].map((item, index) => (
+                  {[1, 2, 3, 4, 5].map((index) => (
                     <div key={index} className="flex items-start space-x-3">
                       <Check className="h-6 w-6 text-success mt-0.5 flex-shrink-0" />
-                      <span className="text-foreground">{item}</span>
+                      <span className="text-foreground">
+                        {loading ? `Service ${index}` : getContent(`service_${index}`, `Service ${index}`)}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -119,19 +113,15 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-foreground mb-8">
-              Voordelen voor uw school
+              {loading ? 'Voordelen voor uw school' : getContent('benefits_title', 'Voordelen voor uw school')}
             </h2>
             <div className="space-y-4">
-              {[
-                "Ervaren begeleiders met expertise in dyscalculie en rekenproblemen",
-                "Verlichting van de werkdruk van leraren",
-                "Verbetering van rekenresultaten bij riscieerends leerlingen",
-                "Positieve bijdrage aan het schoolklimaat en oudertevreeden",
-                "Flexibel inzetbaar: op locatie en onto locatie of online"
-              ].map((item, index) => (
+              {[1, 2, 3, 4, 5].map((index) => (
                 <div key={index} className="flex items-start space-x-3">
                   <Check className="h-6 w-6 text-success mt-0.5 flex-shrink-0" />
-                  <span className="text-foreground">{item}</span>
+                  <span className="text-foreground">
+                    {loading ? `Benefit ${index}` : getContent(`benefit_${index}`, `Benefit ${index}`)}
+                  </span>
                 </div>
               ))}
             </div>
@@ -147,9 +137,11 @@ const Index = () => {
               <Card className="text-center p-6">
                 <CardContent className="pt-6">
                   <Users className="h-16 w-16 text-accent mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-foreground mb-3">Voor wie?</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-3">
+                    {loading ? 'Voor wie?' : getContent('for_who_title', 'Voor wie?')}
+                  </h3>
                   <p className="text-muted-foreground">
-                    Basisscholen die hun zorgstructuur willen versterken
+                    {loading ? 'Basisscholen die hun zorgstructuur willen versterken' : getContent('for_who_description', 'Basisscholen die hun zorgstructuur willen versterken')}
                   </p>
                 </CardContent>
               </Card>
@@ -157,9 +149,11 @@ const Index = () => {
               <Card className="text-center p-6">
                 <CardContent className="pt-6">
                   <Target className="h-16 w-16 text-accent mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-foreground mb-3">Onze missie</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-3">
+                    {loading ? 'Onze missie' : getContent('mission_title', 'Onze missie')}
+                  </h3>
                   <p className="text-muted-foreground">
-                    Rekenslim.nl gelooven er aridern rekenen náam ééno andere mónier va leren.
+                    {loading ? 'Rekenslim.nl gelooven er aridern rekenen náam ééno andere mónier va leren.' : getContent('mission_description', 'Rekenslim.nl gelooven er aridern rekenen náam ééno andere mónier va leren.')}
                   </p>
                 </CardContent>
               </Card>
@@ -167,9 +161,11 @@ const Index = () => {
               <Card className="text-center p-6">
                 <CardContent className="pt-6">
                   <Award className="h-16 w-16 text-accent mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-foreground mb-3">Resultaten</h3>
+                  <h3 className="text-xl font-bold text-foreground mb-3">
+                    {loading ? 'Resultaten' : getContent('results_title', 'Resultaten')}
+                  </h3>
                   <p className="text-muted-foreground">
-                    Bewezen methodes voor betere rekenprestaties
+                    {loading ? 'Bewezen methodes voor betere rekenprestaties' : getContent('results_description', 'Bewezen methodes voor betere rekenprestaties')}
                   </p>
                 </CardContent>
               </Card>
@@ -184,15 +180,15 @@ const Index = () => {
           <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8">
             <div className="flex items-center space-x-2">
               <span>🌐</span>
-              <span>www.rekenslim.nl</span>
+              <span>{loading ? 'www.rekenslim.nl' : getContent('website_url', 'www.rekenslim.nl')}</span>
             </div>
             <div className="flex items-center space-x-2">
               <span>✉️</span>
-              <span>info@rekenslim.nl</span>
+              <span>{loading ? 'info@rekenslim.nl' : getContent('contact_email', 'info@rekenslim.nl')}</span>
             </div>
             <div className="flex items-center space-x-2">
               <span>📞</span>
-              <span>0 - 12447030</span>
+              <span>{loading ? '0 - 12447030' : getContent('contact_phone', '0 - 12447030')}</span>
             </div>
           </div>
         </div>

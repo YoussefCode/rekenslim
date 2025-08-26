@@ -98,10 +98,6 @@ const Auth = () => {
     }
   };
 
-  const handleAdminLogin = () => {
-    setEmail('admin@admin.com');
-    setPassword('admin');
-  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
@@ -175,17 +171,6 @@ const Auth = () => {
               </form>
             </TabsContent>
           </Tabs>
-          
-          <div className="mt-6 pt-6 border-t">
-            <Button 
-              variant="outline" 
-              className="w-full" 
-              onClick={handleAdminLogin}
-              type="button"
-            >
-              Admin Login (admin@admin.com)
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>
