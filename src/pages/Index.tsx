@@ -15,39 +15,39 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      {/* Login/Quiz Section */}
+      {/* Quiz Section */}
       <section className="py-8 bg-primary/5">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            {user ? (
-              <div className="space-y-4">
-                <h3 className="text-2xl font-bold text-foreground">
-                  Welkom terug{profile?.role === 'admin' ? ', Beheerder' : ''}!
-                </h3>
-                <div className="flex justify-center gap-4">
-                  <Button onClick={() => navigate('/quiz')} size="lg">
-                    Start Quiz
-                  </Button>
-                  {profile?.role === 'admin' && (
+            <div className="space-y-4">
+              <h3 className="text-2xl font-bold text-foreground">
+                {loading ? 'Test je rekenvaardigheden' : getContent('home_subtitle', 'Test je rekenvaardigheden')}
+              </h3>
+              <p className="text-muted-foreground">
+                {loading ? 'Start direct met de rekenquiz' : getContent('home_description', 'Start direct met de rekenquiz')}
+              </p>
+              <div className="flex justify-center gap-4">
+                <Button onClick={() => navigate('/quiz')} size="lg">
+                  Start Quiz
+                </Button>
+                {user ? (
+                  profile?.role === 'admin' && (
                     <Button onClick={() => navigate('/admin')} variant="outline" size="lg">
                       Quiz Beheer
                     </Button>
-                  )}
-                </div>
+                  )
+                ) : (
+                  <Button onClick={() => navigate('/auth')} variant="outline" size="lg">
+                    Inloggen (Admin)
+                  </Button>
+                )}
               </div>
-            ) : (
-              <div className="space-y-4">
-                <h3 className="text-2xl font-bold text-foreground">
-                  {loading ? 'Test je rekenvaardigheden' : getContent('home_subtitle', 'Test je rekenvaardigheden')}
-                </h3>
-                <p className="text-muted-foreground">
-                  {loading ? 'Log in om de quiz te maken' : getContent('home_description', 'Log in om de quiz te maken')}
+              {user && (
+                <p className="text-sm text-muted-foreground">
+                  Welkom terug{profile?.role === 'admin' ? ', Beheerder' : ''}!
                 </p>
-                <Button onClick={() => navigate('/auth')} size="lg">
-                  Inloggen
-                </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </section>
