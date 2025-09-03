@@ -142,7 +142,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_quiz_questions: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          correct_answer: number
+          created_at: string
+          id: string
+          options: Json
+          question_text: string
+          updated_at: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

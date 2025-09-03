@@ -44,10 +44,7 @@ const Quiz = () => {
 
   const fetchQuestions = async () => {
     try {
-      const { data, error } = await supabase
-        .from('questions')
-        .select('*')
-        .order('created_at', { ascending: true });
+      const { data, error } = await supabase.rpc('get_quiz_questions');
 
       if (error) throw error;
       
