@@ -33,14 +33,8 @@ const Quiz = () => {
   const { getContent } = useContent();
 
   useEffect(() => {
-    // Redirect if not logged in
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
-    
     fetchQuestions();
-  }, [user, navigate]);
+  }, []);
 
   const fetchQuestions = async () => {
     try {
