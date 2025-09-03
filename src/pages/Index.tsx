@@ -30,15 +30,9 @@ const Index = () => {
                 <Button onClick={() => navigate('/quiz')} size="lg">
                   Start Quiz
                 </Button>
-                {user ? (
-                  profile?.role === 'admin' && (
-                    <Button onClick={() => navigate('/admin')} variant="outline" size="lg">
-                      Quiz Beheer
-                    </Button>
-                  )
-                ) : (
-                  <Button onClick={() => navigate('/auth')} variant="outline" size="lg">
-                    Inloggen
+                {user && profile?.role === 'admin' && (
+                  <Button onClick={() => navigate('/admin')} variant="outline" size="lg">
+                    Quiz Beheer
                   </Button>
                 )}
               </div>
