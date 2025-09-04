@@ -23,26 +23,20 @@ const Header = () => {
             <Link to="/" className="hover:opacity-80 transition-opacity">
               Home
             </Link>
-            {user && (
-              <Link to="/quiz" className="hover:opacity-80 transition-opacity">
-                Quiz
-              </Link>
-            )}
+            <Link to="/quiz" className="hover:opacity-80 transition-opacity">
+              Quiz
+            </Link>
             {profile?.role === 'admin' && (
-              <Link to="/admin" className="hover:opacity-80 transition-opacity">
-                Admin
-              </Link>
-            )}
-            {user ? (
-              <Button variant="secondary" size="sm" onClick={signOut}>
-                Uitloggen
-              </Button>
-            ) : (
-              <Link to="/auth">
-                <Button variant="secondary" size="sm">
-                  Inloggen
-                </Button>
-              </Link>
+              <>
+                <Link to="/admin" className="hover:opacity-80 transition-opacity">
+                  Admin
+                </Link>
+                {user && (
+                  <Button variant="secondary" size="sm" onClick={signOut}>
+                    Uitloggen
+                  </Button>
+                )}
+              </>
             )}
           </nav>
         </div>
