@@ -16,30 +16,30 @@ const Index = () => {
       <Header />
       
       {/* Quiz Section */}
-      <section className="py-8 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 relative overflow-hidden">
+      <section className="py-4 bg-gradient-to-r from-primary/10 via-primary/5 to-accent/10 relative overflow-hidden">
         {/* Decorative background elements */}
-        <div className="absolute top-4 left-4 opacity-10">
-          <Calculator className="h-12 w-12 text-primary" />
+        <div className="absolute top-2 left-4 opacity-10">
+          <Calculator className="h-8 w-8 text-primary" />
         </div>
-        <div className="absolute top-8 right-8 opacity-10">
-          <Brain className="h-8 w-8 text-accent" />
+        <div className="absolute top-3 right-8 opacity-10">
+          <Brain className="h-6 w-6 text-accent" />
         </div>
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <div className="space-y-4">
-              <div className="flex justify-center mb-3">
-                <div className="bg-primary/20 p-3 rounded-full">
-                  <GraduationCap className="h-8 w-8 text-primary" />
+            <div className="space-y-3">
+              <div className="flex justify-center mb-2">
+                <div className="bg-primary/20 p-2 rounded-full">
+                  <GraduationCap className="h-6 w-6 text-primary" />
                 </div>
               </div>
-              <h3 className="text-2xl font-bold text-foreground">
+              <h3 className="text-xl font-bold text-foreground">
                 Test je rekenvaardigheden
               </h3>
-              <p className="text-base text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
                 Start direct met de rekenquiz en ontdek waar je staat
               </p>
-              <div className="flex justify-center gap-4 pt-3">
+              <div className="flex justify-center gap-4 pt-2">
                 <Button onClick={() => navigate('/quiz')} size="lg" className="hover-scale">
                   <Calculator className="mr-2 h-4 w-4" />
                   Test je zelf
