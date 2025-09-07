@@ -92,7 +92,7 @@ const Index = () => {
                     <p className="text-base text-muted-foreground leading-relaxed">
                       Rekenslim.nl is hét platform voor leerlingen die hun rekenvaardigheden willen versterken.
                       Wij combineren oefenmateriaal met professionele begeleiding en voeren vooronderzoek
-                      uit bij een mogelijke verdenking op dyscalculie of een hardnekkige rekenachterstand.!!
+                      uit bij een mogelijke verdenking op dyscalculie of een hardnekkige rekenachterstand.!!!
                     </p>
                   </div>
                 </Card>
