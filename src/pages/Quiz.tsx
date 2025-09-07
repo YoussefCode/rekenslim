@@ -31,6 +31,8 @@ const Quiz = () => {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { getContent } = useContent();
+  const [resultScore, setResultScore] = useState<number | null>(null);
+  const [resultPercentage, setResultPercentage] = useState<number | null>(null);
 
   useEffect(() => {
     fetchQuestions();
@@ -97,45 +99,25 @@ const Quiz = () => {
     }
 
     setIsSubmitting(true);
-    
+
     try {
-      const score = calculateScore(answers);
-      const percentage = (score / questions.length) * 100;
+      const { data, error } = await supabase.functions.invoke('send-quiz-results', {
+        body: {
+          userInfo,
+          answers,
+          questionIds: questions.map((q) => q.id),
+        },
+      });
 
-      const { error: insertError } = await supabase
-        .from('quiz_submissions')
-        .insert({
-          score,
-          total_questions: questions.length,
-          percentage,
-          answers: answers,
-          first_name: userInfo.firstName,
-          last_name: userInfo.lastName,
-          email: userInfo.email,
-          phone_number: userInfo.phoneNumber,
-          parent_name: userInfo.parentName || null,
-        });
+      if (error) throw error;
 
-      if (insertError) throw insertError;
-
-      // Send email notification
-      try {
-        await supabase.functions.invoke('send-quiz-results', {
-          body: {
-            userInfo,
-            score,
-            totalQuestions: questions.length,
-            percentage: Math.round(percentage)
-          }
-        });
-      } catch (emailError) {
-        console.error('Error sending email:', emailError);
-      }
-
+      setResultScore(data?.score ?? null);
+      setResultPercentage(data?.percentage ?? null);
+      setSelectedAnswers(answers);
       setShowResults(true);
       toast({
         title: "Quiz voltooid!",
-        description: `Je hebt ${score} van de ${questions.length} vragen goed beantwoord.`,
+        description: `Je hebt ${data?.score ?? '-'} van de ${questions.length} vragen goed beantwoord.`,
       });
     } catch (error) {
       console.error('Error submitting quiz:', error);
@@ -196,8 +178,8 @@ const Quiz = () => {
   }
 
   if (showResults) {
-    const score = calculateScore(selectedAnswers);
-    const percentage = Math.round((score / questions.length) * 100);
+    const finalScore = resultScore ?? calculateScore(selectedAnswers);
+    const finalPercentage = resultPercentage ?? Math.round((finalScore / questions.length) * 100);
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 p-4 flex items-center justify-center">
@@ -210,16 +192,16 @@ const Quiz = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="text-center space-y-4">
-              <div className="text-6xl font-bold text-primary">{score}/{questions.length}</div>
-              <div className="text-2xl text-muted-foreground">{percentage}% correct</div>
+              <div className="text-6xl font-bold text-primary">{finalScore}/{questions.length}</div>
+              <div className="text-2xl text-muted-foreground">{finalPercentage}% correct</div>
               
               <div className="grid grid-cols-2 gap-4 mt-8">
                 <div className="text-center p-4 bg-success/10 rounded-lg">
-                  <div className="text-2xl font-bold text-success">{score}</div>
+                  <div className="text-2xl font-bold text-success">{finalScore}</div>
                   <div className="text-sm text-muted-foreground">Goede antwoorden</div>
                 </div>
                 <div className="text-center p-4 bg-destructive/10 rounded-lg">
-                  <div className="text-2xl font-bold text-destructive">{questions.length - score}</div>
+                  <div className="text-2xl font-bold text-destructive">{questions.length - finalScore}</div>
                   <div className="text-sm text-muted-foreground">Foute antwoorden</div>
                 </div>
               </div>

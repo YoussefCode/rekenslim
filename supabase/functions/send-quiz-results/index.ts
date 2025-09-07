@@ -10,18 +10,18 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface QuizSubmission {
-  id: string;
-  first_name: string;
-  last_name: string;
+interface UserInfoPayload {
+  firstName: string;
+  lastName: string;
   email: string;
-  phone_number: string;
-  parent_name?: string;
-  score: number;
-  total_questions: number;
-  percentage: number;
-  answers: any[];
-  submitted_at: string;
+  phoneNumber: string;
+  parentName?: string | null;
+}
+
+interface RequestPayload {
+  userInfo: UserInfoPayload;
+  answers: number[];
+  questionIds: string[];
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -31,57 +31,108 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const submission: QuizSubmission = await req.json();
+    const { userInfo, answers, questionIds }: RequestPayload = await req.json();
 
-    console.log("Sending quiz results email for:", submission.first_name, submission.last_name);
+    if (!userInfo || !Array.isArray(answers) || !Array.isArray(questionIds)) {
+      throw new Error('Invalid payload');
+    }
+    if (answers.length !== questionIds.length) {
+      throw new Error('Answers and questionIds length mismatch');
+    }
+
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL') as string;
+    const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') as string;
+    if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
+      throw new Error('Missing Supabase environment variables');
+    }
+
+    const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
+
+    // Fetch correct answers securely
+    const { data: questionRows, error: qError } = await supabaseAdmin
+      .from('questions')
+      .select('id, correct_answer')
+      .in('id', questionIds);
+
+    if (qError) throw qError;
+
+    const correctMap = new Map<string, number>();
+    questionRows?.forEach((q) => correctMap.set(q.id as string, q.correct_answer as number));
+
+    // Compute score
+    let score = 0;
+    for (let i = 0; i < questionIds.length; i++) {
+      const qid = questionIds[i];
+      const correct = correctMap.get(qid);
+      if (typeof correct === 'number' && answers[i] === correct) score++;
+    }
+    const total = questionIds.length;
+    const percentage = Math.round((score / total) * 100);
+
+    // Store submission
+    const insertPayload = {
+      score,
+      total_questions: total,
+      percentage,
+      answers,
+      first_name: userInfo.firstName,
+      last_name: userInfo.lastName,
+      email: userInfo.email,
+      phone_number: userInfo.phoneNumber,
+      parent_name: userInfo.parentName ?? null,
+    };
+
+    const { data: inserted, error: insertError } = await supabaseAdmin
+      .from('quiz_submissions')
+      .insert(insertPayload)
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+
+    // Send email
+    const html = `
+      <h2>Nieuwe Quiz Resultaten van Rekenslim.nl</h2>
+      <h3>Deelnemer Informatie:</h3>
+      <ul>
+        <li><strong>Naam:</strong> ${userInfo.firstName} ${userInfo.lastName}</li>
+        <li><strong>Email:</strong> ${userInfo.email}</li>
+        <li><strong>Telefoon:</strong> ${userInfo.phoneNumber}</li>
+        ${userInfo.parentName ? `<li><strong>Ouder/Begeleider:</strong> ${userInfo.parentName}</li>` : ''}
+      </ul>
+      <h3>Quiz Resultaten:</h3>
+      <ul>
+        <li><strong>Score:</strong> ${score} van ${total} vragen correct</li>
+        <li><strong>Percentage:</strong> ${percentage}%</li>
+        <li><strong>Datum:</strong> ${new Date(inserted.submitted_at).toLocaleDateString('nl-NL')}</li>
+      </ul>
+      <h3>Antwoorden Details:</h3>
+      <p>De gedetailleerde antwoorden zijn opgeslagen in de database met ID: ${inserted.id}</p>
+      <hr />
+      <p><em>Dit bericht is automatisch gegenereerd door Rekenslim.nl</em></p>
+    `;
 
     const emailResponse = await resend.emails.send({
       from: "Rekenslim <onboarding@resend.dev>",
       to: ["yelmourabit@outlook.com"],
-      subject: `Nieuwe Quiz Resultaten - ${submission.first_name} ${submission.last_name}`,
-      html: `
-        <h2>Nieuwe Quiz Resultaten van Rekenslim.nl</h2>
-        
-        <h3>Deelnemer Informatie:</h3>
-        <ul>
-          <li><strong>Naam:</strong> ${submission.first_name} ${submission.last_name}</li>
-          <li><strong>Email:</strong> ${submission.email}</li>
-          <li><strong>Telefoon:</strong> ${submission.phone_number}</li>
-          ${submission.parent_name ? `<li><strong>Ouder/Begeleider:</strong> ${submission.parent_name}</li>` : ''}
-        </ul>
-        
-        <h3>Quiz Resultaten:</h3>
-        <ul>
-          <li><strong>Score:</strong> ${submission.score} van ${submission.total_questions} vragen correct</li>
-          <li><strong>Percentage:</strong> ${submission.percentage}%</li>
-          <li><strong>Datum:</strong> ${new Date(submission.submitted_at).toLocaleDateString('nl-NL')}</li>
-        </ul>
-        
-        <h3>Antwoorden Details:</h3>
-        <p>De gedetailleerde antwoorden zijn opgeslagen in de database met ID: ${submission.id}</p>
-        
-        <hr>
-        <p><em>Dit bericht is automatisch gegenereerd door Rekenslim.nl</em></p>
-      `,
+      subject: `Nieuwe Quiz Resultaten - ${userInfo.firstName} ${userInfo.lastName}`,
+      html,
     });
 
     console.log("Email sent successfully:", emailResponse);
 
-    return new Response(JSON.stringify({ success: true, emailResponse }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
+    return new Response(
+      JSON.stringify({ success: true, score, total_questions: total, percentage, submissionId: inserted.id }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json", ...corsHeaders },
+      }
+    );
   } catch (error: any) {
     console.error("Error in send-quiz-results function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
+      JSON.stringify({ error: error.message ?? 'Unknown error' }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 };
