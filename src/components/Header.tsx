@@ -15,7 +15,7 @@ const Header = () => {
             </div>
             <div>
               <h1 className="text-2xl font-bold">Rekenslim.nl</h1>
-              <p className="text-sm opacity-90">Slim leren omgaan met ercoires</p>
+              <p className="text-sm opacity-90">Slim leren omgaan met rekenen</p>
             </div>
           </Link>
           
