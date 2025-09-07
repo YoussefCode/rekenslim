@@ -38,6 +38,13 @@ const Header = () => {
                 )}
               </>
             )}
+            {!user && (
+              <Link to="/auth">
+                <Button variant="secondary" size="sm">
+                  Inloggen
+                </Button>
+              </Link>
+            )}
           </nav>
         </div>
       </div>
