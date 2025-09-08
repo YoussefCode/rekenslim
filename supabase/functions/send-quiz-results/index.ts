@@ -114,7 +114,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     const emailResponse = await resend.emails.send({
       from: "Rekenslim <onboarding@resend.dev>",
-      to: ["yelmourabit@outlook.com"],
+      to: ["Testuitslagen@rekenslim.nl"],
       subject: `Nieuwe Quiz Resultaten - ${userInfo.firstName} ${userInfo.lastName}`,
       html,
     });
