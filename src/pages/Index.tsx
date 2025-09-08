@@ -90,7 +90,9 @@ const Index = () => {
                       <Target className="h-5 w-5 text-primary" />
                     </div>
                     <p className="text-base text-muted-foreground leading-relaxed">
-                      Rekenslim.nl helpt leerlingen hun rekenvaardigheden versterken. Bij een vermoeden van dyscalculie of een hardnekkige rekenachterstand doen wij een vooronderzoek. We combineren onderzoek met professionele begeleiding, stellen een persoonlijk handelingsplan op en begeleiden leerlingen naar betere resultaten en meer zelfvertrouwen.
+                      Rekenslim.nl helpt leerlingen hun rekenvaardigheden versterken. 
+                      Bij een vermoeden van dyscalculie of een hardnekkige rekenachterstand doen wij een vooronderzoek.
+                      We combineren onderzoek met professionele begeleiding, stellen een persoonlijk handelingsplan op en begeleiden leerlingen naar betere resultaten en meer zelfvertrouwen.
                     </p>
                   </div>
                 </Card>
