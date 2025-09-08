@@ -9,12 +9,14 @@ import { useToast } from '@/hooks/use-toast';
 import { Trash2, Edit, Plus, FileText } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Question {
   id: string;
   question_text: string;
   options: string[];
   correct_answer: number;
+  level: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -37,6 +39,8 @@ const Admin = () => {
   const [questionText, setQuestionText] = useState('');
   const [options, setOptions] = useState(['', '', '', '']);
   const [correctAnswer, setCorrectAnswer] = useState(0);
+  const [selectedLevel, setSelectedLevel] = useState('basis');
+  const [currentLevel, setCurrentLevel] = useState('basis');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isContentDialogOpen, setIsContentDialogOpen] = useState(false);
   const [contentValue, setContentValue] = useState('');
@@ -45,13 +49,14 @@ const Admin = () => {
   useEffect(() => {
     fetchQuestions();
     fetchContent();
-  }, []);
+  }, [currentLevel]);
 
   const fetchQuestions = async () => {
     try {
       const { data, error } = await supabase
         .from('questions')
         .select('*')
+        .eq('level', currentLevel)
         .order('created_at', { ascending: true });
 
       if (error) throw error;
@@ -90,7 +95,8 @@ const Admin = () => {
           .update({
             question_text: questionText,
             options: JSON.stringify(options),
-            correct_answer: correctAnswer
+            correct_answer: correctAnswer,
+            level: selectedLevel
           })
           .eq('id', editingQuestion.id);
 
@@ -102,7 +108,8 @@ const Admin = () => {
           .insert({
             question_text: questionText,
             options: JSON.stringify(options),
-            correct_answer: correctAnswer
+            correct_answer: correctAnswer,
+            level: selectedLevel
           });
 
         if (error) throw error;
@@ -145,6 +152,7 @@ const Admin = () => {
     setQuestionText(question.question_text);
     setOptions(question.options);
     setCorrectAnswer(question.correct_answer);
+    setSelectedLevel(question.level);
     setIsDialogOpen(true);
   };
 
@@ -213,6 +221,7 @@ const Admin = () => {
     setQuestionText('');
     setOptions(['', '', '', '']);
     setCorrectAnswer(0);
+    setSelectedLevel(currentLevel);
   };
 
   const addNewQuestion = () => {
@@ -245,8 +254,19 @@ const Admin = () => {
           </TabsList>
           
           <TabsContent value="questions" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold">Quiz Vragen</h2>
+            <div className="flex justify-between items-center mb-4">
+              <div className="flex items-center gap-4">
+                <h2 className="text-2xl font-semibold">Quiz Vragen</h2>
+                <Select value={currentLevel} onValueChange={setCurrentLevel}>
+                  <SelectTrigger className="w-48">
+                    <SelectValue placeholder="Kies niveau" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="basis">Basis</SelectItem>
+                    <SelectItem value="2f">Niveau 2F</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
               <Button onClick={addNewQuestion}>
                 <Plus className="w-4 h-4 mr-2" />
                 Nieuwe Vraag
@@ -254,14 +274,21 @@ const Admin = () => {
             </div>
 
             <div className="grid gap-4">
-              {questions.map((question, index) => (
-                <Card key={question.id}>
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">Vraag {index + 1}</CardTitle>
-                        <CardDescription>{question.question_text}</CardDescription>
-                      </div>
+              {questions.length === 0 ? (
+                <Card>
+                  <CardContent className="text-center py-8">
+                    <p className="text-muted-foreground">Nog geen vragen voor niveau {currentLevel === 'basis' ? 'Basis' : '2F'}</p>
+                  </CardContent>
+                </Card>
+              ) : (
+                questions.map((question, index) => (
+                  <Card key={question.id}>
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="text-lg">Vraag {index + 1} ({question.level === 'basis' ? 'Basis' : 'Niveau 2F'})</CardTitle>
+                          <CardDescription>{question.question_text}</CardDescription>
+                        </div>
                       <div className="flex gap-2">
                         <Button
                           variant="outline"
@@ -301,7 +328,7 @@ const Admin = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+              )))}
             </div>
           </TabsContent>
 
@@ -346,6 +373,19 @@ const Admin = () => {
             </DialogHeader>
             
             <div className="space-y-4">
+              <div>
+                <Label htmlFor="level">Niveau</Label>
+                <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Kies niveau" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="basis">Basis</SelectItem>
+                    <SelectItem value="2f">Niveau 2F</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <div>
                 <Label htmlFor="question">Vraag</Label>
                 <Textarea

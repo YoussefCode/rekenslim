@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import UserInfoForm, { UserInfo } from "@/components/UserInfoForm";
 import { useContent } from "@/hooks/useContent";
@@ -16,9 +16,11 @@ interface Question {
   question_text: string;
   options: string[];
   correct_answer: number;
+  level: string;
 }
 
 const Quiz = () => {
+  const { level = 'basis' } = useParams<{ level: string }>();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -40,13 +42,14 @@ const Quiz = () => {
 
   const fetchQuestions = async () => {
     try {
-      const { data, error } = await supabase.rpc('get_quiz_questions');
+      const { data, error } = await supabase.rpc('get_quiz_questions', { quiz_level: level });
 
       if (error) throw error;
       
-      const processedQuestions = (data || []).map(q => ({
+      const processedQuestions = (data || []).map((q: any) => ({
         ...q,
-        options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
+        options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options,
+        level: q.level || level // Fallback naar de route parameter als level niet bestaat
       }));
       
       setQuestions(processedQuestions);
@@ -106,6 +109,7 @@ const Quiz = () => {
           userInfo,
           answers,
           questionIds: questions.map((q) => q.id),
+          level,
         },
       });
 
@@ -234,7 +238,7 @@ const Quiz = () => {
       <div className="max-w-2xl mx-auto">
         <div className="mb-6 space-y-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">{getContent('quiz_title', 'Rekenquiz')}</h1>
+            <h1 className="text-2xl font-bold">{getContent('quiz_title', `Rekenquiz ${level === '2f' ? 'Niveau 2F' : 'Basis'}`)}</h1>
             <span className="text-sm text-muted-foreground">
               Vraag {currentQuestion + 1} van {questions.length}
             </span>

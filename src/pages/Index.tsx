@@ -34,15 +34,15 @@ const Index = () => {
                 </div>
               </div>
               <h3 className="text-xl font-bold text-foreground">
-                Test je rekenvaardigheid niveau 1f
+                Test je rekenvaardigheden
               </h3>
               <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-                Start direct met de rekenquiz en ontdek waar je staat
+                Kies je niveau en start direct met de rekenquiz
               </p>
               <div className="flex justify-center gap-4 pt-2">
-                <Button onClick={() => navigate('/quiz')} size="lg" className="hover-scale">
+                <Button onClick={() => navigate('/quiz-selection')} size="lg" className="hover-scale">
                   <Calculator className="mr-2 h-4 w-4" />
-                  Test 1F
+                  Start Quiz
                 </Button>
                 {user && profile?.role === 'admin' && (
                   <Button onClick={() => navigate('/admin')} variant="outline" size="lg" className="hover-scale">

@@ -73,6 +73,7 @@ export type Database = {
           correct_answer: number
           created_at: string
           id: string
+          level: string
           options: Json
           question_text: string
           updated_at: string
@@ -81,6 +82,7 @@ export type Database = {
           correct_answer: number
           created_at?: string
           id?: string
+          level?: string
           options: Json
           question_text: string
           updated_at?: string
@@ -89,6 +91,7 @@ export type Database = {
           correct_answer?: number
           created_at?: string
           id?: string
+          level?: string
           options?: Json
           question_text?: string
           updated_at?: string
@@ -102,6 +105,7 @@ export type Database = {
           first_name: string
           id: string
           last_name: string
+          level: string
           parent_name: string | null
           percentage: number
           phone_number: string
@@ -115,6 +119,7 @@ export type Database = {
           first_name: string
           id?: string
           last_name: string
+          level?: string
           parent_name?: string | null
           percentage: number
           phone_number: string
@@ -128,6 +133,7 @@ export type Database = {
           first_name?: string
           id?: string
           last_name?: string
+          level?: string
           parent_name?: string | null
           percentage?: number
           phone_number?: string
@@ -143,7 +149,7 @@ export type Database = {
     }
     Functions: {
       get_quiz_questions: {
-        Args: Record<PropertyKey, never>
+        Args: Record<PropertyKey, never> | { quiz_level?: string }
         Returns: {
           correct_answer: number
           created_at: string

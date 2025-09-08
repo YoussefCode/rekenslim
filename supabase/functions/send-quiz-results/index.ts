@@ -22,6 +22,7 @@ interface RequestPayload {
   userInfo: UserInfoPayload;
   answers: number[];
   questionIds: string[];
+  level: string;
 }
 
 const handler = async (req: Request): Promise<Response> => {
@@ -31,7 +32,7 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { userInfo, answers, questionIds }: RequestPayload = await req.json();
+    const { userInfo, answers, questionIds, level }: RequestPayload = await req.json();
 
     if (!userInfo || !Array.isArray(answers) || !Array.isArray(questionIds)) {
       throw new Error('Invalid payload');
@@ -80,6 +81,7 @@ const handler = async (req: Request): Promise<Response> => {
       email: userInfo.email,
       phone_number: userInfo.phoneNumber,
       parent_name: userInfo.parentName ?? null,
+      level: level || 'basis',
     };
 
     const { data: inserted, error: insertError } = await supabaseAdmin
@@ -100,7 +102,7 @@ const handler = async (req: Request): Promise<Response> => {
         <li><strong>Telefoon:</strong> ${userInfo.phoneNumber}</li>
         ${userInfo.parentName ? `<li><strong>Ouder/Begeleider:</strong> ${userInfo.parentName}</li>` : ''}
       </ul>
-      <h3>Quiz Resultaten:</h3>
+      <h3>Quiz Resultaten ({level === 'basis' ? 'Basis' : 'Niveau 2F'}):</h3>
       <ul>
         <li><strong>Score:</strong> ${score} van ${total} vragen correct</li>
         <li><strong>Percentage:</strong> ${percentage}%</li>
@@ -115,7 +117,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "Rekenslim <onboarding@resend.dev>",
       to: ["Testuitslagen@rekenslim.nl"],
-      subject: `Nieuwe Quiz Resultaten - ${userInfo.firstName} ${userInfo.lastName}`,
+      subject: `Nieuwe Quiz Resultaten ${level === 'basis' ? 'Basis' : 'Niveau 2F'} - ${userInfo.firstName} ${userInfo.lastName}`,
       html,
     });
 
