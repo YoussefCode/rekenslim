@@ -34,7 +34,7 @@ const Index = () => {
                 </div>
               </div>
               <h3 className="text-xl font-bold text-foreground">
-                Test je rekenvaardigheden
+                Test je rekenvaardigheid niveau 1f
               </h3>
               <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
                 Start direct met de rekenquiz en ontdek waar je staat
