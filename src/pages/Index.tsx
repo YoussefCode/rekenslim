@@ -42,7 +42,7 @@ const Index = () => {
               <div className="flex justify-center gap-4 pt-2">
                 <Button onClick={() => navigate('/quiz')} size="lg" className="hover-scale">
                   <Calculator className="mr-2 h-4 w-4" />
-                  Test je zelf
+                  Test 1F
                 </Button>
                 {user && profile?.role === 'admin' && (
                   <Button onClick={() => navigate('/admin')} variant="outline" size="lg" className="hover-scale">
