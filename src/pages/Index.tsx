@@ -255,6 +255,7 @@ const Index = () => {
               <div className="flex items-center justify-center space-x-2">
                 <span>■</span>
                 <span>info@rekenslim.nl</span>
+                <span>0612447030</span>
               </div>
               <div className="flex items-center justify-center space-x-2">
                 <span>■</span>
