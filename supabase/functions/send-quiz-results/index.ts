@@ -102,7 +102,7 @@ const handler = async (req: Request): Promise<Response> => {
         <li><strong>Telefoon:</strong> ${userInfo.phoneNumber}</li>
         ${userInfo.parentName ? `<li><strong>Ouder/Begeleider:</strong> ${userInfo.parentName}</li>` : ''}
       </ul>
-      <h3>Quiz Resultaten ({level === 'basis' ? 'Basis' : 'Niveau 2F'}):</h3>
+      <h3>Quiz Resultaten (${level === 'basis' ? 'Basis' : 'Niveau 2F'}):</h3>
       <ul>
         <li><strong>Score:</strong> ${score} van ${total} vragen correct</li>
         <li><strong>Percentage:</strong> ${percentage}%</li>
@@ -114,14 +114,45 @@ const handler = async (req: Request): Promise<Response> => {
       <p><em>Dit bericht is automatisch gegenereerd door Rekenslim.nl</em></p>
     `;
 
-    const emailResponse = await resend.emails.send({
+    const primaryRecipient = "Testuitslagen@rekenslim.nl";
+
+    const { data: emailData, error: emailError }: any = await resend.emails.send({
       from: "Rekenslim <onboarding@resend.dev>",
-      to: ["Testuitslagen@rekenslim.nl"],
+      to: [primaryRecipient],
       subject: `Nieuwe Quiz Resultaten ${level === 'basis' ? 'Basis' : 'Niveau 2F'} - ${userInfo.firstName} ${userInfo.lastName}`,
       html,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    if (emailError) {
+      console.error("Resend primary send failed:", emailError);
+      // If we're on a Resend testing plan, only the owner's email is allowed.
+      // Fallback to the owner email so you still receive results while the domain is unverified.
+      if (emailError.statusCode === 403 &&
+          typeof emailError.error === 'string' &&
+          emailError.error.includes('You can only send testing emails')) {
+        const fallbackRecipient = "yelmourabit@outlook.com";
+        const fallbackHtml = `
+          <p><strong>LET OP:</strong> Fallback geactiveerd wegens Resend testlimiet. Bedoelde ontvanger: ${primaryRecipient}.</p>
+          <hr />
+          ${html}
+        `;
+        const { error: fallbackError }: any = await resend.emails.send({
+          from: "Rekenslim <onboarding@resend.dev>",
+          to: [fallbackRecipient],
+          subject: `[FALLBACK] Nieuwe Quiz Resultaten ${level === 'basis' ? 'Basis' : 'Niveau 2F'} - ${userInfo.firstName} ${userInfo.lastName}`,
+          html: fallbackHtml,
+        });
+        if (fallbackError) {
+          console.error("Resend fallback send failed:", fallbackError);
+          throw new Error(fallbackError.error || fallbackError.message || 'Email fallback mislukt');
+        }
+        console.log(`Fallback email verzonden naar ${fallbackRecipient}`);
+      } else {
+        throw new Error(emailError.error || emailError.message || 'Email verzenden mislukt');
+      }
+    } else {
+      console.log("Email verzonden naar primaire ontvanger:", primaryRecipient, emailData);
+    }
 
     return new Response(
       JSON.stringify({ success: true, score, total_questions: total, percentage, submissionId: inserted.id }),
