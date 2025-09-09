@@ -130,7 +130,7 @@ const handler = async (req: Request): Promise<Response> => {
       if (emailError.statusCode === 403 &&
           typeof emailError.error === 'string' &&
           emailError.error.includes('You can only send testing emails')) {
-        const fallbackRecipient = "jouw-email@example.com"; // Vervang dit met jouw gewenste fallback email
+        const fallbackRecipient = "yelmourabit@outlook.com";
         const fallbackHtml = `
           <p><strong>LET OP:</strong> Fallback geactiveerd wegens Resend testlimiet. Bedoelde ontvanger: ${primaryRecipient}.</p>
           <hr />
