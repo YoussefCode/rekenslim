@@ -114,7 +114,7 @@ const handler = async (req: Request): Promise<Response> => {
       <p><em>Dit bericht is automatisch gegenereerd door Rekenslim.nl</em></p>
     `;
 
-    const primaryRecipient = "Testuitslagen@rekenslim.nl";
+    const primaryRecipient = "testuitslagen@rekenslim.nl";
 
     const { data: emailData, error: emailError }: any = await resend.emails.send({
       from: "Rekenslim <onboarding@resend.dev>",
