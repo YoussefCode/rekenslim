@@ -37,17 +37,17 @@ const Index = () => {
                 Test je rekenvaardigheden
               </h3>
               <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-                Kies je niveau en start direct met de rekenquiz
+                Kies je niveau en start direct met de test
               </p>
               <div className="flex justify-center gap-4 pt-2">
                 <Button onClick={() => navigate('/quiz-selection')} size="lg" className="hover-scale">
                   <Calculator className="mr-2 h-4 w-4" />
-                  Start Quiz
+                  Start test
                 </Button>
                 {user && profile?.role === 'admin' && (
                   <Button onClick={() => navigate('/admin')} variant="outline" size="lg" className="hover-scale">
                     <Target className="mr-2 h-4 w-4" />
-                    Quiz Beheer
+                    Beheer
                   </Button>
                 )}
               </div>
