@@ -49,23 +49,40 @@ const handler = async (req: Request): Promise<Response> => {
 
     const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY);
 
-    // Fetch correct answers securely
+    // Fetch correct answers and domains securely
     const { data: questionRows, error: qError } = await supabaseAdmin
       .from('questions')
-      .select('id, correct_answer')
+      .select('id, correct_answer, domain')
       .in('id', questionIds);
 
     if (qError) throw qError;
 
     const correctMap = new Map<string, number>();
-    questionRows?.forEach((q) => correctMap.set(q.id as string, q.correct_answer as number));
+    const domainMap = new Map<string, string>();
+    questionRows?.forEach((q) => {
+      correctMap.set(q.id as string, q.correct_answer as number);
+      domainMap.set(q.id as string, q.domain as string || 'Algemeen');
+    });
 
-    // Compute score
+    // Compute score and domain results
     let score = 0;
+    const domainResults: Record<string, { correct: number; total: number }> = {};
+    
     for (let i = 0; i < questionIds.length; i++) {
       const qid = questionIds[i];
       const correct = correctMap.get(qid);
-      if (typeof correct === 'number' && answers[i] === correct) score++;
+      const domain = domainMap.get(qid) || 'Algemeen';
+      
+      // Initialize domain if not exists
+      if (!domainResults[domain]) {
+        domainResults[domain] = { correct: 0, total: 0 };
+      }
+      domainResults[domain].total++;
+      
+      if (typeof correct === 'number' && answers[i] === correct) {
+        score++;
+        domainResults[domain].correct++;
+      }
     }
     const total = questionIds.length;
     const percentage = Math.round((score / total) * 100);
@@ -82,6 +99,7 @@ const handler = async (req: Request): Promise<Response> => {
       phone_number: userInfo.phoneNumber,
       parent_name: userInfo.parentName ?? null,
       level: level || 'basis',
+      domain_results: domainResults,
     };
 
     const { data: inserted, error: insertError } = await supabaseAdmin
@@ -93,6 +111,15 @@ const handler = async (req: Request): Promise<Response> => {
     if (insertError) throw insertError;
 
     // Send email
+    const domainResultsHtml = Object.keys(domainResults).length > 0 
+      ? `<h3>Resultaten per Domein:</h3>
+         <ul>
+           ${Object.entries(domainResults).map(([domain, result]) => 
+             `<li><strong>${domain}:</strong> ${result.correct} van ${result.total} correct (${Math.round((result.correct / result.total) * 100)}%)</li>`
+           ).join('')}
+         </ul>`
+      : '';
+
     const html = `
       <h2>Nieuwe Quiz Resultaten van Rekenslim.nl</h2>
       <h3>Deelnemer Informatie:</h3>
@@ -108,6 +135,7 @@ const handler = async (req: Request): Promise<Response> => {
         <li><strong>Percentage:</strong> ${percentage}%</li>
         <li><strong>Datum:</strong> ${new Date(inserted.submitted_at).toLocaleDateString('nl-NL')}</li>
       </ul>
+      ${domainResultsHtml}
       <h3>Antwoorden Details:</h3>
       <p>De gedetailleerde antwoorden zijn opgeslagen in de database met ID: ${inserted.id}</p>
       <hr />

@@ -10,6 +10,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import UserInfoForm, { UserInfo } from "@/components/UserInfoForm";
 import { useContent } from "@/hooks/useContent";
+import FractionDisplay from "@/components/FractionDisplay";
 
 interface Question {
   id: string;
@@ -17,6 +18,7 @@ interface Question {
   options: string[];
   correct_answer: number;
   level: string;
+  domain?: string;
 }
 
 const Quiz = () => {
@@ -249,8 +251,13 @@ const Quiz = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-xl">
-              {currentQ.question_text}
+              <FractionDisplay text={currentQ.question_text} />
             </CardTitle>
+            {currentQ.domain && (
+              <CardDescription className="text-sm text-muted-foreground">
+                Domein: {currentQ.domain}
+              </CardDescription>
+            )}
           </CardHeader>
           <CardContent className="space-y-6">
             <RadioGroup value={selectedAnswer?.toString()} onValueChange={handleAnswerSelect}>
@@ -258,7 +265,7 @@ const Quiz = () => {
                 <div key={index} className="flex items-center space-x-2">
                   <RadioGroupItem value={index.toString()} id={`option-${index}`} />
                   <Label htmlFor={`option-${index}`} className="flex-1 cursor-pointer p-3 rounded-lg hover:bg-accent/50">
-                    {option}
+                    <FractionDisplay text={option} />
                   </Label>
                 </div>
               ))}
