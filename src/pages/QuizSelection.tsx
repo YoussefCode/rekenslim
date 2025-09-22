@@ -16,7 +16,7 @@ const QuizSelection = () => {
       color: "from-blue-500 to-blue-600",
     },
     {
-      id: "2f",
+      id: "f2",
       title: "Niveau 2F Rekentest", 
       description: "Gevorderde rekenvaardigheden voor niveau 2F",
       icon: TrendingUp,
