@@ -110,4 +110,25 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
   }
+
+  /* Fraction display styles */
+  .fraction-container .fraction {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    vertical-align: middle;
+    margin: 0 2px;
+    font-size: 0.9em;
+  }
+
+  .fraction-container .numerator {
+    border-bottom: 1px solid currentColor;
+    padding: 0 2px;
+    line-height: 1;
+  }
+
+  .fraction-container .denominator {
+    padding: 0 2px;
+    line-height: 1;
+  }
 }

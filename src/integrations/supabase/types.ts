@@ -72,6 +72,7 @@ export type Database = {
         Row: {
           correct_answer: number
           created_at: string
+          domain: string | null
           id: string
           level: string
           options: Json
@@ -81,6 +82,7 @@ export type Database = {
         Insert: {
           correct_answer: number
           created_at?: string
+          domain?: string | null
           id?: string
           level?: string
           options: Json
@@ -90,6 +92,7 @@ export type Database = {
         Update: {
           correct_answer?: number
           created_at?: string
+          domain?: string | null
           id?: string
           level?: string
           options?: Json
@@ -101,6 +104,7 @@ export type Database = {
       quiz_submissions: {
         Row: {
           answers: Json
+          domain_results: Json | null
           email: string
           first_name: string
           id: string
@@ -115,6 +119,7 @@ export type Database = {
         }
         Insert: {
           answers: Json
+          domain_results?: Json | null
           email: string
           first_name: string
           id?: string
@@ -129,6 +134,7 @@ export type Database = {
         }
         Update: {
           answers?: Json
+          domain_results?: Json | null
           email?: string
           first_name?: string
           id?: string
