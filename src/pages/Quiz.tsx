@@ -37,6 +37,7 @@ const Quiz = () => {
   const { getContent } = useContent();
   const [resultScore, setResultScore] = useState<number | null>(null);
   const [resultPercentage, setResultPercentage] = useState<number | null>(null);
+  const [domainResults, setDomainResults] = useState<Record<string, { correct: number; total: number }> | null>(null);
 
   useEffect(() => {
     fetchQuestions();
@@ -119,6 +120,7 @@ const Quiz = () => {
 
       setResultScore(data?.score ?? null);
       setResultPercentage(data?.percentage ?? null);
+      setDomainResults(data?.domain_results ?? null);
       setSelectedAnswers(answers);
       setShowResults(true);
       toast({
@@ -149,6 +151,7 @@ const Quiz = () => {
     setSelectedAnswer(null);
     setShowResults(false);
     setUserInfo(null);
+    setDomainResults(null);
   };
 
   if (loading) {
@@ -211,6 +214,31 @@ const Quiz = () => {
                   <div className="text-sm text-muted-foreground">Foute antwoorden</div>
                 </div>
               </div>
+
+              {/* Domain Results */}
+              {domainResults && Object.keys(domainResults).length > 0 && (
+                <div className="mt-8">
+                  <h3 className="text-xl font-semibold mb-4">Resultaten per Domein</h3>
+                  <div className="grid gap-3">
+                    {Object.entries(domainResults).map(([domain, result]) => {
+                      const domainPercentage = Math.round((result.correct / result.total) * 100);
+                      return (
+                        <div key={domain} className="p-4 bg-card border rounded-lg">
+                          <div className="flex justify-between items-center">
+                            <span className="font-medium">{domain}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {result.correct}/{result.total} ({domainPercentage}%)
+                            </span>
+                          </div>
+                          <div className="mt-2">
+                            <Progress value={domainPercentage} className="h-2" />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
             
             <div className="text-center space-y-4">
