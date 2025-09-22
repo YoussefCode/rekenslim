@@ -22,7 +22,7 @@ interface Question {
 }
 
 const Quiz = () => {
-  const { level = 'f2' } = useParams<{ level: string }>();
+  const { level = 'basis' } = useParams<{ level: string }>();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
