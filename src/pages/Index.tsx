@@ -262,8 +262,9 @@ const Index = () => {
                 <span>Amsterdam</span>
               </div>
             </div>
-            <div className="mt-8 text-lg font-semibold">
-              Rekenslim.nl – Samen bouwen we aan rekenvaardigheid!
+            <div className="mt-8 text-lg font-semibold flex justify-between items-center">
+              <span>Rekenslim.nl – Samen bouwen we aan rekenvaardigheid!</span>
+              <span className="text-sm text-muted-foreground">elmowebsites</span>
             </div>
           </div>
         </div>
