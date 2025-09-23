@@ -373,7 +373,10 @@ const Quiz = () => {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">{getContent('quiz_title', `Rekenquiz ${level === '2f' ? 'Niveau 2F' : 'Basis'}`)}</h1>
             <span className="text-sm text-muted-foreground">
-              Vraag {currentQuestion + 1} van {questions.length}
+              {level === 'f2' ? 
+                `Domein ${currentDomainIndex + 1}/${domainOrder.length} - Vraag ${currentQuestion + 1}/${getCurrentQuestions().length}` :
+                `Vraag ${currentQuestion + 1} van ${questions.length}`
+              }
             </span>
           </div>
           <Progress value={progress} className="w-full" />
