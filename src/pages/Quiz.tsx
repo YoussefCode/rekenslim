@@ -57,9 +57,12 @@ const Quiz = () => {
       if (error) throw error;
       
       const processedQuestions = (data || []).map((q: any) => ({
-        ...q,
+        id: q.id,
+        question_text: q.question_text,
         options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options,
-        level: q.level || level
+        correct_answer: q.correct_answer,
+        level: q.level || level,
+        domain: q.domain
       }));
       
       setQuestions(processedQuestions);
