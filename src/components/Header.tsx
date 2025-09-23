@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-
 const Header = () => {
-  const { user, profile, signOut } = useAuth();
-
-  return (
-    <header className="bg-primary text-primary-foreground">
+  const {
+    user,
+    profile,
+    signOut
+  } = useAuth();
+  return <header className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3">
@@ -23,33 +24,23 @@ const Header = () => {
             <Link to="/" className="hover:opacity-80 transition-opacity">
               Home
             </Link>
-            <Link to="/quiz" className="hover:opacity-80 transition-opacity">
-              Quiz
-            </Link>
-            {profile?.role === 'admin' && (
-              <>
+            
+            {profile?.role === 'admin' && <>
                 <Link to="/admin" className="hover:opacity-80 transition-opacity">
                   Admin
                 </Link>
-                {user && (
-                  <Button variant="secondary" size="sm" onClick={signOut}>
+                {user && <Button variant="secondary" size="sm" onClick={signOut}>
                     Uitloggen
-                  </Button>
-                )}
-              </>
-            )}
-            {!user && (
-              <Link to="/auth">
+                  </Button>}
+              </>}
+            {!user && <Link to="/auth">
                 <Button variant="secondary" size="sm">
                   Inloggen
                 </Button>
-              </Link>
-            )}
+              </Link>}
           </nav>
         </div>
       </div>
-    </header>
-  );
+    </header>;
 };
-
 export default Header;
