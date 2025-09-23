@@ -59,6 +59,7 @@ const Admin = () => {
         .from('questions')
         .select('*')
         .eq('level', currentLevel)
+        .not('domain', 'is', null) // Only show questions with domains
         .order('created_at', { ascending: true });
 
       if (error) throw error;
