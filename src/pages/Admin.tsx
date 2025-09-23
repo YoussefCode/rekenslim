@@ -17,6 +17,7 @@ interface Question {
   options: string[];
   correct_answer: number;
   level: string;
+  domain?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -40,6 +41,7 @@ const Admin = () => {
   const [options, setOptions] = useState(['', '', '', '']);
   const [correctAnswer, setCorrectAnswer] = useState(0);
   const [selectedLevel, setSelectedLevel] = useState('basis');
+  const [selectedDomain, setSelectedDomain] = useState('');
   const [currentLevel, setCurrentLevel] = useState('basis');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isContentDialogOpen, setIsContentDialogOpen] = useState(false);
@@ -96,7 +98,8 @@ const Admin = () => {
             question_text: questionText,
             options: JSON.stringify(options),
             correct_answer: correctAnswer,
-            level: selectedLevel
+            level: selectedLevel,
+            domain: selectedDomain || null
           })
           .eq('id', editingQuestion.id);
 
@@ -109,7 +112,8 @@ const Admin = () => {
             question_text: questionText,
             options: JSON.stringify(options),
             correct_answer: correctAnswer,
-            level: selectedLevel
+            level: selectedLevel,
+            domain: selectedDomain || null
           });
 
         if (error) throw error;
@@ -153,6 +157,7 @@ const Admin = () => {
     setOptions(question.options);
     setCorrectAnswer(question.correct_answer);
     setSelectedLevel(question.level);
+    setSelectedDomain(question.domain || '');
     setIsDialogOpen(true);
   };
 
@@ -222,6 +227,7 @@ const Admin = () => {
     setOptions(['', '', '', '']);
     setCorrectAnswer(0);
     setSelectedLevel(currentLevel);
+    setSelectedDomain('');
   };
 
   const addNewQuestion = () => {
@@ -373,17 +379,35 @@ const Admin = () => {
             </DialogHeader>
             
             <div className="space-y-4">
-              <div>
-                <Label htmlFor="level">Niveau</Label>
-                <Select value={selectedLevel} onValueChange={setSelectedLevel}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Kies niveau" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="basis">Basis</SelectItem>
-                    <SelectItem value="2f">Niveau 2F</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="level">Niveau</Label>
+                  <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Kies niveau" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="basis">Basis</SelectItem>
+                      <SelectItem value="2f">Niveau 2F</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <Label htmlFor="domain">Domein (optioneel)</Label>
+                  <Select value={selectedDomain} onValueChange={setSelectedDomain}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Kies domein" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">Geen domein</SelectItem>
+                      <SelectItem value="Verhoudingen">Verhoudingen</SelectItem>
+                      <SelectItem value="Procenten">Procenten</SelectItem>
+                      <SelectItem value="Kommagetallen">Kommagetallen</SelectItem>
+                      <SelectItem value="Meten en Meetkunde">Meten en Meetkunde</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
               <div>
