@@ -397,7 +397,7 @@ const Quiz = () => {
             )}
           </CardHeader>
           <CardContent className="space-y-6">
-            <RadioGroup value={selectedAnswer?.toString()} onValueChange={handleAnswerSelect}>
+            <RadioGroup value={selectedAnswer?.toString() || ""} onValueChange={handleAnswerSelect}>
               {currentQ.options.map((option, index) => (
                 <div key={index} className="flex items-center space-x-2">
                   <RadioGroupItem value={index.toString()} id={`option-${index}`} />
