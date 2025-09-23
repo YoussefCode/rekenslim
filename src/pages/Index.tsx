@@ -5,14 +5,17 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import { useContent } from "@/hooks/useContent";
-
 const Index = () => {
   const navigate = useNavigate();
-  const { user, profile } = useAuth();
-  const { getContent, loading } = useContent();
-
-  return (
-    <div className="min-h-screen bg-background">
+  const {
+    user,
+    profile
+  } = useAuth();
+  const {
+    getContent,
+    loading
+  } = useContent();
+  return <div className="min-h-screen bg-background">
       <Header />
       
       {/* Quiz Section */}
@@ -44,18 +47,14 @@ const Index = () => {
                   <Calculator className="mr-2 h-4 w-4" />
                   Start test
                 </Button>
-                {user && profile?.role === 'admin' && (
-                  <Button onClick={() => navigate('/admin')} variant="outline" size="lg" className="hover-scale">
+                {user && profile?.role === 'admin' && <Button onClick={() => navigate('/admin')} variant="outline" size="lg" className="hover-scale">
                     <Target className="mr-2 h-4 w-4" />
                     Beheer
-                  </Button>
-                )}
+                  </Button>}
               </div>
-              {user && (
-                <p className="text-sm text-muted-foreground">
+              {user && <p className="text-sm text-muted-foreground">
                   Welkom terug{profile?.role === 'admin' ? ', Beheerder' : ''}!
-                </p>
-              )}
+                </p>}
             </div>
           </div>
         </div>
@@ -263,14 +262,12 @@ const Index = () => {
               </div>
             </div>
             <div className="mt-8 text-lg font-semibold flex justify-between items-center">
-              <span>Rekenslim.nl – Samen bouwen we aan rekenvaardigheid!</span>
-              <span className="text-sm text-muted-foreground">elmowebsites</span>
+              <span>                                                   Rekenslim.nl – Samen bouwen we aan rekenvaardigheid!</span>
+              
             </div>
           </div>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
