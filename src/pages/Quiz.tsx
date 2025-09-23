@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import UserInfoForm, { UserInfo } from "@/components/UserInfoForm";
 import { useContent } from "@/hooks/useContent";
 import FractionDisplay from "@/components/FractionDisplay";
+import DomainStartScreen from "@/components/DomainStartScreen";
 
 interface Question {
   id: string;
@@ -38,6 +39,12 @@ const Quiz = () => {
   const [resultScore, setResultScore] = useState<number | null>(null);
   const [resultPercentage, setResultPercentage] = useState<number | null>(null);
   const [domainResults, setDomainResults] = useState<Record<string, { correct: number; total: number }> | null>(null);
+  
+  // Domain-based quiz state
+  const [currentDomainIndex, setCurrentDomainIndex] = useState(0);
+  const [showDomainStart, setShowDomainStart] = useState(false);
+  const [questionsByDomain, setQuestionsByDomain] = useState<Record<string, Question[]>>({});
+  const [domainOrder, setDomainOrder] = useState<string[]>([]);
 
   useEffect(() => {
     fetchQuestions();
@@ -52,10 +59,30 @@ const Quiz = () => {
       const processedQuestions = (data || []).map((q: any) => ({
         ...q,
         options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options,
-        level: q.level || level // Fallback naar de route parameter als level niet bestaat
+        level: q.level || level
       }));
       
       setQuestions(processedQuestions);
+      
+      // Group questions by domain for f2 level
+      if (level === 'f2') {
+        const grouped = processedQuestions.reduce((acc: Record<string, Question[]>, question: Question) => {
+          const domain = question.domain || 'Algemeen';
+          if (!acc[domain]) {
+            acc[domain] = [];
+          }
+          acc[domain].push(question);
+          return acc;
+        }, {});
+        
+        setQuestionsByDomain(grouped);
+        const domains = Object.keys(grouped);
+        setDomainOrder(domains);
+        
+        if (domains.length > 0) {
+          setShowDomainStart(true);
+        }
+      }
     } catch (error) {
       toast({
         title: "Fout bij laden vragen",
@@ -82,16 +109,64 @@ const Quiz = () => {
       return;
     }
 
+    const currentQuestions = getCurrentQuestions();
+    const globalQuestionIndex = getGlobalQuestionIndex();
+    
     const newSelectedAnswers = [...selectedAnswers];
-    newSelectedAnswers[currentQuestion] = selectedAnswer;
+    newSelectedAnswers[globalQuestionIndex] = selectedAnswer;
     setSelectedAnswers(newSelectedAnswers);
 
-    if (currentQuestion + 1 < questions.length) {
-      setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(null);
+    // Check if we're at the end of current domain (f2 level)
+    if (level === 'f2' && domainOrder.length > 0) {
+      if (currentQuestion + 1 < currentQuestions.length) {
+        // More questions in current domain
+        setCurrentQuestion(currentQuestion + 1);
+        setSelectedAnswer(null);
+      } else {
+        // End of current domain
+        if (currentDomainIndex + 1 < domainOrder.length) {
+          // Move to next domain
+          setCurrentDomainIndex(currentDomainIndex + 1);
+          setCurrentQuestion(0);
+          setSelectedAnswer(null);
+          setShowDomainStart(true);
+        } else {
+          // All domains completed
+          submitQuizResults(newSelectedAnswers);
+        }
+      }
     } else {
-      submitQuizResults(newSelectedAnswers);
+      // Standard quiz flow (basis level)
+      if (currentQuestion + 1 < questions.length) {
+        setCurrentQuestion(currentQuestion + 1);
+        setSelectedAnswer(null);
+      } else {
+        submitQuizResults(newSelectedAnswers);
+      }
     }
+  };
+
+  const getCurrentQuestions = () => {
+    if (level === 'f2' && domainOrder.length > 0) {
+      const currentDomain = domainOrder[currentDomainIndex];
+      return questionsByDomain[currentDomain] || [];
+    }
+    return questions;
+  };
+
+  const getGlobalQuestionIndex = () => {
+    if (level === 'f2' && domainOrder.length > 0) {
+      let index = 0;
+      // Add questions from previous domains
+      for (let i = 0; i < currentDomainIndex; i++) {
+        const domain = domainOrder[i];
+        index += questionsByDomain[domain]?.length || 0;
+      }
+      // Add current question index
+      index += currentQuestion;
+      return index;
+    }
+    return currentQuestion;
   };
 
   const submitQuizResults = async (answers: number[]) => {
@@ -145,6 +220,12 @@ const Quiz = () => {
     }, 0);
   };
 
+  const handleDomainStart = () => {
+    setShowDomainStart(false);
+    setCurrentQuestion(0);
+    setSelectedAnswer(null);
+  };
+
   const handleRestart = () => {
     setCurrentQuestion(0);
     setSelectedAnswers([]);
@@ -152,6 +233,11 @@ const Quiz = () => {
     setShowResults(false);
     setUserInfo(null);
     setDomainResults(null);
+    setCurrentDomainIndex(0);
+    
+    if (level === 'f2' && domainOrder.length > 0) {
+      setShowDomainStart(true);
+    }
   };
 
   if (loading) {
@@ -184,6 +270,22 @@ const Quiz = () => {
 
   if (!userInfo) {
     return <UserInfoForm onSubmit={setUserInfo} />;
+  }
+
+  // Show domain start screen for f2 level
+  if (level === 'f2' && showDomainStart && domainOrder.length > 0) {
+    const currentDomain = domainOrder[currentDomainIndex];
+    const domainQuestions = questionsByDomain[currentDomain] || [];
+    
+    return (
+      <DomainStartScreen
+        domain={currentDomain}
+        questionCount={domainQuestions.length}
+        totalDomains={domainOrder.length}
+        currentDomainIndex={currentDomainIndex}
+        onStart={handleDomainStart}
+      />
+    );
   }
 
   if (showResults) {
@@ -260,8 +362,9 @@ const Quiz = () => {
     );
   }
 
-  const progress = ((currentQuestion + 1) / questions.length) * 100;
-  const currentQ = questions[currentQuestion];
+  const currentQuestions = getCurrentQuestions();
+  const progress = currentQuestions.length > 0 ? ((currentQuestion + 1) / currentQuestions.length) * 100 : 0;
+  const currentQ = currentQuestions[currentQuestion];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
@@ -305,7 +408,8 @@ const Quiz = () => {
                 onClick={() => {
                   if (currentQuestion > 0) {
                     setCurrentQuestion(currentQuestion - 1);
-                    setSelectedAnswer(selectedAnswers[currentQuestion - 1] || null);
+                    const globalIndex = getGlobalQuestionIndex() - 1;
+                    setSelectedAnswer(selectedAnswers[globalIndex] || null);
                   }
                 }}
                 disabled={currentQuestion === 0}
@@ -314,7 +418,10 @@ const Quiz = () => {
               </Button>
               
               <Button onClick={handleNext} disabled={isSubmitting}>
-                {isSubmitting ? 'Bezig...' : currentQuestion === questions.length - 1 ? 'Voltooien' : 'Volgende'}
+                {isSubmitting ? 'Bezig...' : 
+                 level === 'f2' ? 
+                   (currentQuestion === currentQuestions.length - 1 && currentDomainIndex === domainOrder.length - 1 ? 'Voltooien' : 'Volgende') :
+                   (currentQuestion === questions.length - 1 ? 'Voltooien' : 'Volgende')}
               </Button>
             </div>
           </CardContent>
