@@ -67,8 +67,8 @@ const Quiz = () => {
       
       setQuestions(processedQuestions);
       
-      // Group questions by domain for f2 level
-      if (level === 'f2') {
+      // Group questions by domain for basis and f2 level
+      if (level === 'basis' || level === 'f2') {
         const grouped = processedQuestions.reduce((acc: Record<string, Question[]>, question: Question) => {
           const domain = question.domain || 'Algemeen';
           if (!acc[domain]) {
@@ -119,8 +119,8 @@ const Quiz = () => {
     newSelectedAnswers[globalQuestionIndex] = selectedAnswer;
     setSelectedAnswers(newSelectedAnswers);
 
-    // Check if we're at the end of current domain (f2 level)
-    if (level === 'f2' && domainOrder.length > 0) {
+    // Check if we're at the end of current domain (basis and f2 level)
+    if ((level === 'basis' || level === 'f2') && domainOrder.length > 0) {
       if (currentQuestion + 1 < currentQuestions.length) {
         // More questions in current domain
         setCurrentQuestion(currentQuestion + 1);
@@ -138,19 +138,19 @@ const Quiz = () => {
           submitQuizResults(newSelectedAnswers);
         }
       }
-    } else {
-      // Standard quiz flow (basis level)
-      if (currentQuestion + 1 < questions.length) {
-        setCurrentQuestion(currentQuestion + 1);
-        setSelectedAnswer(null);
-      } else {
-        submitQuizResults(newSelectedAnswers);
-      }
-    }
+        } else {
+          // Standard quiz flow (for levels without domains)
+          if (currentQuestion + 1 < questions.length) {
+            setCurrentQuestion(currentQuestion + 1);
+            setSelectedAnswer(null);
+          } else {
+            submitQuizResults(newSelectedAnswers);
+          }
+        }
   };
 
   const getCurrentQuestions = () => {
-    if (level === 'f2' && domainOrder.length > 0) {
+    if ((level === 'basis' || level === 'f2') && domainOrder.length > 0) {
       const currentDomain = domainOrder[currentDomainIndex];
       return questionsByDomain[currentDomain] || [];
     }
@@ -158,7 +158,7 @@ const Quiz = () => {
   };
 
   const getGlobalQuestionIndex = () => {
-    if (level === 'f2' && domainOrder.length > 0) {
+    if ((level === 'basis' || level === 'f2') && domainOrder.length > 0) {
       let index = 0;
       // Add questions from previous domains
       for (let i = 0; i < currentDomainIndex; i++) {
@@ -238,7 +238,7 @@ const Quiz = () => {
     setDomainResults(null);
     setCurrentDomainIndex(0);
     
-    if (level === 'f2' && domainOrder.length > 0) {
+    if ((level === 'basis' || level === 'f2') && domainOrder.length > 0) {
       setShowDomainStart(true);
     }
   };
@@ -275,8 +275,8 @@ const Quiz = () => {
     return <UserInfoForm onSubmit={setUserInfo} />;
   }
 
-  // Show domain start screen for f2 level
-  if (level === 'f2' && showDomainStart && domainOrder.length > 0) {
+  // Show domain start screen for basis and f2 level
+  if ((level === 'basis' || level === 'f2') && showDomainStart && domainOrder.length > 0) {
     const currentDomain = domainOrder[currentDomainIndex];
     const domainQuestions = questionsByDomain[currentDomain] || [];
     
@@ -376,7 +376,7 @@ const Quiz = () => {
           <div className="flex justify-between items-center">
             <h1 className="text-2xl font-bold">{getContent('quiz_title', `Rekenquiz ${level === '2f' ? 'Niveau 2F' : 'Basis'}`)}</h1>
             <span className="text-sm text-muted-foreground">
-              {level === 'f2' ? 
+              {(level === 'basis' || level === 'f2') && domainOrder.length > 0 ? 
                 `Domein ${currentDomainIndex + 1}/${domainOrder.length} - Vraag ${currentQuestion + 1}/${getCurrentQuestions().length}` :
                 `Vraag ${currentQuestion + 1} van ${questions.length}`
               }
@@ -425,7 +425,7 @@ const Quiz = () => {
               
               <Button onClick={handleNext} disabled={isSubmitting}>
                 {isSubmitting ? 'Bezig...' : 
-                 level === 'f2' ? 
+                 (level === 'basis' || level === 'f2') && domainOrder.length > 0 ? 
                    (currentQuestion === currentQuestions.length - 1 && currentDomainIndex === domainOrder.length - 1 ? 'Voltooien' : 'Volgende') :
                    (currentQuestion === questions.length - 1 ? 'Voltooien' : 'Volgende')}
               </Button>
