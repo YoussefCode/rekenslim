@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-
 interface Question {
   id: string;
   question_text: string;
@@ -22,7 +21,6 @@ interface Question {
   created_at?: string;
   updated_at?: string;
 }
-
 interface Content {
   id: string;
   key: string;
@@ -31,7 +29,6 @@ interface Content {
   created_at?: string;
   updated_at?: string;
 }
-
 interface QuizResult {
   id: string;
   submitted_at: string;
@@ -44,9 +41,11 @@ interface QuizResult {
   score: number;
   total_questions: number;
   percentage: number;
-  domain_results?: Record<string, { correct: number; total: number }>;
+  domain_results?: Record<string, {
+    correct: number;
+    total: number;
+  }>;
 }
-
 const Admin = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [content, setContent] = useState<Content[]>([]);
@@ -64,108 +63,104 @@ const Admin = () => {
   const [isContentDialogOpen, setIsContentDialogOpen] = useState(false);
   const [contentValue, setContentValue] = useState('');
   const [nameFilter, setNameFilter] = useState('');
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   useEffect(() => {
     fetchQuestions();
     fetchContent();
     fetchResults();
   }, [currentLevel]);
-
   const fetchQuestions = async () => {
     try {
-      const { data, error } = await supabase
-        .from('questions')
-        .select('*')
-        .eq('level', currentLevel)
-        .order('created_at', { ascending: true });
-
+      const {
+        data,
+        error
+      } = await supabase.from('questions').select('*').eq('level', currentLevel).order('created_at', {
+        ascending: true
+      });
       if (error) throw error;
-      
       const processedQuestions = (data || []).map(q => ({
         ...q,
         options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
       }));
-      
       setQuestions(processedQuestions);
     } catch (error) {
       toast({
         title: "Fout bij laden vragen",
         description: "Kon vragen niet laden",
-        variant: "destructive",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
     }
   };
-
   const fetchResults = async () => {
     try {
-      const { data, error } = await supabase
-        .from('quiz_submissions')
-        .select('*')
-        .order('submitted_at', { ascending: false });
-
+      const {
+        data,
+        error
+      } = await supabase.from('quiz_submissions').select('*').order('submitted_at', {
+        ascending: false
+      });
       if (error) throw error;
-      
+
       // Type the data properly
       const typedResults: QuizResult[] = (data || []).map(item => ({
         ...item,
-        domain_results: typeof item.domain_results === 'object' && item.domain_results !== null 
-          ? item.domain_results as Record<string, { correct: number; total: number }>
-          : undefined
+        domain_results: typeof item.domain_results === 'object' && item.domain_results !== null ? item.domain_results as Record<string, {
+          correct: number;
+          total: number;
+        }> : undefined
       }));
-      
       setResults(typedResults);
     } catch (error) {
       toast({
         title: "Fout bij laden resultaten",
         description: "Kon quiz resultaten niet laden",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const saveQuestion = async () => {
     if (!questionText.trim() || options.some(option => !option.trim())) {
       toast({
         title: "Validatiefout",
         description: "Vul alle velden in",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     try {
       if (editingQuestion) {
-        const { error } = await supabase
-          .from('questions')
-          .update({
-            question_text: questionText,
-            options: JSON.stringify(options),
-            correct_answer: correctAnswer,
-            level: selectedLevel,
-            domain: selectedDomain || null
-          })
-          .eq('id', editingQuestion.id);
-
+        const {
+          error
+        } = await supabase.from('questions').update({
+          question_text: questionText,
+          options: JSON.stringify(options),
+          correct_answer: correctAnswer,
+          level: selectedLevel,
+          domain: selectedDomain || null
+        }).eq('id', editingQuestion.id);
         if (error) throw error;
-        toast({ title: "Vraag bijgewerkt" });
+        toast({
+          title: "Vraag bijgewerkt"
+        });
       } else {
-        const { error } = await supabase
-          .from('questions')
-          .insert({
-            question_text: questionText,
-            options: JSON.stringify(options),
-            correct_answer: correctAnswer,
-            level: selectedLevel,
-            domain: selectedDomain || null
-          });
-
+        const {
+          error
+        } = await supabase.from('questions').insert({
+          question_text: questionText,
+          options: JSON.stringify(options),
+          correct_answer: correctAnswer,
+          level: selectedLevel,
+          domain: selectedDomain || null
+        });
         if (error) throw error;
-        toast({ title: "Vraag toegevoegd" });
+        toast({
+          title: "Vraag toegevoegd"
+        });
       }
-
       resetForm();
       fetchQuestions();
       setIsDialogOpen(false);
@@ -173,30 +168,28 @@ const Admin = () => {
       toast({
         title: "Fout bij opslaan",
         description: "Kon vraag niet opslaan",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const deleteQuestion = async (id: string) => {
     try {
-      const { error } = await supabase
-        .from('questions')
-        .delete()
-        .eq('id', id);
-
+      const {
+        error
+      } = await supabase.from('questions').delete().eq('id', id);
       if (error) throw error;
-      toast({ title: "Vraag verwijderd" });
+      toast({
+        title: "Vraag verwijderd"
+      });
       fetchQuestions();
     } catch (error) {
       toast({
         title: "Fout bij verwijderen",
         description: "Kon vraag niet verwijderen",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const editQuestion = (question: Question) => {
     setEditingQuestion(question);
     setQuestionText(question.question_text);
@@ -206,44 +199,43 @@ const Admin = () => {
     setSelectedDomain(question.domain || '');
     setIsDialogOpen(true);
   };
-
   const fetchContent = async () => {
     try {
-      const { data, error } = await supabase
-        .from('content')
-        .select('*')
-        .order('key', { ascending: true });
-
+      const {
+        data,
+        error
+      } = await supabase.from('content').select('*').order('key', {
+        ascending: true
+      });
       if (error) throw error;
       setContent(data || []);
     } catch (error) {
       toast({
         title: "Fout bij laden content",
         description: "Kon website tekst niet laden",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const saveContent = async () => {
     if (!editingContent || !contentValue.trim()) {
       toast({
         title: "Validatiefout",
         description: "Vul alle velden in",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
     try {
-      const { error } = await supabase
-        .from('content')
-        .update({ value: contentValue })
-        .eq('id', editingContent.id);
-
+      const {
+        error
+      } = await supabase.from('content').update({
+        value: contentValue
+      }).eq('id', editingContent.id);
       if (error) throw error;
-      toast({ title: "Content bijgewerkt" });
-      
+      toast({
+        title: "Content bijgewerkt"
+      });
       resetContentForm();
       fetchContent();
       setIsContentDialogOpen(false);
@@ -251,22 +243,19 @@ const Admin = () => {
       toast({
         title: "Fout bij opslaan",
         description: "Kon content niet opslaan",
-        variant: "destructive",
+        variant: "destructive"
       });
     }
   };
-
   const editContent = (contentItem: Content) => {
     setEditingContent(contentItem);
     setContentValue(contentItem.value);
     setIsContentDialogOpen(true);
   };
-
   const resetContentForm = () => {
     setEditingContent(null);
     setContentValue('');
   };
-
   const resetForm = () => {
     setEditingQuestion(null);
     setQuestionText('');
@@ -275,22 +264,16 @@ const Admin = () => {
     setSelectedLevel(currentLevel);
     setSelectedDomain('');
   };
-
   const addNewQuestion = () => {
     resetForm();
     setIsDialogOpen(true);
   };
-
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
+    return <div className="min-h-screen flex items-center justify-center">
         <div>Laden...</div>
-      </div>
-    );
+      </div>;
   }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
+  return <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
@@ -303,7 +286,7 @@ const Admin = () => {
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="questions">Quiz Vragen</TabsTrigger>
             <TabsTrigger value="results">Quiz Resultaten</TabsTrigger>
-            <TabsTrigger value="content">Website Tekst</TabsTrigger>
+            
           </TabsList>
           
           <TabsContent value="questions" className="space-y-4">
@@ -327,15 +310,11 @@ const Admin = () => {
             </div>
 
             <div className="grid gap-4">
-              {questions.length === 0 ? (
-                <Card>
+              {questions.length === 0 ? <Card>
                   <CardContent className="text-center py-8">
                     <p className="text-muted-foreground">Nog geen vragen voor niveau {currentLevel === 'basis' ? 'Basis' : '2F'}</p>
                   </CardContent>
-                </Card>
-              ) : (
-                questions.map((question, index) => (
-                  <Card key={question.id}>
+                </Card> : questions.map((question, index) => <Card key={question.id}>
                     <CardHeader>
                       <div className="flex justify-between items-start">
                         <div>
@@ -343,18 +322,10 @@ const Admin = () => {
                           <CardDescription>{question.question_text}</CardDescription>
                         </div>
                       <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => editQuestion(question)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => editQuestion(question)}>
                           <Edit className="w-4 h-4" />
                         </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => deleteQuestion(question.id)}
-                        >
+                        <Button variant="destructive" size="sm" onClick={() => deleteQuestion(question.id)}>
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
@@ -362,86 +333,80 @@ const Admin = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-2">
-                      {question.options.map((option, optionIndex) => (
-                        <div
-                          key={optionIndex}
-                          className={`p-2 rounded border ${
-                            optionIndex === question.correct_answer
-                              ? 'bg-green-50 border-green-200'
-                              : 'bg-gray-50 border-gray-200'
-                          }`}
-                        >
+                      {question.options.map((option, optionIndex) => <div key={optionIndex} className={`p-2 rounded border ${optionIndex === question.correct_answer ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
                           <span className="font-medium mr-2">{String.fromCharCode(65 + optionIndex)}.</span>
                           {option}
-                          {optionIndex === question.correct_answer && (
-                            <span className="ml-2 text-green-600 font-medium">✓ Correct</span>
-                          )}
-                        </div>
-                      ))}
+                          {optionIndex === question.correct_answer && <span className="ml-2 text-green-600 font-medium">✓ Correct</span>}
+                        </div>)}
                     </div>
                   </CardContent>
-                </Card>
-              )))}
+                </Card>)}
             </div>
           </TabsContent>
 
           <TabsContent value="results" className="space-y-4">
             {(() => {
-              const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
-              
-              // Filter results by name first
-              const filteredResults = results.filter(result => {
-                if (!nameFilter) return true;
-                const fullName = `${result.first_name} ${result.last_name}`.toLowerCase();
-                return fullName.includes(nameFilter.toLowerCase());
-              });
-              
-              // Calculate overall statistics using filtered results
-              const totalSubmissions = filteredResults.length;
-              const averageScore = filteredResults.length > 0 ? 
-                filteredResults.reduce((sum, r) => sum + r.percentage, 0) / filteredResults.length : 0;
-              
-              // Group by level using filtered results
-              const levelStats = filteredResults.reduce((acc, result) => {
-                const level = result.level === 'basis' ? 'Basis' : result.level === '2f' ? 'Niveau 2F' : result.level;
-                if (!acc[level]) {
-                  acc[level] = { count: 0, totalScore: 0 };
-                }
-                acc[level].count++;
-                acc[level].totalScore += result.percentage;
-                return acc;
-              }, {} as Record<string, { count: number; totalScore: number }>);
+            const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 
-              const levelChartData = Object.entries(levelStats).map(([level, stats]) => ({
-                level,
-                submissions: stats.count,
-                averageScore: stats.count > 0 ? Math.round(stats.totalScore / stats.count) : 0
-              }));
+            // Filter results by name first
+            const filteredResults = results.filter(result => {
+              if (!nameFilter) return true;
+              const fullName = `${result.first_name} ${result.last_name}`.toLowerCase();
+              return fullName.includes(nameFilter.toLowerCase());
+            });
 
-              // Domain performance analysis using filtered results
-              const domainStats = filteredResults.reduce((acc, result) => {
-                if (result.domain_results) {
-                  Object.entries(result.domain_results).forEach(([domain, stats]) => {
-                    if (!acc[domain]) {
-                      acc[domain] = { totalCorrect: 0, totalQuestions: 0 };
-                    }
-                    acc[domain].totalCorrect += stats.correct;
-                    acc[domain].totalQuestions += stats.total;
-                  });
-                }
-                return acc;
-              }, {} as Record<string, { totalCorrect: number; totalQuestions: number }>);
+            // Calculate overall statistics using filtered results
+            const totalSubmissions = filteredResults.length;
+            const averageScore = filteredResults.length > 0 ? filteredResults.reduce((sum, r) => sum + r.percentage, 0) / filteredResults.length : 0;
 
-              const domainChartData = Object.entries(domainStats).map(([domain, stats]) => ({
-                domain,
-                percentage: stats.totalQuestions > 0 ? Math.round((stats.totalCorrect / stats.totalQuestions) * 100) : 0,
-                correct: stats.totalCorrect,
-                total: stats.totalQuestions
-              }));
+            // Group by level using filtered results
+            const levelStats = filteredResults.reduce((acc, result) => {
+              const level = result.level === 'basis' ? 'Basis' : result.level === '2f' ? 'Niveau 2F' : result.level;
+              if (!acc[level]) {
+                acc[level] = {
+                  count: 0,
+                  totalScore: 0
+                };
+              }
+              acc[level].count++;
+              acc[level].totalScore += result.percentage;
+              return acc;
+            }, {} as Record<string, {
+              count: number;
+              totalScore: number;
+            }>);
+            const levelChartData = Object.entries(levelStats).map(([level, stats]) => ({
+              level,
+              submissions: stats.count,
+              averageScore: stats.count > 0 ? Math.round(stats.totalScore / stats.count) : 0
+            }));
 
-
-              return (
-                <>
+            // Domain performance analysis using filtered results
+            const domainStats = filteredResults.reduce((acc, result) => {
+              if (result.domain_results) {
+                Object.entries(result.domain_results).forEach(([domain, stats]) => {
+                  if (!acc[domain]) {
+                    acc[domain] = {
+                      totalCorrect: 0,
+                      totalQuestions: 0
+                    };
+                  }
+                  acc[domain].totalCorrect += stats.correct;
+                  acc[domain].totalQuestions += stats.total;
+                });
+              }
+              return acc;
+            }, {} as Record<string, {
+              totalCorrect: number;
+              totalQuestions: number;
+            }>);
+            const domainChartData = Object.entries(domainStats).map(([domain, stats]) => ({
+              domain,
+              percentage: stats.totalQuestions > 0 ? Math.round(stats.totalCorrect / stats.totalQuestions * 100) : 0,
+              correct: stats.totalCorrect,
+              total: stats.totalQuestions
+            }));
+            return <>
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-semibold">Quiz Resultaten</h2>
                     <div className="flex gap-4 text-sm text-muted-foreground">
@@ -454,13 +419,7 @@ const Admin = () => {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center gap-4">
                       <Label htmlFor="name-filter">Filter op naam:</Label>
-                      <Input
-                        id="name-filter"
-                        placeholder="Zoek op voor- of achternaam..."
-                        value={nameFilter}
-                        onChange={(e) => setNameFilter(e.target.value)}
-                        className="w-64"
-                      />
+                      <Input id="name-filter" placeholder="Zoek op voor- of achternaam..." value={nameFilter} onChange={e => setNameFilter(e.target.value)} className="w-64" />
                     </div>
                     <div className="text-sm text-muted-foreground">
                       {filteredResults.length} van {results.length} resultaten
@@ -562,8 +521,7 @@ const Admin = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {filteredResults.slice(0, 10).map((result) => (
-                                <tr key={result.id} className="border-b hover:bg-muted/50">
+                              {filteredResults.slice(0, 10).map(result => <tr key={result.id} className="border-b hover:bg-muted/50">
                                   <td className="p-2">
                                     {new Date(result.submitted_at).toLocaleDateString('nl-NL')}
                                   </td>
@@ -574,43 +532,32 @@ const Admin = () => {
                                   </td>
                                   <td className="p-2">{result.score}/{result.total_questions}</td>
                                   <td className="p-2">
-                                    <span className={`px-2 py-1 rounded text-xs ${
-                                      result.percentage >= 80 ? 'bg-green-100 text-green-800' :
-                                      result.percentage >= 60 ? 'bg-yellow-100 text-yellow-800' :
-                                      'bg-red-100 text-red-800'
-                                    }`}>
+                                    <span className={`px-2 py-1 rounded text-xs ${result.percentage >= 80 ? 'bg-green-100 text-green-800' : result.percentage >= 60 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
                                       {Math.round(result.percentage)}%
                                     </span>
                                   </td>
-                                </tr>
-                              ))}
+                                </tr>)}
                             </tbody>
                           </table>
                         </div>
                       </CardContent>
                     </Card>
                   </div>
-                </>
-              );
-            })()}
+                </>;
+          })()}
           </TabsContent>
 
           <TabsContent value="content" className="space-y-4">
             <h2 className="text-2xl font-semibold">Website Tekst</h2>
             <div className="grid gap-4">
-              {content.map((contentItem) => (
-                <Card key={contentItem.id}>
+              {content.map(contentItem => <Card key={contentItem.id}>
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
                         <CardTitle className="text-lg capitalize">{contentItem.key.replace('_', ' ')}</CardTitle>
                         <CardDescription>{contentItem.description}</CardDescription>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => editContent(contentItem)}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => editContent(contentItem)}>
                         <Edit className="w-4 h-4" />
                       </Button>
                     </div>
@@ -618,8 +565,7 @@ const Admin = () => {
                   <CardContent>
                     <p className="text-sm bg-muted p-3 rounded">{contentItem.value}</p>
                   </CardContent>
-                </Card>
-              ))}
+                </Card>)}
             </div>
           </TabsContent>
         </Tabs>
@@ -669,37 +615,20 @@ const Admin = () => {
               
               <div>
                 <Label htmlFor="question">Vraag</Label>
-                <Textarea
-                  id="question"
-                  value={questionText}
-                  onChange={(e) => setQuestionText(e.target.value)}
-                  placeholder="Voer de vraag in..."
-                />
+                <Textarea id="question" value={questionText} onChange={e => setQuestionText(e.target.value)} placeholder="Voer de vraag in..." />
               </div>
 
               <div className="space-y-3">
                 <Label>Antwoordopties</Label>
-                {options.map((option, index) => (
-                  <div key={index} className="flex gap-3 items-center">
+                {options.map((option, index) => <div key={index} className="flex gap-3 items-center">
                     <Label className="w-8">{String.fromCharCode(65 + index)}.</Label>
-                    <Input
-                      value={option}
-                      onChange={(e) => {
-                        const newOptions = [...options];
-                        newOptions[index] = e.target.value;
-                        setOptions(newOptions);
-                      }}
-                      placeholder={`Optie ${String.fromCharCode(65 + index)}`}
-                    />
-                    <input
-                      type="radio"
-                      name="correct"
-                      checked={correctAnswer === index}
-                      onChange={() => setCorrectAnswer(index)}
-                      className="w-4 h-4"
-                    />
-                  </div>
-                ))}
+                    <Input value={option} onChange={e => {
+                  const newOptions = [...options];
+                  newOptions[index] = e.target.value;
+                  setOptions(newOptions);
+                }} placeholder={`Optie ${String.fromCharCode(65 + index)}`} />
+                    <input type="radio" name="correct" checked={correctAnswer === index} onChange={() => setCorrectAnswer(index)} className="w-4 h-4" />
+                  </div>)}
               </div>
 
               <div className="flex justify-end gap-3">
@@ -728,13 +657,7 @@ const Admin = () => {
             <div className="space-y-4">
               <div>
                 <Label htmlFor="content">Tekst</Label>
-                <Textarea
-                  id="content"
-                  value={contentValue}
-                  onChange={(e) => setContentValue(e.target.value)}
-                  placeholder="Voer de tekst in..."
-                  rows={4}
-                />
+                <Textarea id="content" value={contentValue} onChange={e => setContentValue(e.target.value)} placeholder="Voer de tekst in..." rows={4} />
               </div>
 
               <div className="flex justify-end gap-3">
@@ -749,8 +672,6 @@ const Admin = () => {
           </DialogContent>
         </Dialog>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Admin;
