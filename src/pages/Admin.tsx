@@ -6,10 +6,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Trash2, Edit, Plus, FileText } from 'lucide-react';
+import { Trash2, Edit, Plus, FileText, BarChart3 } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface Question {
   id: string;
@@ -31,9 +32,25 @@ interface Content {
   updated_at?: string;
 }
 
+interface QuizResult {
+  id: string;
+  submitted_at: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string;
+  parent_name?: string;
+  level: string;
+  score: number;
+  total_questions: number;
+  percentage: number;
+  domain_results?: Record<string, { correct: number; total: number }>;
+}
+
 const Admin = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [content, setContent] = useState<Content[]>([]);
+  const [results, setResults] = useState<QuizResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingQuestion, setEditingQuestion] = useState<Question | null>(null);
   const [editingContent, setEditingContent] = useState<Content | null>(null);
@@ -51,6 +68,7 @@ const Admin = () => {
   useEffect(() => {
     fetchQuestions();
     fetchContent();
+    fetchResults();
   }, [currentLevel]);
 
   const fetchQuestions = async () => {
@@ -77,6 +95,33 @@ const Admin = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchResults = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('quiz_submissions')
+        .select('*')
+        .order('submitted_at', { ascending: false });
+
+      if (error) throw error;
+      
+      // Type the data properly
+      const typedResults: QuizResult[] = (data || []).map(item => ({
+        ...item,
+        domain_results: typeof item.domain_results === 'object' && item.domain_results !== null 
+          ? item.domain_results as Record<string, { correct: number; total: number }>
+          : undefined
+      }));
+      
+      setResults(typedResults);
+    } catch (error) {
+      toast({
+        title: "Fout bij laden resultaten",
+        description: "Kon quiz resultaten niet laden",
+        variant: "destructive",
+      });
     }
   };
 
@@ -254,8 +299,9 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="questions" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="questions">Quiz Vragen</TabsTrigger>
+            <TabsTrigger value="results">Quiz Resultaten</TabsTrigger>
             <TabsTrigger value="content">Website Tekst</TabsTrigger>
           </TabsList>
           
@@ -336,6 +382,191 @@ const Admin = () => {
                 </Card>
               )))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="results" className="space-y-4">
+            {(() => {
+              const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+              
+              // Calculate overall statistics
+              const totalSubmissions = results.length;
+              const averageScore = results.length > 0 ? 
+                results.reduce((sum, r) => sum + r.percentage, 0) / results.length : 0;
+              
+              // Group by level
+              const levelStats = results.reduce((acc, result) => {
+                const level = result.level === 'basis' ? 'Basis' : result.level === '2f' ? 'Niveau 2F' : result.level;
+                if (!acc[level]) {
+                  acc[level] = { count: 0, totalScore: 0 };
+                }
+                acc[level].count++;
+                acc[level].totalScore += result.percentage;
+                return acc;
+              }, {} as Record<string, { count: number; totalScore: number }>);
+
+              const levelChartData = Object.entries(levelStats).map(([level, stats]) => ({
+                level,
+                submissions: stats.count,
+                averageScore: Math.round(stats.totalScore / stats.count)
+              }));
+
+              // Domain performance analysis
+              const domainStats = results.reduce((acc, result) => {
+                if (result.domain_results) {
+                  Object.entries(result.domain_results).forEach(([domain, stats]) => {
+                    if (!acc[domain]) {
+                      acc[domain] = { totalCorrect: 0, totalQuestions: 0 };
+                    }
+                    acc[domain].totalCorrect += stats.correct;
+                    acc[domain].totalQuestions += stats.total;
+                  });
+                }
+                return acc;
+              }, {} as Record<string, { totalCorrect: number; totalQuestions: number }>);
+
+              const domainChartData = Object.entries(domainStats).map(([domain, stats]) => ({
+                domain,
+                percentage: Math.round((stats.totalCorrect / stats.totalQuestions) * 100),
+                correct: stats.totalCorrect,
+                total: stats.totalQuestions
+              }));
+
+              return (
+                <>
+                  <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-2xl font-semibold">Quiz Resultaten</h2>
+                    <div className="flex gap-4 text-sm text-muted-foreground">
+                      <span>Totaal inzendingen: {totalSubmissions}</span>
+                      <span>Gemiddelde score: {Math.round(averageScore)}%</span>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-6">
+                    {/* Overview Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Card>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm font-medium">Totaal Inzendingen</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold">{totalSubmissions}</div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm font-medium">Gemiddelde Score</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold">{Math.round(averageScore)}%</div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-sm font-medium">Hoogste Score</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold">
+                            {results.length > 0 ? Math.max(...results.map(r => r.percentage)) : 0}%
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Charts */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Level Performance Chart */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Prestaties per Niveau</CardTitle>
+                          <CardDescription>Inzendingen en gemiddelde scores per niveau</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <ResponsiveContainer width="100%" height={300}>
+                            <BarChart data={levelChartData}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis dataKey="level" />
+                              <YAxis yAxisId="left" />
+                              <YAxis yAxisId="right" orientation="right" />
+                              <Tooltip />
+                              <Legend />
+                              <Bar yAxisId="left" dataKey="submissions" fill="#8884d8" name="Inzendingen" />
+                              <Bar yAxisId="right" dataKey="averageScore" fill="#82ca9d" name="Gem. Score %" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </CardContent>
+                      </Card>
+
+                      {/* Domain Performance Chart */}
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>Prestaties per Domein</CardTitle>
+                          <CardDescription>Gemiddelde scores per wiskundedomein</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <ResponsiveContainer width="100%" height={300}>
+                            <BarChart data={domainChartData}>
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis dataKey="domain" angle={-45} textAnchor="end" height={80} />
+                              <YAxis />
+                              <Tooltip />
+                              <Bar dataKey="percentage" fill="#ffc658" name="Score %" />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </CardContent>
+                      </Card>
+                    </div>
+
+                    {/* Recent Submissions Table */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Recente Inzendingen</CardTitle>
+                        <CardDescription>Laatste 10 quiz inzendingen</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b">
+                                <th className="text-left p-2">Datum</th>
+                                <th className="text-left p-2">Naam</th>
+                                <th className="text-left p-2">Email</th>
+                                <th className="text-left p-2">Niveau</th>
+                                <th className="text-left p-2">Score</th>
+                                <th className="text-left p-2">Percentage</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {results.slice(0, 10).map((result) => (
+                                <tr key={result.id} className="border-b hover:bg-muted/50">
+                                  <td className="p-2">
+                                    {new Date(result.submitted_at).toLocaleDateString('nl-NL')}
+                                  </td>
+                                  <td className="p-2">{result.first_name} {result.last_name}</td>
+                                  <td className="p-2">{result.email}</td>
+                                  <td className="p-2">
+                                    {result.level === 'basis' ? 'Basis' : result.level === '2f' ? 'Niveau 2F' : result.level}
+                                  </td>
+                                  <td className="p-2">{result.score}/{result.total_questions}</td>
+                                  <td className="p-2">
+                                    <span className={`px-2 py-1 rounded text-xs ${
+                                      result.percentage >= 80 ? 'bg-green-100 text-green-800' :
+                                      result.percentage >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                                      'bg-red-100 text-red-800'
+                                    }`}>
+                                      {Math.round(result.percentage)}%
+                                    </span>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </>
+              );
+            })()}
           </TabsContent>
 
           <TabsContent value="content" className="space-y-4">
