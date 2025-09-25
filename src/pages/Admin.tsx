@@ -63,6 +63,7 @@ const Admin = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isContentDialogOpen, setIsContentDialogOpen] = useState(false);
   const [contentValue, setContentValue] = useState('');
+  const [nameFilter, setNameFilter] = useState('');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -431,6 +432,13 @@ const Admin = () => {
                 total: stats.totalQuestions
               }));
 
+              // Filter results by name
+              const filteredResults = results.filter(result => {
+                if (!nameFilter) return true;
+                const fullName = `${result.first_name} ${result.last_name}`.toLowerCase();
+                return fullName.includes(nameFilter.toLowerCase());
+              });
+
               return (
                 <>
                   <div className="flex justify-between items-center mb-6">
@@ -438,6 +446,23 @@ const Admin = () => {
                     <div className="flex gap-4 text-sm text-muted-foreground">
                       <span>Totaal inzendingen: {totalSubmissions}</span>
                       <span>Gemiddelde score: {Math.round(averageScore)}%</span>
+                    </div>
+                  </div>
+
+                  {/* Name Filter */}
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                      <Label htmlFor="name-filter">Filter op naam:</Label>
+                      <Input
+                        id="name-filter"
+                        placeholder="Zoek op voor- of achternaam..."
+                        value={nameFilter}
+                        onChange={(e) => setNameFilter(e.target.value)}
+                        className="w-64"
+                      />
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {filteredResults.length} van {results.length} resultaten
                     </div>
                   </div>
 
@@ -536,7 +561,7 @@ const Admin = () => {
                               </tr>
                             </thead>
                             <tbody>
-                              {results.slice(0, 10).map((result) => (
+                              {filteredResults.slice(0, 10).map((result) => (
                                 <tr key={result.id} className="border-b hover:bg-muted/50">
                                   <td className="p-2">
                                     {new Date(result.submitted_at).toLocaleDateString('nl-NL')}
