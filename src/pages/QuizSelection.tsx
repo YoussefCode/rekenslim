@@ -9,15 +9,15 @@ const QuizSelection = () => {
 
   const quizLevels = [
     {
-      id: "basis",
-      title: "Basis Rekentest",
-      description: "Test je basisvaardigheden in rekenen",
+      id: "1f",
+      title: "Test 1F",
+      description: "Test je basisvaardigheden in rekenen niveau 1F",
       icon: Calculator,
       color: "from-blue-500 to-blue-600",
     },
     {
-      id: "f2",
-      title: "Niveau 2F Rekentest", 
+      id: "2f",
+      title: "Test 2F", 
       description: "Gevorderde rekenvaardigheden voor niveau 2F",
       icon: TrendingUp,
       color: "from-green-500 to-green-600",
