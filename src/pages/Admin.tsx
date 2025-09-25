@@ -283,10 +283,9 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="questions" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="questions">Quiz Vragen</TabsTrigger>
-            <TabsTrigger value="results">Quiz Resultaten</TabsTrigger>
-            
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="questions" className="w-1/2">Quiz Vragen</TabsTrigger>
+            <TabsTrigger value="results" className="w-1/2">Quiz Resultaten</TabsTrigger>
           </TabsList>
           
           <TabsContent value="questions" className="space-y-4">
