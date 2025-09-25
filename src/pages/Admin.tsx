@@ -389,13 +389,20 @@ const Admin = () => {
             {(() => {
               const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
               
-              // Calculate overall statistics
-              const totalSubmissions = results.length;
-              const averageScore = results.length > 0 ? 
-                results.reduce((sum, r) => sum + r.percentage, 0) / results.length : 0;
+              // Filter results by name first
+              const filteredResults = results.filter(result => {
+                if (!nameFilter) return true;
+                const fullName = `${result.first_name} ${result.last_name}`.toLowerCase();
+                return fullName.includes(nameFilter.toLowerCase());
+              });
               
-              // Group by level
-              const levelStats = results.reduce((acc, result) => {
+              // Calculate overall statistics using filtered results
+              const totalSubmissions = filteredResults.length;
+              const averageScore = filteredResults.length > 0 ? 
+                filteredResults.reduce((sum, r) => sum + r.percentage, 0) / filteredResults.length : 0;
+              
+              // Group by level using filtered results
+              const levelStats = filteredResults.reduce((acc, result) => {
                 const level = result.level === 'basis' ? 'Basis' : result.level === '2f' ? 'Niveau 2F' : result.level;
                 if (!acc[level]) {
                   acc[level] = { count: 0, totalScore: 0 };
@@ -408,11 +415,11 @@ const Admin = () => {
               const levelChartData = Object.entries(levelStats).map(([level, stats]) => ({
                 level,
                 submissions: stats.count,
-                averageScore: Math.round(stats.totalScore / stats.count)
+                averageScore: stats.count > 0 ? Math.round(stats.totalScore / stats.count) : 0
               }));
 
-              // Domain performance analysis
-              const domainStats = results.reduce((acc, result) => {
+              // Domain performance analysis using filtered results
+              const domainStats = filteredResults.reduce((acc, result) => {
                 if (result.domain_results) {
                   Object.entries(result.domain_results).forEach(([domain, stats]) => {
                     if (!acc[domain]) {
@@ -427,17 +434,11 @@ const Admin = () => {
 
               const domainChartData = Object.entries(domainStats).map(([domain, stats]) => ({
                 domain,
-                percentage: Math.round((stats.totalCorrect / stats.totalQuestions) * 100),
+                percentage: stats.totalQuestions > 0 ? Math.round((stats.totalCorrect / stats.totalQuestions) * 100) : 0,
                 correct: stats.totalCorrect,
                 total: stats.totalQuestions
               }));
 
-              // Filter results by name
-              const filteredResults = results.filter(result => {
-                if (!nameFilter) return true;
-                const fullName = `${result.first_name} ${result.last_name}`.toLowerCase();
-                return fullName.includes(nameFilter.toLowerCase());
-              });
 
               return (
                 <>
@@ -491,7 +492,7 @@ const Admin = () => {
                         </CardHeader>
                         <CardContent>
                           <div className="text-2xl font-bold">
-                            {results.length > 0 ? Math.max(...results.map(r => r.percentage)) : 0}%
+                            {filteredResults.length > 0 ? Math.max(...filteredResults.map(r => r.percentage)) : 0}%
                           </div>
                         </CardContent>
                       </Card>
