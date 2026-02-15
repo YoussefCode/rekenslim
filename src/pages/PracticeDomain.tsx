@@ -586,7 +586,12 @@ const procentenSections: Section[] = [
           Procent betekent <strong>per honderd</strong>. 1% is 1 op 100, 25% is 25 op 100, enzovoort.
         </p>
         <ExampleBox>
-          50% = 1/2 = 0,5 - 25% = 1/4 = 0,25 - 10% = 1/10 = 0,1 - 1% = 1/100 = 0,01
+          <p>
+            50% = 1/2 = 0,5<br />
+            25% = 1/4 = 0,25<br />
+            10% = 1/10 = 0,1<br />
+            1% = 1/100 = 0,01
+          </p>
         </ExampleBox>
         <TipBox>
           <strong>Truc:</strong> Begin met 10%, 5% en 1%. Combineer die delen om snel andere percentages te vinden.
@@ -608,7 +613,8 @@ const procentenSections: Section[] = [
           <ExampleBox>
             <strong>Procent → breuk</strong>
             <br />
-            20% = 20/100 = 1/5 - 12,5% = 1/8.
+            20% = 20/100 = 1/5<br />
+            12,5% = 1/8
           </ExampleBox>
         </div>
         <SimpleTable
