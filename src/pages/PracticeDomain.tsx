@@ -39,7 +39,7 @@ const Pill = ({ children }: { children: React.ReactNode }) => (
   </span>
 );
 
-const SimpleTable = ({ headers, rows }: { headers: string[]; rows: string[][] }) => (
+const SimpleTable = ({ headers, rows }: { headers: string[]; rows: (string | number)[][] }) => (
   <div className="overflow-x-auto">
     <table className="min-w-full border border-border/60 text-left text-sm">
       <thead className="bg-slate-100">
@@ -65,6 +65,254 @@ const SimpleTable = ({ headers, rows }: { headers: string[]; rows: string[][] })
     </table>
   </div>
 );
+
+const verbandenSections: Section[] = [
+  {
+    id: "kernidee",
+    title: "Kernidee",
+    content: (
+      <>
+        <p>
+          Een <strong>verband</strong> laat zien hoe twee grootheden samenhangen. Je kunt een verband tonen in een <strong>tabel</strong>, <strong>grafiek</strong> of <strong>formule</strong>. Deze drie horen altijd bij elkaar.
+        </p>
+        <TipBox>
+          <strong>Onthouden:</strong> De tabel, grafiek en formule vertellen steeds hetzelfde verhaal in een andere vorm.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "begrippen",
+    title: "Begrippen",
+    content: (
+      <div className="grid gap-3 md:grid-cols-2">
+        <ExampleBox>
+          <strong>Variabelen</strong>
+          <br />Grootheden die kunnen veranderen (bijv. x en y).
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Onafhankelijk vs afhankelijk</strong>
+          <br />x = invoer, y = uitkomst die afhangt van x.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Lineair verband</strong>
+          <br />Rechte lijn met formule y = ax + b.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Evenredig verband</strong>
+          <br />Rechte lijn door (0,0) met formule y = ax.
+        </ExampleBox>
+      </div>
+    ),
+  },
+  {
+    id: "tabellen",
+    title: "Tabellen",
+    content: (
+      <>
+        <p>Een tabel laat zien hoe x en y samen veranderen.</p>
+        <ExampleBox>
+          <p>
+            <strong>Voorbeeld:</strong> Taxi: €3 starttarief + €2 per km.
+          </p>
+          <SimpleTable headers={["km (x)", "kosten (y)"]} rows={[[0, 3], [1, 5], [2, 7], [5, 13]]} />
+        </ExampleBox>
+        <TipBox>
+          <strong>Tip:</strong> Bij lineaire verbanden neemt y telkens met hetzelfde aantal toe.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "grafieken",
+    title: "Grafieken",
+    content: (
+      <>
+        <p>Een grafiek laat het verband visueel zien.</p>
+        <ExampleBox>
+          <p><strong>Let op:</strong></p>
+          <ul className="list-disc ml-5 space-y-1">
+            <li>Een lineair verband tekent een <strong>rechte lijn</strong>.</li>
+            <li>Evenredig → rechte lijn <strong>door de oorsprong</strong>.</li>
+          </ul>
+        </ExampleBox>
+        <ExampleBox>
+          <p><strong>Voorbeeld (y = 2x + 3):</strong></p>
+          <ul className="list-disc ml-5 space-y-1">
+            <li>Start bij y = 3 (startgetal).</li>
+            <li>Elke +1 km → +2 euro (hellingsgetal).</li>
+          </ul>
+        </ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "formules",
+    title: "Formules",
+    content: (
+      <>
+        <p>Een formule beschrijft het verband in één regel.</p>
+        <ExampleBox>
+          <p><strong>Taxi:</strong> y = 2x + 3</p>
+          <ul className="list-disc ml-5 space-y-1">
+            <li><strong>a = 2</strong> → hellingsgetal (toename per x).</li>
+            <li><strong>b = 3</strong> → startgetal (waarde bij x = 0).</li>
+          </ul>
+        </ExampleBox>
+        <TipBox>
+          <strong>Tip:</strong> Bij evenredigheid is b = 0 → y = ax.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "lineair",
+    title: "Lineaire verbanden",
+    content: (
+      <>
+        <ExampleBox>
+          <p><strong>Formule:</strong> y = ax + b</p>
+          <p><strong>a = hellingsgetal:</strong> hoe snel y groeit.</p>
+          <p><strong>b = startgetal:</strong> beginpunt op de y-as.</p>
+        </ExampleBox>
+        <h3 className="text-lg font-semibold mt-4">Hellingsgetal bepalen</h3>
+        <ExampleBox>
+          <p>Gebruik de tabel:</p>
+          <SimpleTable headers={["x", "1", "2", "3"]} rows={[["y", 4, 7, 10]]} />
+          <p>y neemt steeds met +3 toe → hellingsgetal = 3.</p>
+        </ExampleBox>
+        <h3 className="text-lg font-semibold mt-4">Startgetal bepalen</h3>
+        <ExampleBox>
+          <p>Neem x = 0 → y = 3x + 4 → startgetal = 4.</p>
+        </ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "evenredig",
+    title: "Evenredige verbanden",
+    content: (
+      <>
+        <ExampleBox>
+          <p>Formule: <strong>y = ax</strong> (zonder + b).</p>
+          <ul className="list-disc ml-5 space-y-1">
+            <li>Rechte lijn door (0,0).</li>
+            <li>Verhouding tussen x en y blijft gelijk.</li>
+          </ul>
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Voorbeeld:</strong> 3 repen kosten €6 → één reep €2 → 5 repen €10.
+        </ExampleBox>
+      </>
+    ),
+  },
+];
+
+const getallenSections: Section[] = [
+  {
+    id: "kernidee",
+    title: "Kernidee",
+    content: (
+      <>
+        <p>
+          Bij het domein <strong>Getallen</strong> draait alles om rekenen met hele getallen, kommagetallen, breuken en percentages.
+        </p>
+        <TipBox>
+          <strong>Tip:</strong> Werk stap voor stap en controleer je antwoord door terug te rekenen.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "optellen-aftrekken",
+    title: "Optellen & aftrekken",
+    content: (
+      <>
+        <p>Houd de volgorde in de gaten en maak tussenschattingen.</p>
+        <ExampleBox>
+          <p><strong>Voorbeeld:</strong> 302 − 178 = 124.</p>
+        </ExampleBox>
+        <TipBox>
+          <strong>Schatting:</strong> 300 − 180 ≈ 120 → antwoord is logisch.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "vermenigvuldigen-delen",
+    title: "Vermenigvuldigen & delen",
+    content: (
+      <>
+        <p>Ken de tafels en breek grote opgaven op in kleinere stukjes.</p>
+        <ExampleBox>
+          <p><strong>Voorbeeld:</strong> 25 × 16 → 25 × (10 + 6) = 250 + 150 = 400.</p>
+        </ExampleBox>
+        <ExampleBox>
+          <p><strong>Voorbeeld:</strong> 480 ÷ 6 = 80.</p>
+        </ExampleBox>
+        <TipBox>
+          <strong>Tip:</strong> Gebruik tussenstappen die je makkelijk kunt uitrekenen.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "percentages",
+    title: "Percentages",
+    content: (
+      <>
+        <p>Percentage betekent “per honderd”.</p>
+        <ExampleBox>
+          <p><strong>Voorbeeld:</strong> 12% van 240.</p>
+          <ul className="list-disc ml-5 space-y-1">
+            <li>10% = 24</li>
+            <li>1% = 2,4 → 2% = 4,8</li>
+            <li>12% = 24 + 4,8 = 28,8</li>
+          </ul>
+        </ExampleBox>
+        <ExampleBox>
+          <p><strong>Voorbeeld:</strong> 140% van 50 = 70.</p>
+        </ExampleBox>
+        <TipBox>
+          <strong>Tip:</strong> Start met 10% en 1% en combineer die.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "breuken",
+    title: "Breuken & kommagetallen",
+    content: (
+      <>
+        <p>Breuken en decimalen zijn twee manieren om delen van een geheel te noteren.</p>
+        <ExampleBox>
+          <p><strong>Voorbeeld:</strong> 3/4 van 200 → 200 ÷ 4 = 50 → 50 × 3 = 150.</p>
+        </ExampleBox>
+        <ExampleBox>
+          <p><strong>Voorbeeld:</strong> 0,25 × 400 → 0,25 = 1/4 → 400 ÷ 4 = 100.</p>
+        </ExampleBox>
+        <TipBox>
+          <strong>Handig:</strong> Onthoud 0,25 = 1/4, 0,5 = 1/2, 0,75 = 3/4.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "afronden",
+    title: "Afronden",
+    content: (
+      <>
+        <p>Kijk naar het cijfer direct achter de positie waarop je afrondt.</p>
+        <ExampleBox>
+          <p><strong>Voorbeeld:</strong> Rond 56,78 af op één decimaal → tweede decimaal = 8 → 56,8.</p>
+        </ExampleBox>
+        <TipBox>
+          <strong>Regel:</strong> 0-4 naar beneden, 5-9 naar boven.
+        </TipBox>
+      </>
+    ),
+  },
+];
 
 const verhoudingenSections: Section[] = [
   {
