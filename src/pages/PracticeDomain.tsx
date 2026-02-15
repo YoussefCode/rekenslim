@@ -25,6 +25,47 @@ const WarnBox = ({ children }: { children: React.ReactNode }) => (
   <div className="bg-rose-50 border border-rose-200 p-4 rounded-lg my-3">
     {children}
   </div>
+);
+
+const NoteBox = ({ children }: { children: React.ReactNode }) => (
+  <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg my-3">
+    {children}
+  </div>
+);
+
+const Pill = ({ children }: { children: React.ReactNode }) => (
+  <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+    {children}
+  </span>
+);
+
+const SimpleTable = ({ headers, rows }: { headers: string[]; rows: string[][] }) => (
+  <div className="overflow-x-auto">
+    <table className="min-w-full border border-border/60 text-left text-sm">
+      <thead className="bg-slate-100">
+        <tr>
+          {headers.map((header) => (
+            <th key={header} className="border border-border/60 px-2 py-1 font-semibold text-slate-700">
+              {header}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row, rowIndex) => (
+          <tr key={rowIndex} className={rowIndex % 2 === 0 ? "bg-white" : "bg-slate-50"}>
+            {row.map((cell, cellIndex) => (
+              <td key={`${rowIndex}-${cellIndex}`} className="border border-border/60 px-2 py-1 text-slate-700">
+                {cell}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+);
+
 const verhoudingenSections: Section[] = [
   {
     id: "kernidee",
