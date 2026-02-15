@@ -10,13 +10,13 @@ interface Section {
 }
 
 const ExampleBox = ({ children }: { children: React.ReactNode }) => (
-  <div className="bg-accent/50 p-4 border-l-4 border-primary rounded-lg my-3">
+  <div className="bg-sky-50 border border-sky-200 p-4 rounded-lg my-3">
     {children}
   </div>
 );
 
 const TipBox = ({ children }: { children: React.ReactNode }) => (
-  <div className="bg-secondary/50 p-4 border-l-4 border-secondary-foreground/30 rounded-lg my-3">
+  <div className="bg-sky-100 border border-sky-200 p-4 rounded-lg my-3">
     {children}
   </div>
 );

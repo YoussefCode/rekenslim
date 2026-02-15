@@ -10,7 +10,7 @@ type DomainSet = { title: string; description?: string; items: Question[] };
 const questionsByDomain: Record<string, DomainSet[]> = {
   getallen: [
     {
-      title: "Getallen – Auto-check set 1",
+      title: "Getallen – Set 1",
       description: "Strategieën: splitsen, compenseren, getallenlijn, distributief, halveren & verdubbelen, rechthoekmodel, happen, schattend delen, delen door 5.",
       items: [
         { q: "1. 38 + 47 =", a: 85, exp: "Splits: 38=30+8, 47=40+7. Tientallen: 30+40=70. Eenheden: 8+7=15 → 70+15=85." },
@@ -76,7 +76,7 @@ const questionsByDomain: Record<string, DomainSet[]> = {
       ],
     },
     {
-      title: "Getallen – Auto-check set 2",
+      title: "Getallen – Set 2",
       description: "Gemengde vraagstukken: contextopgaven, breuken, procenten, verhoudingen, meten en tijd.",
       items: [
         { q: "1. Sam heeft 348 knikkers, hij koopt er 129 bij =", a: 477, exp: "Splitsen: 348=300+48, 129=100+29 → (300+100)+(48+29)=400+77=477." },
