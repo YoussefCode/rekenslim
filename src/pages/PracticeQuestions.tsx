@@ -144,7 +144,7 @@ const questionsByDomain: Record<string, DomainSet[]> = {
   ],
   verbanden: [
     {
-      title: "Verbanden – Auto-check 60",
+      title: "Verbanden",
       items: [
         { q: "1. Hellingsgetal a bij y = 3x + 4 =", a: 3, exp: "In y = ax + b is a het hellingsgetal (toename per x). Hier a = 3." },
         { q: "2. Startgetal b bij y = 3x + 4 =", a: 4, exp: "In y = ax + b is b het startgetal: y bij x=0. Hier b = 4." },
