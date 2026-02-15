@@ -47,6 +47,10 @@ const Index = () => {
                   <Calculator className="mr-2 h-4 w-4" />
                   Start test
                 </Button>
+                <Button onClick={() => navigate('/oefenen')} variant="secondary" size="lg" className="hover-scale">
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Oefenen
+                </Button>
                 {user && profile?.role === 'admin' && <Button onClick={() => navigate('/admin')} variant="outline" size="lg" className="hover-scale">
                     <Target className="mr-2 h-4 w-4" />
                     Beheer
