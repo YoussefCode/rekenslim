@@ -167,7 +167,7 @@ const PracticeQuestions = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 to-secondary/5 p-6">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8 mt-8">
           <h1 className="text-3xl font-bold text-foreground">Oefenen – {domainTitle}</h1>
           <p className="text-muted-foreground mt-2">{items.length} vragen – automatische controle</p>
@@ -175,7 +175,7 @@ const PracticeQuestions = () => {
 
         <div className="bg-card shadow-md rounded-xl p-6 space-y-4">
           {items.map((item, index) => (
-            <div key={index} className="grid grid-cols-1 md:grid-cols-[1fr_minmax(160px,1fr)_minmax(140px,1fr)] gap-4 items-start">
+            <div key={index} className="grid grid-cols-1 md:grid-cols-[minmax(360px,1.6fr)_minmax(180px,0.8fr)_minmax(160px,0.6fr)] gap-5 items-start">
               <div className="text-foreground">{item.q}</div>
               <input
                 className="border rounded-lg p-2 bg-background text-foreground"
@@ -186,9 +186,9 @@ const PracticeQuestions = () => {
                 {feedback[index]}
               </div>
               {explanations[index] && (
-                <details className="md:col-span-3 bg-muted/30 border border-muted-foreground/20 rounded-lg p-3">
-                  <summary className="cursor-pointer text-sm font-semibold text-foreground">Uitleg</summary>
-                  <p className="mt-2 text-sm text-muted-foreground">{explanations[index]}</p>
+                <details className="md:col-span-3 bg-sky-50 border border-sky-200 rounded-lg p-3">
+                  <summary className="cursor-pointer text-sm font-semibold text-sky-900">Uitleg</summary>
+                  <p className="mt-2 text-sm text-sky-900/80">{explanations[index]}</p>
                 </details>
               )}
             </div>
