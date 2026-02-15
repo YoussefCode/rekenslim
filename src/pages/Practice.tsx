@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Calculator, BookOpen, TrendingUp, ArrowLeft } from "lucide-react";
+import { Calculator, BookOpen, TrendingUp, Divide, ArrowLeft } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const domains = [
@@ -18,6 +18,13 @@ const domains = [
     description: "Verhoudingstabellen, procenten en schaal",
     icon: TrendingUp,
     color: "from-green-500 to-green-600",
+  },
+  {
+    id: "breuken",
+    title: "Breuken",
+    description: "Tellers, noemers, gelijknamig maken en gemengde getallen",
+    icon: Divide,
+    color: "from-violet-500 to-violet-600",
   },
   {
     id: "verbanden",

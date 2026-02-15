@@ -277,6 +277,74 @@ const questionsByDomain: Record<string, DomainSet[]> = {
       ],
     },
   ],
+  breuken: [
+    {
+      title: "Breuken",
+      description: "Kern: teller/noemer, vereenvoudigen, gelijknamig maken, optellen/aftrekken, vermenigvuldigen, delen, gemengde getallen, breuk van een getal.",
+      items: [
+        { q: "1. Vereenvoudig: 12/18", a: "2/3", exp: "Deel teller en noemer door 6 → 2/3." },
+        { q: "2. Vereenvoudig: 15/25", a: "3/5", exp: "Deel teller en noemer door 5 → 3/5." },
+        { q: "3. Vereenvoudig: 42/56", a: "3/4", exp: "Deel teller en noemer door 14 → 3/4." },
+        { q: "4. Vereenvoudig: 48/60", a: "4/5", exp: "Deel teller en noemer door 12 → 4/5." },
+        { q: "5. Vereenvoudig: 21/35", a: "3/5", exp: "Deel teller en noemer door 7 → 3/5." },
+        { q: "6. Vereenvoudig: 36/54", a: "2/3", exp: "Deel teller en noemer door 18 → 2/3." },
+        { q: "7. Vereenvoudig: 16/40", a: "2/5", exp: "Deel teller en noemer door 8 → 2/5." },
+        { q: "8. Vereenvoudig: 27/45", a: "3/5", exp: "Deel teller en noemer door 9 → 3/5." },
+        { q: "9. Vereenvoudig: 50/80", a: "5/8", exp: "Deel teller en noemer door 10 → 5/8." },
+        { q: "10. Vereenvoudig: 63/84", a: "3/4", exp: "Deel teller en noemer door 21 → 3/4." },
+        { q: "11. Vereenvoudig: 18/24", a: "3/4", exp: "Deel teller en noemer door 6 → 3/4." },
+        { q: "12. Vereenvoudig: 32/48", a: "2/3", exp: "Deel teller en noemer door 16 → 2/3." },
+        { q: "13. Zet om naar gemengd getal: 11/4", a: 2.75, exp: "11 ÷ 4 = 2 rest 3 → 2 3/4 (2.75)." },
+        { q: "14. Zet om naar gemengd getal: 17/5", a: 3.4, exp: "17 ÷ 5 = 3 rest 2 → 3 2/5 (3.4)." },
+        { q: "15. Zet om naar gemengd getal: 23/6", a: 3.833333, exp: "23 ÷ 6 = 3 rest 5 → 3 5/6 (≈3.833333)." },
+        { q: "16. Zet om naar gemengd getal: 29/8", a: 3.625, exp: "29 ÷ 8 = 3 rest 5 → 3 5/8 (3.625)." },
+        { q: "17. Zet om naar oneigen breuk: 2 3/4", a: "11/4", exp: "2 × 4 + 3 = 11 → 11/4." },
+        { q: "18. Zet om naar oneigen breuk: 3 1/5", a: "16/5", exp: "3 × 5 + 1 = 16 → 16/5." },
+        { q: "19. Zet om naar oneigen breuk: 1 5/6", a: "11/6", exp: "1 × 6 + 5 = 11 → 11/6." },
+        { q: "20. Zet om naar oneigen breuk: 4 2/3", a: "14/3", exp: "4 × 3 + 2 = 14 → 14/3." },
+        { q: "21. 2/7 + 3/7 =", a: "5/7", exp: "Gelijknamig: tel tellers op → 5/7." },
+        { q: "22. 5/12 + 1/12 =", a: "1/2", exp: "5/12 + 1/12 = 6/12 → 1/2." },
+        { q: "23. 7/20 + 9/20 =", a: "4/5", exp: "7/20 + 9/20 = 16/20 → 4/5." },
+        { q: "24. 3/8 + 4/8 =", a: "7/8", exp: "Gelijknamig: 3 + 4 = 7 op noemer 8." },
+        { q: "25. 11/15 + 2/15 =", a: "13/15", exp: "Gelijknamig: 11 + 2 = 13 → 13/15." },
+        { q: "26. 3/4 + 2/3 =", a: "17/12", exp: "KGV(4,3)=12 → 9/12 + 8/12 = 17/12." },
+        { q: "27. 5/6 + 1/4 =", a: "13/12", exp: "KGV(6,4)=12 → 10/12 + 3/12 = 13/12." },
+        { q: "28. 7/9 + 2/5 =", a: "53/45", exp: "KGV(9,5)=45 → 35/45 + 18/45 = 53/45." },
+        { q: "29. 3/10 + 1/6 =", a: "7/15", exp: "KGV(10,6)=30 → 9/30 + 5/30 = 14/30 = 7/15." },
+        { q: "30. 4/7 + 5/14 =", a: "13/14", exp: "4/7 = 8/14 → 8/14 + 5/14 = 13/14." },
+        { q: "31. 7/12 − 3/12 =", a: "1/3", exp: "(7 − 3)/12 = 4/12 = 1/3." },
+        { q: "32. 9/20 − 4/20 =", a: "1/4", exp: "(9 − 4)/20 = 5/20 = 1/4." },
+        { q: "33. 11/15 − 1/15 =", a: "2/3", exp: "(11 − 1)/15 = 10/15 = 2/3." },
+        { q: "34. 5/8 − 2/8 =", a: "3/8", exp: "(5 − 2)/8 = 3/8." },
+        { q: "35. 5/6 − 1/4 =", a: "7/12", exp: "KGV(6,4)=12 → 10/12 − 3/12 = 7/12." },
+        { q: "36. 7/9 − 1/3 =", a: "4/9", exp: "1/3 = 3/9 → 7/9 − 3/9 = 4/9." },
+        { q: "37. 11/12 − 5/8 =", a: "7/24", exp: "KGV(12,8)=24 → 22/24 − 15/24 = 7/24." },
+        { q: "38. 5/7 − 2/5 =", a: "11/35", exp: "KGV(7,5)=35 → 25/35 − 14/35 = 11/35." },
+        { q: "39. (3/5) × (10/9) =", a: "2/3", exp: "Vermenigvuldig tellers/noemers en vereenvoudig → 30/45 = 2/3." },
+        { q: "40. (2/7) × (7/3) =", a: "2/3", exp: "Na vereenvoudigen blijft 2/3 over." },
+        { q: "41. (5/8) × (12/15) =", a: "1/2", exp: "60/120 = 1/2." },
+        { q: "42. (4/9) × (3/16) =", a: "1/12", exp: "12/144 = 1/12." },
+        { q: "43. (7/12) × (6/7) =", a: "1/2", exp: "42/84 = 1/2." },
+        { q: "44. (9/10) × (5/18) =", a: "1/4", exp: "45/180 = 1/4." },
+        { q: "45. (11/14) × (7/22) =", a: "1/4", exp: "77/308 = 1/4." },
+        { q: "46. (3/4) × (2/9) =", a: "1/6", exp: "6/36 = 1/6." },
+        { q: "47. (4/7) ÷ (2/3) =", a: "6/7", exp: "Delen = vermenigvuldigen met omgekeerde → 12/14 = 6/7." },
+        { q: "48. (5/8) ÷ (10/3) =", a: "3/16", exp: "(5/8) × (3/10) = 15/80 = 3/16." },
+        { q: "49. (7/9) ÷ (14/27) =", a: "3/2", exp: "(7/9) × (27/14) = 189/126 = 3/2." },
+        { q: "50. (3/5) ÷ (9/10) =", a: "2/3", exp: "(3/5) × (10/9) = 30/45 = 2/3." },
+        { q: "51. (8/15) ÷ (4/9) =", a: "6/5", exp: "(8/15) × (9/4) = 72/60 = 6/5." },
+        { q: "52. (2/3) ÷ (5/12) =", a: "8/5", exp: "(2/3) × (12/5) = 24/15 = 8/5." },
+        { q: "53. (11/12) ÷ (22/9) =", a: "3/8", exp: "(11/12) × (9/22) = 99/264 = 3/8." },
+        { q: "54. (5/6) ÷ (25/18) =", a: "3/5", exp: "(5/6) × (18/25) = 90/150 = 3/5." },
+        { q: "55. 3/8 van 64 =", a: 24, exp: "64 ÷ 8 = 8 → 8 × 3 = 24." },
+        { q: "56. 5/12 van 144 =", a: 60, exp: "144 ÷ 12 = 12 → 12 × 5 = 60." },
+        { q: "57. 7/20 van 200 =", a: 70, exp: "200 ÷ 20 = 10 → 10 × 7 = 70." },
+        { q: "58. 2/5 van 85 =", a: 34, exp: "85 ÷ 5 = 17 → 17 × 2 = 34." },
+        { q: "59. 9/10 van 70 =", a: 63, exp: "70 ÷ 10 = 7 → 7 × 9 = 63." },
+        { q: "60. 11/12 van 132 =", a: 121, exp: "132 ÷ 12 = 11 → 11 × 11 = 121." },
+      ],
+    },
+  ],
 };
 
 const QuizSet: React.FC<{ items: Question[] }> = ({ items }) => {
@@ -451,7 +519,15 @@ const PracticeQuestions = () => {
   }
 
   const domainTitle =
-    domain === "getallen" ? "Getallen" : domain === "verbanden" ? "Verbanden" : domain === "verhoudingen" ? "Verhoudingen" : domain;
+    domain === "getallen"
+      ? "Getallen"
+      : domain === "verhoudingen"
+      ? "Verhoudingen"
+      : domain === "breuken"
+      ? "Breuken"
+      : domain === "verbanden"
+      ? "Verbanden"
+      : domain;
   const totalQuestions = domainSets.reduce((sum, set) => sum + set.items.length, 0);
   const infoText = domainSets.length > 1 ? `${totalQuestions} vragen over ${domainSets.length} sets – automatische controle` : `${totalQuestions} vragen – automatische controle`;
 
