@@ -25,250 +25,6 @@ const WarnBox = ({ children }: { children: React.ReactNode }) => (
   <div className="bg-rose-50 border border-rose-200 p-4 rounded-lg my-3">
     {children}
   </div>
-);
-
-const NoteBox = ({ children }: { children: React.ReactNode }) => (
-  <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg my-3">
-    {children}
-  </div>
-);
-
-const Pill = ({ children }: { children: React.ReactNode }) => (
-  <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
-    {children}
-  </span>
-);
-
-const SimpleTable = ({ headers, rows }: { headers: string[]; rows: (string | number)[][] }) => (
-  <table className="w-full border-collapse my-2 text-sm">
-    <thead>
-      <tr>{headers.map((h, i) => <th key={i} className="border border-border p-2 text-left bg-muted/50">{h}</th>)}</tr>
-    </thead>
-    <tbody>
-      {rows.map((row, i) => (
-        <tr key={i}>{row.map((cell, j) => <td key={j} className="border border-border p-2">{cell}</td>)}</tr>
-      ))}
-    </tbody>
-  </table>
-);
-
-const verbandenSections: Section[] = [
-  {
-    id: "kernidee",
-    title: "Kernidee",
-    content: (
-      <>
-        <p>Een <strong>verband</strong> laat zien hoe twee grootheden samenhangen. Je kunt een verband tonen in een <strong>tabel</strong>, <strong>grafiek</strong> of <strong>formule</strong>. Deze drie horen altijd bij elkaar.</p>
-        <TipBox><strong>Belangrijk:</strong> Een grafiek vertelt hetzelfde verhaal als een tabel en formule — maar in een andere vorm.</TipBox>
-      </>
-    ),
-  },
-  {
-    id: "begrippen",
-    title: "Begrippen",
-    content: (
-      <>
-        <ExampleBox><strong>Variabelen:</strong> grootheden die kunnen veranderen (x, y).</ExampleBox>
-        <ExampleBox><strong>Afhankelijk / onafhankelijk:</strong> x → input, y → resultaat.</ExampleBox>
-        <ExampleBox><strong>Lineair verband:</strong> rechte lijn, formule y = ax + b.</ExampleBox>
-        <ExampleBox><strong>Evenredig verband:</strong> rechte lijn door (0,0), formule y = ax.</ExampleBox>
-      </>
-    ),
-  },
-  {
-    id: "tabellen",
-    title: "Tabellen",
-    content: (
-      <>
-        <p>Een tabel laat zien hoe x en y samen veranderen.</p>
-        <ExampleBox>
-          <p><strong>Voorbeeld:</strong> Taxi: €3 start + €2 per km.</p>
-          <SimpleTable headers={["km (x)", "kosten (y)"]} rows={[[0, 3], [1, 5], [2, 7], [5, 13]]} />
-        </ExampleBox>
-        <TipBox>Bij lineaire verbanden verandert y steeds met hetzelfde aantal.</TipBox>
-      </>
-    ),
-  },
-  {
-    id: "grafieken",
-    title: "Grafieken",
-    content: (
-      <>
-        <p>Een grafiek geeft het verband visueel weer.</p>
-        <ExampleBox>
-          <p><strong>Belangrijk:</strong></p>
-          <ul className="list-disc ml-5 space-y-1">
-            <li>Een lineaire grafiek is een <strong>rechte lijn</strong>.</li>
-            <li>Evenredig → rechte lijn <strong>door de oorsprong</strong>.</li>
-          </ul>
-        </ExampleBox>
-        <ExampleBox>
-          <p><strong>Voorbeeld grafiek uitleg</strong></p>
-          <p>Voor taxi-formule y = 2x + 3:</p>
-          <ul className="list-disc ml-5 space-y-1">
-            <li>Begin bij y = 3 (startgetal).</li>
-            <li>Elke +1 km → +2 euro (hellingsgetal).</li>
-          </ul>
-        </ExampleBox>
-      </>
-    ),
-  },
-  {
-    id: "formules",
-    title: "Formules",
-    content: (
-      <>
-        <p>Een formule beschrijft het verband in 1 regel.</p>
-        <ExampleBox>
-          <p><strong>Taxi:</strong> y = 2x + 3</p>
-          <ul className="list-disc ml-5 space-y-1">
-            <li><strong>a = 2</strong> → hellingsgetal (toename per x)</li>
-            <li><strong>b = 3</strong> → startgetal (bij x = 0)</li>
-          </ul>
-        </ExampleBox>
-        <TipBox>Bij evenredigheid is b = 0 → y = ax.</TipBox>
-      </>
-    ),
-  },
-  {
-    id: "lineair",
-    title: "Lineaire verbanden",
-    content: (
-      <>
-        <ExampleBox>
-          <p><strong>Formule:</strong> y = ax + b</p>
-          <p><strong>a = hellingsgetal:</strong> hoe snel y groeit</p>
-          <p><strong>b = startgetal:</strong> beginpunt op de y-as</p>
-        </ExampleBox>
-        <h3 className="text-lg font-semibold mt-4 mb-2">Hellingsgetal bepalen</h3>
-        <ExampleBox>
-          <p>In tabel:</p>
-          <SimpleTable headers={["x", "1", "2", "3"]} rows={[["y", 4, 7, 10]]} />
-          <p>y gaat steeds +3 → hellingsgetal = 3</p>
-        </ExampleBox>
-        <h3 className="text-lg font-semibold mt-4 mb-2">Startgetal bepalen</h3>
-        <ExampleBox>
-          <p>Gebruik x = 0:</p>
-          <p>y = 3x + 4 → startgetal = 4</p>
-        </ExampleBox>
-      </>
-    ),
-  },
-  {
-    id: "evenredig",
-    title: "Evenredige verbanden",
-    content: (
-      <>
-        <ExampleBox>
-          <p>Formule: <strong>y = ax</strong> (zonder + b)</p>
-          <ul className="list-disc ml-5 space-y-1">
-            <li>Rechte lijn door (0,0)</li>
-            <li>Verhouding blijft steeds gelijk</li>
-          </ul>
-        </ExampleBox>
-        <ExampleBox><strong>Voorbeeld:</strong> 3 repen kosten €6 → 1 reep = €2 → 5 repen = €10</ExampleBox>
-      </>
-    ),
-  },
-];
-
-const getallenSections: Section[] = [
-  {
-    id: "kernidee",
-    title: "Kernidee",
-    content: (
-      <>
-        <p>Bij het domein <strong>Getallen</strong> draait alles om rekenen met verschillende soorten getallen: hele getallen, kommagetallen, breuken en percentages.</p>
-        <TipBox><strong>Belangrijk:</strong> Werk altijd stap voor stap en controleer je antwoord door terug te rekenen.</TipBox>
-      </>
-    ),
-  },
-  {
-    id: "optellen-aftrekken",
-    title: "Optellen & Aftrekken",
-    content: (
-      <>
-        <p>Bij optellen en aftrekken is de volgorde belangrijk. Werk van links naar rechts.</p>
-        <ExampleBox>
-          <p><strong>Voorbeeld:</strong> 302 − 178 = ?</p>
-          <p>302 − 178 = 124</p>
-        </ExampleBox>
-        <TipBox>Tip: rond af om te schatten. 302 − 178 ≈ 300 − 180 = 120. Klopt ongeveer!</TipBox>
-      </>
-    ),
-  },
-  {
-    id: "vermenigvuldigen-delen",
-    title: "Vermenigvuldigen & Delen",
-    content: (
-      <>
-        <p>Ken je tafels goed! Ze zijn de basis van vermenigvuldigen en delen.</p>
-        <ExampleBox>
-          <p><strong>Voorbeeld:</strong> 25 × 16 = ?</p>
-          <p>25 × 16 = 25 × 10 + 25 × 6 = 250 + 150 = 400</p>
-        </ExampleBox>
-        <ExampleBox>
-          <p><strong>Voorbeeld:</strong> 480 ÷ 6 = ?</p>
-          <p>480 ÷ 6 = 80</p>
-        </ExampleBox>
-        <TipBox>Tip: splits moeilijke vermenigvuldigingen op in makkelijke stukken.</TipBox>
-      </>
-    ),
-  },
-  {
-    id: "percentages",
-    title: "Percentages",
-    content: (
-      <>
-        <p>Percentage = per honderd. 12% betekent 12 van de 100.</p>
-        <ExampleBox>
-          <p><strong>Voorbeeld:</strong> 12% van 240 = ?</p>
-          <p>10% van 240 = 24</p>
-          <p>1% van 240 = 2,4</p>
-          <p>12% = 24 + 2×2,4 = 28,8</p>
-        </ExampleBox>
-        <ExampleBox>
-          <p><strong>Voorbeeld:</strong> 140% van 50 = ?</p>
-          <p>100% = 50, 40% = 20 → 140% = 70</p>
-        </ExampleBox>
-        <TipBox>Tip: bereken eerst 10% en 1%, dan kun je elk percentage samenstellen.</TipBox>
-      </>
-    ),
-  },
-  {
-    id: "breuken",
-    title: "Breuken & kommagetallen",
-    content: (
-      <>
-        <p>Breuken en kommagetallen zijn twee manieren om hetzelfde getal te schrijven.</p>
-        <ExampleBox>
-          <p><strong>Voorbeeld:</strong> 3/4 van 200 = ?</p>
-          <p>200 ÷ 4 = 50 → 50 × 3 = 150</p>
-        </ExampleBox>
-        <ExampleBox>
-          <p><strong>Voorbeeld:</strong> 0,25 × 400 = ?</p>
-          <p>0,25 = 1/4 → 400 ÷ 4 = 100</p>
-        </ExampleBox>
-        <TipBox>Tip: 0,25 = 1/4, 0,5 = 1/2, 0,75 = 3/4. Onthoud deze!</TipBox>
-      </>
-    ),
-  },
-  {
-    id: "afronden",
-    title: "Afronden",
-    content: (
-      <>
-        <p>Bij afronden kijk je naar het cijfer achter de plek waarop je afrondt.</p>
-        <ExampleBox>
-          <p><strong>Voorbeeld:</strong> Rond 56,78 af op één decimaal.</p>
-          <p>Kijk naar de 8 (tweede decimaal). 8 ≥ 5, dus naar boven: <strong>56,8</strong></p>
-        </ExampleBox>
-        <TipBox>Regel: 0-4 → naar beneden, 5-9 → naar boven.</TipBox>
-      </>
-    ),
-  },
-];
-
 const verhoudingenSections: Section[] = [
   {
     id: "kernidee",
@@ -276,10 +32,10 @@ const verhoudingenSections: Section[] = [
     content: (
       <>
         <p>
-          Een <strong>verhouding</strong> vergelijkt hoeveelheden, zoals <em>3 : 2</em>. Je gebruikt verhoudingen om eerlijk te verdelen, te schalen, prijzen te vergelijken en procenten te begrijpen.
+          Een <strong>verhouding</strong> vergelijkt hoeveelheden: bijvoorbeeld <em>3 : 2</em>. Je gebruikt verhoudingen om eerlijk te verdelen, te schalen, prijzen te vergelijken en procenten te begrijpen.
         </p>
         <TipBox>
-          <strong>Tip:</strong> Noteer steeds <em>wat bij wat</em> hoort. Bijvoorbeeld <Pill>suiker : meel = 2 : 5</Pill> of <Pill>prijs : gewicht</Pill>.
+          <strong>Tip:</strong> Noteer altijd <em>wat bij wat</em> hoort. Bijvoorbeeld <Pill>suiker : meel = 2 : 5</Pill> of <Pill>prijs : gewicht</Pill>.
         </TipBox>
       </>
     ),
@@ -311,7 +67,7 @@ const verhoudingenSections: Section[] = [
         </ExampleBox>
         <ExampleBox>
           <strong>Schaal</strong>
-          <br />Kaart of model versus echt. Bijvoorbeeld 1 : 50 000 → 1 cm op kaart = 500 m echt.
+          <br />Kaart/model versus echt. Bijvoorbeeld 1 : 50 000 → 1 cm op kaart = 500 m echt.
         </ExampleBox>
       </div>
     ),
@@ -398,269 +154,8 @@ const verhoudingenSections: Section[] = [
           <p>
             <strong>Voorbeeld:</strong> Recept voor 4 personen → 10 personen. Factor = 10/4 = 2,5. Alle hoeveelheden × 2,5.
           </p>
-
-        const breukenSections: Section[] = [
-          {
-            id: "kernidee",
-            title: "Kernidee",
-            content: (
-              <>
-                <p>
-                  Een <strong>breuk</strong> beschrijft een deel van een geheel: de <em>teller</em> staat boven en zegt hoeveel delen je hebt, de <em>noemer</em> onderaan geeft aan in hoeveel gelijke stukken het geheel verdeeld is.
-                </p>
-                <TipBox>
-                  <strong>Tip:</strong> Werk altijd met gelijke delen; zonder gelijke stukken kun je breuken niet eerlijk vergelijken of optellen.
-                </TipBox>
-              </>
-            ),
-          },
-          {
-            id: "begrippen",
-            title: "Begrippen",
-            content: (
-              <div className="grid gap-3 md:grid-cols-3">
-                <ExampleBox>
-                  <strong>Teller / noemer</strong>
-                  <br />Teller = aantal delen, noemer = totaal gelijke delen van het geheel.
-                </ExampleBox>
-                <ExampleBox>
-                  <strong>Stambreuk</strong>
-                  <br />Breuk met teller 1: 1/2, 1/3, 1/4 ...
-                </ExampleBox>
-                <ExampleBox>
-                  <strong>Eigen vs. oneigen</strong>
-                  <br />Eigen: teller < noemer (3/5). Oneigen: teller ≥ noemer (7/4).
-                </ExampleBox>
-                <ExampleBox>
-                  <strong>Gelijknamig</strong>
-                  <br />Breuken met dezelfde noemer (bijv. 2/7 en 5/7) tel je eenvoudig op/af.
-                </ExampleBox>
-                <ExampleBox>
-                  <strong>Gemengd getal</strong>
-                  <br />Hele + breukdeel, bijvoorbeeld 2 3/4 = 11/4.
-                </ExampleBox>
-                <ExampleBox>
-                  <strong>GGD &amp; KGV</strong>
-                  <br />GGD → vereenvoudigen, KGV → gelijknamig maken.
-                </ExampleBox>
-              </div>
-            ),
-          },
-          {
-            id: "modellen",
-            title: "Modellen",
-            content: (
-              <div className="grid gap-3 md:grid-cols-3">
-                <ExampleBox>
-                  <strong>Strookmodel</strong>
-                  <br />Een rechthoek verdeeld in gelijke vakjes. 3/5 = 3 gekleurde vakken van 5.
-                </ExampleBox>
-                <ExampleBox>
-                  <strong>Cirkel/pizza</strong>
-                  <br />Taart in punten. 1/8 is één punt van acht.
-                </ExampleBox>
-                <ExampleBox>
-                  <strong>Getallenlijn</strong>
-                  <br />Tussen 0 en 1 in gelijke stukken. 3/4 ligt op driekwart van de lijn.
-                </ExampleBox>
-              </div>
-            ),
-          },
-          {
-            id: "vereenvoudigen",
-            title: "Vereenvoudigen & gelijkwaardig",
-            content: (
-              <>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <h3 className="text-lg font-semibold">Vereenvoudigen</h3>
-                    <ExampleBox>
-                      <p>12/18 → deel teller én noemer door GGD(12,18) = 6 → <strong>2/3</strong>.</p>
-                    </ExampleBox>
-                    <TipBox>
-                      <strong>Truc:</strong> Kruislings vereenvoudigen bij vermenigvuldigen voorkomt grote getallen.
-                    </TipBox>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold">Gelijkwaardige breuken</h3>
-                    <ExampleBox>
-                      <p>2/3 = 4/6 = 6/9 → vermenigvuldig teller én noemer met hetzelfde getal.</p>
-                    </ExampleBox>
-                  </div>
-                </div>
-                <WarnBox>
-                  <strong>Let op:</strong> Je mag teller en noemer alleen door hetzelfde getal delen of met hetzelfde getal vermenigvuldigen (≠ 0). De breuk krijgt dan een andere vorm maar blijft even groot.
-                </WarnBox>
-              </>
-            ),
-          },
-          {
-            id: "gelijknamig",
-            title: "Gelijknamig maken",
-            content: (
-              <>
-                <ExampleBox>
-                  <p>Voor 3/4 en 2/3 is KGV(4,3) = 12 → 3/4 = 9/12 en 2/3 = 8/12.</p>
-                </ExampleBox>
-                <TipBox>
-                  <strong>Tip:</strong> Soms volstaat kruislings ×-ruilen: 3/4 = (×3)/(×3) → 9/12 en 2/3 = (×4)/(×4) → 8/12.
-                </TipBox>
-              </>
-            ),
-          },
-          {
-            id: "optellen",
-            title: "Optellen & aftrekken",
-            content: (
-              <>
-                <h3 className="text-lg font-semibold">1) Gelijknamig</h3>
-                <ExampleBox>
-                  <p>2/7 + 3/7 = (2 + 3)/7 = <strong>5/7</strong>.</p>
-                </ExampleBox>
-                <h3 className="text-lg font-semibold mt-4">2) Ongelijknamig</h3>
-                <ExampleBox>
-                  <p>3/4 + 2/3 → KGV = 12 → 9/12 + 8/12 = 17/12 = <strong>1 5/12</strong>.</p>
-                </ExampleBox>
-                <h3 className="text-lg font-semibold mt-4">3) Aftrekken</h3>
-                <ExampleBox>
-                  <p>5/6 − 1/4 → KGV = 12 → 10/12 − 3/12 = <strong>7/12</strong>.</p>
-                </ExampleBox>
-                <details className="bg-white border border-dashed border-border rounded-lg p-3 mt-3">
-                  <summary className="cursor-pointer font-semibold text-primary">Veelgebruikt schema</summary>
-                  <pre className="bg-slate-900 text-slate-100 text-xs md:text-sm rounded-lg p-3 mt-2 overflow-auto">
-        a   c     ad ± bc
-        - ± -  =  -------  (met m = KGV(b,d))
         </ExampleBox>
 
-                  </pre>
-                </details>
-              </>
-            ),
-          },
-          {
-            id: "vermenigvuldigen",
-            title: "Vermenigvuldigen",
-            content: (
-              <>
-                <ExampleBox>
-                  <p>
-                    (3/5) × (10/9) = (3 × 10)/(5 × 9). Vereenvoudig eerst: 3 en 9 → 1 en 3; 10 en 5 → 2 en 1. Resultaat = <strong>2/3</strong>.
-                  </p>
-                </ExampleBox>
-                <TipBox>
-                  <strong>Truc:</strong> Vereenvoudig kruislings <em>voor</em> je vermenigvuldigt; zo houd je de getallen klein.
-                </TipBox>
-              </>
-            ),
-          },
-          {
-            id: "delen",
-            title: "Delen",
-            content: (
-              <>
-                <ExampleBox>
-                  <p>(4/7) ÷ (2/3) = (4/7) × (3/2) = 12/14 = <strong>6/7</strong>.</p>
-                </ExampleBox>
-                <TipBox>
-                  <strong>Onthouden:</strong> Delen door een breuk = vermenigvuldigen met de <em>omgekeerde</em> breuk (teller ↔ noemer).
-                </TipBox>
-              </>
-            ),
-          },
-          {
-            id: "gemengd",
-            title: "Gemengde getallen",
-            content: (
-              <div className="grid gap-4 md:grid-cols-2">
-                <ExampleBox>
-                  <strong>Oneigen maken</strong>
-                  <br />2 3/4 = (2 × 4 + 3)/4 = 11/4.
-                </ExampleBox>
-                <ExampleBox>
-                  <strong>Gemengd maken</strong>
-                  <br />17/5 = 3 rest 2 = <strong>3 2/5</strong>.
-                </ExampleBox>
-              </div>
-            ),
-          },
-          {
-            id: "breukgetal",
-            title: "Breuk van een getal",
-            content: (
-              <div className="grid gap-4 md:grid-cols-2">
-                <div>
-                  <h3 className="text-lg font-semibold">Breuk van een getal</h3>
-                  <ExampleBox>
-                    3/8 van 64 = (64 ÷ 8) × 3 = <strong>24</strong>.
-                  </ExampleBox>
-                  <TipBox>Eerst delen door de noemer, daarna vermenigvuldigen met de teller.</TipBox>
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold">Getal bij een breuk</h3>
-                  <ExampleBox>
-                    2/5 is 18 → 1 deel = 18 ÷ 2 = 9 → geheel = 5 × 9 = <strong>45</strong>.
-                  </ExampleBox>
-                </div>
-              </div>
-            ),
-          },
-          {
-            id: "decimaal",
-            title: "Decimaal & procent",
-            content: (
-              <>
-                <div className="grid gap-3 md:grid-cols-3">
-                  <ExampleBox>
-                    <strong>Breuk → decimaal</strong>
-                    <br />1/4 = 0,25 • 3/8 = 0,375 • 1/3 ≈ 0,333…
-                  </ExampleBox>
-                  <ExampleBox>
-                    <strong>Breuk → procent</strong>
-                    <br />2/5 = 0,4 = <strong>40%</strong> • 3/4 = 0,75 = <strong>75%</strong>.
-                  </ExampleBox>
-                  <ExampleBox>
-                    <strong>Wanneer decimaal?</strong>
-                    <br />Rekenen met geld of lengtes is soms sneller in decimalen, exact uitrekenen doe je vaak met breuken.
-                  </ExampleBox>
-                </div>
-                <NoteBox>
-                  <strong>Notatie:</strong> Gebruik in het Nederlands een komma voor decimalen (0,5). Een rekenmachine mag met punten werken, maar schrijf de uitkomst met komma.
-                </NoteBox>
-              </>
-            ),
-          },
-          {
-            id: "oefenen",
-            title: "Oefenen & checks",
-            content: (
-              <>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <h3 className="text-lg font-semibold">Snelquiz</h3>
-                    <ul className="list-disc ml-5 space-y-1 text-sm">
-                      <li>Vereenvoudig 14/21.</li>
-                      <li>3/4 + 5/6 = ? (maak gelijknamig).</li>
-                      <li>2 1/3 − 3/5 = ?</li>
-                      <li>(5/8) × (12/15) = ? (vereenvoudig eerst).</li>
-                      <li>(7/9) ÷ (14/27) = ?</li>
-                      <li>3/10 van 250 = ?</li>
-                    </ul>
-                    <TipBox>Controleer of je antwoord logisch ligt tussen 0 en het hele getal.</TipBox>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold">Veelgemaakte fouten</h3>
-                    <ul className="list-disc ml-5 space-y-1 text-sm">
-                      <li><strong>Tellers én noemers optellen:</strong> mag alleen met gelijke noemer de tellers samenvoegen.</li>
-                      <li><strong>Vergeten te keren</strong> bij delen door een breuk.</li>
-                      <li><strong>Niet vereenvoudigen:</strong> geef het antwoord in de kleinste vorm.</li>
-                      <li><strong>Gemengde getallen bij elkaar optellen:</strong> zet om naar oneigen breuken of werk apart met hele en breukdeel.</li>
-                    </ul>
-                  </div>
-                </div>
-              </>
-            ),
-          },
-        ];
         <h3 className="text-lg font-semibold mt-4">2) Verdeling naar verhouding</h3>
         <ExampleBox>
           <p>
@@ -775,6 +270,7 @@ const verhoudingenSections: Section[] = [
               <li>Schaal 1 : 25 000, kaart 9,6 cm → echt?</li>
               <li>Verdeel €96 in 2 : 5.</li>
             </ul>
+            <TipBox>Check: schat grof. Ligt je antwoord logisch tussen 0 en het geheel?</TipBox>
           </div>
           <div>
             <h3 className="text-lg font-semibold">Veelgemaakte fouten</h3>
@@ -783,6 +279,265 @@ const verhoudingenSections: Section[] = [
               <li><strong>Niet naar 1 deel:</strong> reken eerst eenheidsprijs uit.</li>
               <li><strong>Percentages optellen:</strong> werk met factoren.</li>
               <li><strong>Schaal vergeten:</strong> zet eerst alles om naar dezelfde eenheid.</li>
+            </ul>
+          </div>
+        </div>
+      </>
+    ),
+  },
+];
+
+const breukenSections: Section[] = [
+  {
+    id: "kernidee",
+    title: "Kernidee",
+    content: (
+      <>
+        <p>
+          Een <strong>breuk</strong> geeft een deel van een geheel aan: <em>teller</em> (boven) en <em>noemer</em> (onder). Voorbeeld: 3/4 betekent 3 delen van in totaal 4 gelijke delen.
+        </p>
+        <TipBox>
+          <strong>Tip:</strong> Denk in gelijke delen. Zonder gelijke stukken kun je niet eerlijk vergelijken of optellen.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "begrippen",
+    title: "Begrippen",
+    content: (
+      <div className="grid gap-3 md:grid-cols-3">
+        <ExampleBox>
+          <strong>Teller / noemer</strong>
+          <br />Teller = hoeveel delen; noemer = in hoeveel gelijke delen het geheel is verdeeld.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Stambreuk</strong>
+          <br />Breuk met teller 1: 1/2, 1/3, 1/4 …
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Eigen / oneigen</strong>
+          <br />Eigen: teller &lt; noemer (3/5). Oneigen: teller ≥ noemer (7/4).
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Gelijknamig</strong>
+          <br />Zelfde noemer (zoals 2/7 en 5/7). Makkelijk optellen/aftrekken.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Gemengd getal</strong>
+          <br />Hele + breukdeel, bv. 2 3/4 = 11/4.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>GGD / KGV</strong>
+          <br />GGD = vereenvoudigen. KGV = gelijknamig maken.
+        </ExampleBox>
+      </div>
+    ),
+  },
+  {
+    id: "modellen",
+    title: "Modellen",
+    content: (
+      <div className="grid gap-3 md:grid-cols-3">
+        <ExampleBox>
+          <strong>Strookmodel</strong>
+          <br />Een strook in gelijke vakjes. 3/5 = 3 vakjes gekleurd van 5.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Cirkel/pizza</strong>
+          <br />Taart in punten. 1/8 = één punt van acht.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Getallenlijn</strong>
+          <br />Tussen 0 en 1 in gelijke stukjes. 3/4 ligt driekwart van de weg.
+        </ExampleBox>
+      </div>
+    ),
+  },
+  {
+    id: "vereenvoudigen",
+    title: "Vereenvoudigen & gelijkwaardig",
+    content: (
+      <>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <h3 className="text-lg font-semibold">Vereenvoudigen</h3>
+            <ExampleBox>
+              <p>12/18 → deel teller én noemer door GGD(12,18)=6 → <strong>2/3</strong>.</p>
+            </ExampleBox>
+            <TipBox>
+              <strong>Truc:</strong> Kruislings vereenvoudigen bij vermenigvuldigen voorkomt grote getallen.
+            </TipBox>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Gelijkwaardig maken</h3>
+            <ExampleBox>
+              <p>2/3 = 4/6 = 6/9 (teller en noemer × hetzelfde getal).</p>
+            </ExampleBox>
+          </div>
+        </div>
+        <WarnBox>
+          <strong>Let op:</strong> Teller en noemer mag je alleen met hetzelfde getal vermenigvuldigen of delen (≠ 0). De breuk blijft even groot.
+        </WarnBox>
+      </>
+    ),
+  },
+  {
+    id: "gelijknamig",
+    title: "Gelijknamig maken",
+    content: (
+      <>
+        <ExampleBox>
+          <p>Voor 3/4 en 2/3 is KGV(4,3)=12 → 3/4 = 9/12, 2/3 = 8/12.</p>
+        </ExampleBox>
+        <TipBox>
+          <strong>Truc:</strong> Soms is ×-ruil voldoende: 3/4 = (×3)/(×3) = 9/12, 2/3 = (×4)/(×4) = 8/12.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "optellen",
+    title: "Optellen & aftrekken",
+    content: (
+      <>
+        <h3 className="text-lg font-semibold">1) Gelijknamig</h3>
+        <ExampleBox>
+          <p>2/7 + 3/7 = (2+3)/7 = <strong>5/7</strong>.</p>
+        </ExampleBox>
+        <h3 className="text-lg font-semibold mt-4">2) Ongelijknamig</h3>
+        <ExampleBox>
+          <p>3/4 + 2/3 → KGV = 12 → 9/12 + 8/12 = 17/12 = <strong>1 5/12</strong>.</p>
+        </ExampleBox>
+        <h3 className="text-lg font-semibold mt-4">3) Aftrekken</h3>
+        <ExampleBox>
+          <p>5/6 − 1/4 → KGV = 12 → 10/12 − 3/12 = <strong>7/12</strong>.</p>
+        </ExampleBox>
+        <details className="bg-white border border-dashed border-border rounded-lg p-3 mt-3">
+          <summary className="cursor-pointer font-semibold text-primary">Veelvoorkomend schema</summary>
+          <pre className="bg-slate-900 text-slate-100 text-xs md:text-sm rounded-lg p-3 mt-2 overflow-auto">
+{`  a   c     ad ± bc
+  - ± -  =  -------  (met m = KGV(b,d))
+  b   d        bd
+→ Stap 1: naar KGV. Stap 2: tel/trek tellers op/af. Stap 3: vereenvoudig en maak evt. gemengd.`}
+          </pre>
+        </details>
+      </>
+    ),
+  },
+  {
+    id: "vermenigvuldigen",
+    title: "Vermenigvuldigen",
+    content: (
+      <>
+        <ExampleBox>
+          <p>
+            (3/5) × (10/9) = (3×10)/(5×9). Vereenvoudig kruislings: 3 en 9 → 1 en 3; 10 en 5 → 2 en 1. Resultaat = <strong>2/3</strong>.
+          </p>
+        </ExampleBox>
+        <TipBox>
+          <strong>Truc:</strong> Eerst vereenvoudigen (kruislings), daarna pas vermenigvuldigen.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "delen",
+    title: "Delen",
+    content: (
+      <>
+        <ExampleBox>
+          <p>(4/7) ÷ (2/3) = (4/7) × (3/2) = 12/14 = <strong>6/7</strong>.</p>
+        </ExampleBox>
+        <TipBox>
+          <strong>Onthouden:</strong> Delen door een breuk = vermenigvuldigen met de <em>omgekeerde</em> breuk (teller↔noemer).
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "gemengd",
+    title: "Gemengde getallen ↔ oneigen",
+    content: (
+      <div className="grid gap-4 md:grid-cols-2">
+        <ExampleBox>
+          <strong>Omzetten naar oneigen</strong>
+          <br />2 3/4 = (2×4+3)/4 = 11/4.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Omzetten naar gemengd</strong>
+          <br />17/5 = 3 rest 2 = <strong>3 2/5</strong>.
+        </ExampleBox>
+      </div>
+    ),
+  },
+  {
+    id: "breukgetal",
+    title: "Breuk van een getal / getal bij een breuk",
+    content: (
+      <div className="grid gap-4 md:grid-cols-2">
+        <div>
+          <h3 className="text-lg font-semibold">Breuk van een getal</h3>
+          <ExampleBox>3/8 van 64 = (64 ÷ 8) × 3 = <strong>24</strong>.</ExampleBox>
+          <TipBox>Eerst delen door de noemer, dan vermenigvuldigen met de teller.</TipBox>
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold">Getal bij een breuk</h3>
+          <ExampleBox>2/5 = 18 → 1 deel = 18 ÷ 2 = 9 → geheel = 5 × 9 = <strong>45</strong>.</ExampleBox>
+        </div>
+      </div>
+    ),
+  },
+  {
+    id: "decimaal",
+    title: "Decimale breuken & procent",
+    content: (
+      <>
+        <div className="grid gap-3 md:grid-cols-3">
+          <ExampleBox>
+            <strong>Breuk → decimaal</strong>
+            <br />1/4 = 0,25 • 3/8 = 0,375 • 1/3 ≈ 0,333…
+          </ExampleBox>
+          <ExampleBox>
+            <strong>Breuk → procent</strong>
+            <br />2/5 = 0,4 = <strong>40%</strong> • 3/4 = 0,75 = <strong>75%</strong>.
+          </ExampleBox>
+          <ExampleBox>
+            <strong>Wanneer handig?</strong>
+            <br />Rekenen met geld en meten: soms sneller als decimaal, soms als breuk (exact).
+          </ExampleBox>
+        </div>
+        <NoteBox>
+          <strong>Notatie:</strong> Gebruik een komma voor decimalen (0,5). In de rekenmachine mag je een punt gebruiken, maar schrijf antwoorden met komma.
+        </NoteBox>
+      </>
+    ),
+  },
+  {
+    id: "oefenen",
+    title: "Oefenen & checks",
+    content: (
+      <>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <h3 className="text-lg font-semibold">Snelquiz</h3>
+            <ul className="list-disc ml-5 space-y-1 text-sm">
+              <li>Vereenvoudig 14/21.</li>
+              <li>3/4 + 5/6 = ? (maak gelijknamig).</li>
+              <li>2 1/3 − 3/5 = ?</li>
+              <li>(5/8) × (12/15) = ? (vereenvoudig eerst).</li>
+              <li>(7/9) ÷ (14/27) = ?</li>
+              <li>3/10 van 250 = ?</li>
+            </ul>
+            <TipBox>Check: ligt je antwoord logisch tussen 0 en het geheel?</TipBox>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Veelgemaakte fouten</h3>
+            <ul className="list-disc ml-5 space-y-1 text-sm">
+              <li><strong>Tellers én noemers optellen:</strong> alleen tellers samen als de noemer gelijk is.</li>
+              <li><strong>Vergeten om te keren</strong> bij delen door een breuk.</li>
+              <li><strong>Niet vereenvoudigen:</strong> schrijf het antwoord in de kleinste vorm.</li>
+              <li><strong>Gemengde getallen optellen:</strong> zet om naar oneigen breuken of werk apart met hele en breukdeel.</li>
             </ul>
           </div>
         </div>
