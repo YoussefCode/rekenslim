@@ -576,6 +576,195 @@ const verhoudingenSections: Section[] = [
   },
 ];
 
+const procentenSections: Section[] = [
+  {
+    id: "basis",
+    title: "Wat zijn procenten?",
+    content: (
+      <>
+        <p>
+          Procent betekent <strong>per honderd</strong>. 1% is 1 op 100, 25% is 25 op 100, enzovoort.
+        </p>
+        <ExampleBox>
+          50% = 1/2 = 0,5 - 25% = 1/4 = 0,25 - 10% = 1/10 = 0,1 - 1% = 1/100 = 0,01
+        </ExampleBox>
+        <TipBox>
+          <strong>Truc:</strong> Begin met 10%, 5% en 1%. Combineer die delen om snel andere percentages te vinden.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "omzetten",
+    title: "Omzetten: procent ↔ breuk ↔ decimaal",
+    content: (
+      <>
+        <div className="grid gap-3 md:grid-cols-2">
+          <ExampleBox>
+            <strong>Procent → decimaal</strong>
+            <br />
+            Deel door 100. Bijvoorbeeld 37% → 0,37.
+          </ExampleBox>
+          <ExampleBox>
+            <strong>Procent → breuk</strong>
+            <br />
+            20% = 20/100 = 1/5 - 12,5% = 1/8.
+          </ExampleBox>
+        </div>
+        <SimpleTable
+          headers={["Percentage", "Breuk", "Decimaal"]}
+          rows={[
+            ["50%", "1/2", "0,5"],
+            ["25%", "1/4", "0,25"],
+            ["20%", "1/5", "0,2"],
+            ["10%", "1/10", "0,1"],
+            ["1%", "1/100", "0,01"],
+          ]}
+        />
+      </>
+    ),
+  },
+  {
+    id: "procentvan",
+    title: "Procent van een getal",
+    content: (
+      <>
+        <ExampleBox>
+          <strong>Regel:</strong> percentage van getal = getal ÷ 100 × percentage.
+        </ExampleBox>
+        <div className="grid gap-3 md:grid-cols-2">
+          <ExampleBox>
+            <strong>20% van 150</strong> = 150 ÷ 100 × 20 = <strong>30</strong>.
+          </ExampleBox>
+          <ExampleBox>
+            <strong>15% van 80</strong> = 10% (8) + 5% (4) = <strong>12</strong>.
+          </ExampleBox>
+        </div>
+        <TipBox>
+          <strong>Tip:</strong> Splits in 10%, 5% en 1% voor snelle hoofdrekensommen.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "korting",
+    title: "Korting",
+    content: (
+      <>
+        <p>Bij korting betaal je het <strong>restpercentage</strong> (100% − korting).</p>
+        <div className="grid gap-3 md:grid-cols-2">
+          <ExampleBox>
+            <strong>25% korting op €80</strong> → je betaalt 75%: 0,75 × 80 = <strong>€60</strong>.
+          </ExampleBox>
+          <ExampleBox>
+            <strong>30% korting op €50</strong> → je betaalt 70%: 0,70 × 50 = <strong>€35</strong>.
+          </ExampleBox>
+        </div>
+        <WarnBox>
+          <strong>Let op:</strong> Bij korting vermenigvuldig je met het resterende percentage. Delen door 0,7 hoort bij omgekeerde procenten.
+        </WarnBox>
+      </>
+    ),
+  },
+  {
+    id: "btw",
+    title: "BTW",
+    content: (
+      <>
+        <div className="grid gap-3 md:grid-cols-2">
+          <ExampleBox>
+            <strong>Excl. → incl. (21%)</strong>: ×1,21. <br />€100 → €121.
+          </ExampleBox>
+          <ExampleBox>
+            <strong>Incl. → excl. (21%)</strong>: ÷1,21. <br />€121 → €100.
+          </ExampleBox>
+        </div>
+        <NoteBox>Veelgebruikte tarieven: 21% (hoog) en 9% (laag).</NoteBox>
+      </>
+    ),
+  },
+  {
+    id: "groei",
+    title: "Groei & daling",
+    content: (
+      <>
+        <ExampleBox>
+          <strong>Formule:</strong> nieuwe waarde = oude waarde × (1 ± p/100).
+        </ExampleBox>
+        <div className="grid gap-3 md:grid-cols-2">
+          <ExampleBox>
+            <strong>+10% en daarna −10%</strong>: 1,10 × 0,90 = 0,99 → totaal <strong>−1%</strong>.
+          </ExampleBox>
+          <ExampleBox>
+            <strong>5 jaar +8%</strong>: factor = 1,08^5 (elk jaar dezelfde factor).
+          </ExampleBox>
+        </div>
+        <TipBox>
+          <strong>Tip:</strong> Bij meerdere stappen altijd met <em>factoren</em> werken, niet de percentages optellen.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "punten",
+    title: "Procentpunt",
+    content: (
+      <ExampleBox>
+        Van 20% naar 25% is +5 <em>procentpunt</em>. De procentuele stijging is 5/20 = <strong>+25%</strong>.
+      </ExampleBox>
+    ),
+  },
+  {
+    id: "omgekeerd",
+    title: "Omgekeerde procenten",
+    content: (
+      <>
+        <ExampleBox>
+          <strong>Formule:</strong> oude waarde = nieuwe waarde ÷ factor.
+        </ExampleBox>
+        <ExampleBox>
+          Laptop nu €750 na 25% korting → factor 0,75 → oud = 750 ÷ 0,75 = <strong>€1000</strong>.
+        </ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "oefenen",
+    title: "Oefenen & checks",
+    content: (
+      <>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <h3 className="text-lg font-semibold">Snelquiz</h3>
+            <ul className="list-disc ml-5 space-y-1 text-sm">
+              <li>25% van 240 = ?</li>
+              <li>€60 na 20% korting → oude prijs?</li>
+              <li>Van 30% naar 42%: groei in procentpunt en procent?</li>
+              <li>€150 excl. btw, 21% → incl. prijs?</li>
+            </ul>
+            <TipBox>Maak een schatting: hoort het antwoord groter of kleiner te zijn?</TipBox>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Veelgemaakte fouten</h3>
+            <ul className="list-disc ml-5 space-y-1 text-sm">
+              <li>Percentages optellen bij meerdere stappen → werk met factoren.</li>
+              <li>Korting toepassen door te delen door 0,7 i.p.v. met 0,7 te vermenigvuldigen.</li>
+              <li>Procentpunt verwarren met procentuele stijging.</li>
+            </ul>
+          </div>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          <span className="mr-2">Laatste update:</span>
+          <span className="rounded-md border border-border px-1.5 py-0.5 font-mono text-xs">Ctrl</span>
+          {" + "}
+          <span className="mr-2 rounded-md border border-border px-1.5 py-0.5 font-mono text-xs">P</span>
+          om te printen.
+        </div>
+      </>
+    ),
+  },
+];
+
 const breukenSections: Section[] = [
   {
     id: "kernidee",
@@ -859,6 +1048,12 @@ const domainData: Record<string, { title: string; subtitle: string; gradient: st
     subtitle: "Vereenvoudigen • Gelijknamig maken • Optellen • Aftrekken • Vermenigvuldigen • Delen • Gemengde getallen",
     gradient: "from-violet-600 to-indigo-600",
     sections: breukenSections,
+  },
+  procenten: {
+    title: "Rekenslim: Procenten",
+    subtitle: "Basis • Omzetten • Procent van een getal • Korting • BTW • Groei & daling • Procentpunten • Omgekeerd",
+    gradient: "from-blue-500 to-purple-600",
+    sections: procentenSections,
   },
 };
 
