@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
-type Question = { q: string; a: number; exp?: string };
+type Question = { q: string; a: number | string; exp?: string };
 type DomainSet = { title: string; description?: string; items: Question[] };
 
 const questionsByDomain: Record<string, DomainSet[]> = {
@@ -209,6 +209,74 @@ const questionsByDomain: Record<string, DomainSet[]> = {
       ],
     },
   ],
+  verhoudingen: [
+    {
+      title: "Verhoudingen",
+      description: "Strategieën: vereenvoudigen, naar 1 deel, constante factor k, schaalfactor, recept-opschalen, verhoudingstabellen.",
+      items: [
+        { q: "1. Vereenvoudig: 18:12 (geef als a:b)", a: "3:2", exp: "GGD(18,12)=6 → 3:2." },
+        { q: "2. Vereenvoudig: 45:30 (geef als a:b)", a: "3:2", exp: "GGD(45,30)=15 → 3:2." },
+        { q: "3. Vereenvoudig: 50:20 (geef als a:b)", a: "5:2", exp: "GGD(50,20)=10 → 5:2." },
+        { q: "4. Vereenvoudig: 42:56 (geef als a:b)", a: "3:4", exp: "GGD(42,56)=14 → 3:4." },
+        { q: "5. Vereenvoudig: 36:48 (geef als a:b)", a: "3:4", exp: "GGD(36,48)=12 → 3:4." },
+        { q: "6. Vereenvoudig: 96:72 (geef als a:b)", a: "4:3", exp: "GGD(96,72)=24 → 4:3." },
+        { q: "7. Vereenvoudig: 14:35 (geef als a:b)", a: "2:5", exp: "GGD(14,35)=7 → 2:5." },
+        { q: "8. Vereenvoudig: 28:42 (geef als a:b)", a: "2:3", exp: "GGD(28,42)=14 → 2:3." },
+        { q: "9. Vereenvoudig: 63:84 (geef als a:b)", a: "3:4", exp: "GGD(63,84)=21 → 3:4." },
+        { q: "10. Vereenvoudig: 120:150 (geef als a:b)", a: "4:5", exp: "GGD(120,150)=30 → 4:5." },
+        { q: "11. Vereenvoudig: 81:27 (geef als a:b)", a: "3:1", exp: "GGD(81,27)=27 → 3:1." },
+        { q: "12. Vereenvoudig: 44:11 (geef als a:b)", a: "4:1", exp: "GGD(44,11)=11 → 4:1." },
+        { q: "13. 500 verdeeld over 20 → gram per portie (2 dec) =", a: 25.0, exp: "Eenheidsmaat = 25.0 g/p." },
+        { q: "14. 2.5 verdeeld over 5 → liter per deel (2 dec) =", a: 0.5, exp: "Eenheidsmaat = 0.5 L/deel." },
+        { q: "15. 3.6 verdeeld over 12 → km per min (2 dec) =", a: 0.3, exp: "Eenheidsmaat = 0.3 km/min." },
+        { q: "16. 240 verdeeld over 3 → € per kg (2 dec) =", a: 80.0, exp: "Eenheidsmaat = 80.0 €/kg." },
+        { q: "17. 90 verdeeld over 15 → km/u (2 dec) =", a: 6.0, exp: "Eenheidsmaat = 6.0 km/u." },
+        { q: "18. 7.2 verdeeld over 12 → € per stuk (2 dec) =", a: 0.6, exp: "Eenheidsmaat = 0.6 €/stuk." },
+        { q: "19. 1.5 verdeeld over 6 → L per persoon (2 dec) =", a: 0.25, exp: "Eenheidsmaat = 0.25 L/p." },
+        { q: "20. 8 verdeeld over 0.5 → km per uur (2 dec) =", a: 16.0, exp: "Eenheidsmaat = 16.0 km/u." },
+        { q: "21. 24 verdeeld over 3 → stuks per doos (2 dec) =", a: 8.0, exp: "Eenheidsmaat = 8.0 st/doos." },
+        { q: "22. 450 verdeeld over 9 → g per koek (2 dec) =", a: 50.0, exp: "Eenheidsmaat = 50.0 g/koek." },
+        { q: "23. (x,y)=(3,12); bereken y bij x=7", a: 28.0, exp: "k=12/3=4.00 → y=kx=4.00×7=28.0." },
+        { q: "24. (x,y)=(5,40); bereken y bij x=12", a: 96.0, exp: "k=40/5=8.00 → y=kx=8.00×12=96.0." },
+        { q: "25. (x,y)=(8,24); bereken x bij y=9", a: 3.0, exp: "k=24/8=3.00 → x=y/k=9/3.00=3.0." },
+        { q: "26. (x,y)=(12,30); bereken x bij y=20", a: 8.0, exp: "k=30/12=2.50 → x=y/k=20/2.50=8.0." },
+        { q: "27. (x,y)=(7,56); bereken y bij x=3", a: 24.0, exp: "k=56/7=8.00 → y=kx=8.00×3=24.0." },
+        { q: "28. (x,y)=(4,18); bereken x bij y=27", a: 6.0, exp: "k=18/4=4.50 → x=y/k=27/4.50=6.0." },
+        { q: "29. (x,y)=(9,63); bereken y bij x=5", a: 35.0, exp: "k=63/9=7.00 → y=kx=7.00×5=35.0." },
+        { q: "30. (x,y)=(6,21); bereken x bij y=14", a: 4.0, exp: "k=21/6=3.50 → x=y/k=14/3.50=4.0." },
+        { q: "31. Schaal 1:10000. Kaart = 3.5 → werkelijkheid =", a: 35000.0, exp: "Vermenigvuldig met 10000/1 → 35000.0." },
+        { q: "32. Schaal 1:5000. Werkelijkheid = 125 → kaart =", a: 0.03, exp: "Vermenigvuldig met 1/5000 → 0.03." },
+        { q: "33. Schaal 2:1. Kaart = 6 → werkelijkheid =", a: 3.0, exp: "Vermenigvuldig met 1/2 → 3.0." },
+        { q: "34. Schaal 1:2. Werkelijkheid = 14 → kaart =", a: 7.0, exp: "Vermenigvuldig met 1/2 → 7.0." },
+        { q: "35. Schaal 1:25000. Kaart = 8 → werkelijkheid =", a: 200000.0, exp: "Vermenigvuldig met 25000/1 → 200000.0." },
+        { q: "36. Schaal 1:200. Werkelijkheid = 3.6 → kaart =", a: 0.02, exp: "Vermenigvuldig met 1/200 → 0.02." },
+        { q: "37. Schaal 3:2. Kaart = 45 → werkelijkheid =", a: 30.0, exp: "Vermenigvuldig met 2/3 → 30.0." },
+        { q: "38. Schaal 5:1. Werkelijkheid = 12 → kaart =", a: 60.0, exp: "Vermenigvuldig met 5/1 → 60.0." },
+        { q: "39. Recept water:siroop=5:2. Als eerste=14, tweede=", a: 5.6, exp: "b/a=2/5 → b=5.6." },
+        { q: "40. Recept melk:meel=3:2. Als tweede=450, eerste=", a: 675.0, exp: "a/b=3/2 → a=675.0." },
+        { q: "41. Recept bloem:suiker=4:1. Als eerste=300, tweede=", a: 75.0, exp: "b/a=1/4 → b=75.0." },
+        { q: "42. Recept rijst:water=1:1,5. Als tweede=600, eerste=", a: 400.0, exp: "a/b=1/1.5 → a=400.0." },
+        { q: "43. Recept appels:peren=7:3. Als tweede=900, eerste=", a: 2100.0, exp: "a/b=7/3 → a=2100.0." },
+        { q: "44. Recept tomaat:olie=5:1. Als eerste=250, tweede=", a: 50.0, exp: "b/a=1/5 → b=50.0." },
+        { q: "45. d bij s=60, t=2 =", a: 120, exp: "d=s×t=120." },
+        { q: "46. s bij d=210, t=3 =", a: 70.0, exp: "s=d/t=70.0." },
+        { q: "47. t bij d=180, s=90 =", a: 2.0, exp: "t=d/s=2.0." },
+        { q: "48. d bij s=72, t=2.5 =", a: 180.0, exp: "d=s×t=180.0." },
+        { q: "49. s bij d=35, t=0.5 =", a: 70.0, exp: "s=d/t=70.0." },
+        { q: "50. t bij d=132, s=48 =", a: 2.75, exp: "t=d/s=2.75." },
+        { q: "51. d bij s=5.5, t=1.75 =", a: 9.62, exp: "d=s×t=9.62." },
+        { q: "52. s bij d=66, t=1.2 =", a: 55.0, exp: "s=d/t=55.0." },
+        { q: "53. Equivalent?: 2:3 vs 8:12 (1=ja,0=nee)", a: 1, exp: "Vergelijk a/b." },
+        { q: "54. Equivalent?: 5:7 vs 25:30 (1=ja,0=nee)", a: 0, exp: "Vergelijk a/b." },
+        { q: "55. Equivalent?: 4:6 vs 10:15 (1=ja,0=nee)", a: 1, exp: "Vergelijk a/b." },
+        { q: "56. Equivalent?: 9:12 vs 15:21 (1=ja,0=nee)", a: 0, exp: "Vergelijk a/b." },
+        { q: "57. Schaal 1:25000, 7,2 cm → werkelijkheid (m) =", a: 1800.0, exp: "7,2×250 m = 1800,0." },
+        { q: "58. 4:3 = a:450 → a =", a: 600.0, exp: "a=(4/3)×450=600." },
+        { q: "59. 3 kg voor €7,50 → €/kg =", a: 2.5, exp: "=2,50." },
+        { q: "60. 2:5 = x:20 → x =", a: 8.0, exp: "=8." },
+      ],
+    },
+  ],
 };
 
 const QuizSet: React.FC<{ items: Question[] }> = ({ items }) => {
@@ -242,16 +310,52 @@ const QuizSet: React.FC<{ items: Question[] }> = ({ items }) => {
     return v.replace(",", ".");
   }, []);
 
+  const parseRatio = React.useCallback((value: string) => {
+    const cleaned = value.replace(/\s/g, "");
+    if (!cleaned.includes(":")) {
+      return null;
+    }
+    const parts = cleaned.split(":");
+    if (parts.length !== 2) {
+      return null;
+    }
+    const left = parseFloat(parts[0].replace(",", "."));
+    const right = parseFloat(parts[1].replace(",", "."));
+    if (isNaN(left) || isNaN(right) || right === 0) {
+      return null;
+    }
+    return { left, right };
+  }, []);
+
   const equal = React.useCallback(
-    (input: string, expected: number) => {
-      const parsed = parseFloat(normalize(input));
-      if (isNaN(parsed) || isNaN(expected)) {
-        return false;
+    (input: string, expected: number | string) => {
+      const expectedRatio = typeof expected === "string" ? parseRatio(expected) : null;
+      const inputRatio = parseRatio(input);
+
+      if (expectedRatio) {
+        if (inputRatio) {
+          const cross = Math.abs(expectedRatio.left * inputRatio.right - expectedRatio.right * inputRatio.left);
+          return cross < 0.0001;
+        }
+        const parsedInput = parseFloat(normalize(input));
+        if (isNaN(parsedInput)) {
+          return false;
+        }
+        const target = expectedRatio.left / expectedRatio.right;
+        return Math.abs(parsedInput - target) <= 0.01;
       }
-      const tolerance = Math.floor(expected) === expected ? 0 : 0.01;
-      return Math.abs(parsed - expected) <= tolerance;
+
+      const normalizedExpected = typeof expected === "string" ? parseFloat(normalize(expected)) : expected;
+      const parsedInput = parseFloat(normalize(input));
+
+      if (isNaN(parsedInput) || isNaN(normalizedExpected)) {
+        return typeof expected === "string" && normalize(input).toLowerCase() === normalize(expected).toLowerCase();
+      }
+
+      const tolerance = Math.floor(normalizedExpected) === normalizedExpected ? 0 : 0.01;
+      return Math.abs(parsedInput - normalizedExpected) <= tolerance;
     },
-    [normalize]
+    [normalize, parseRatio]
   );
 
   const handleCheck = React.useCallback(() => {
@@ -346,7 +450,8 @@ const PracticeQuestions = () => {
     );
   }
 
-  const domainTitle = domain === "getallen" ? "Getallen" : domain === "verbanden" ? "Verbanden" : domain;
+  const domainTitle =
+    domain === "getallen" ? "Getallen" : domain === "verbanden" ? "Verbanden" : domain === "verhoudingen" ? "Verhoudingen" : domain;
   const totalQuestions = domainSets.reduce((sum, set) => sum + set.items.length, 0);
   const infoText = domainSets.length > 1 ? `${totalQuestions} vragen over ${domainSets.length} sets – automatische controle` : `${totalQuestions} vragen – automatische controle`;
 

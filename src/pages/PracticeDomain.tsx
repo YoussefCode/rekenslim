@@ -21,6 +21,18 @@ const TipBox = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
+const WarnBox = ({ children }: { children: React.ReactNode }) => (
+  <div className="bg-rose-50 border border-rose-200 p-4 rounded-lg my-3">
+    {children}
+  </div>
+);
+
+const Pill = ({ children }: { children: React.ReactNode }) => (
+  <span className="inline-flex items-center rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">
+    {children}
+  </span>
+);
+
 const SimpleTable = ({ headers, rows }: { headers: string[]; rows: (string | number)[][] }) => (
   <table className="w-full border-collapse my-2 text-sm">
     <thead>
@@ -251,6 +263,267 @@ const getallenSections: Section[] = [
   },
 ];
 
+const verhoudingenSections: Section[] = [
+  {
+    id: "kernidee",
+    title: "Kernidee",
+    content: (
+      <>
+        <p>
+          Een <strong>verhouding</strong> vergelijkt hoeveelheden, zoals <em>3 : 2</em>. Je gebruikt verhoudingen om eerlijk te verdelen, te schalen, prijzen te vergelijken en procenten te begrijpen.
+        </p>
+        <TipBox>
+          <strong>Tip:</strong> Noteer steeds <em>wat bij wat</em> hoort. Bijvoorbeeld <Pill>suiker : meel = 2 : 5</Pill> of <Pill>prijs : gewicht</Pill>.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "begrippen",
+    title: "Begrippen",
+    content: (
+      <div className="grid gap-3 md:grid-cols-2">
+        <ExampleBox>
+          <strong>Verhouding a : b</strong>
+          <br />Vergelijking tussen twee grootheden. Voorbeeld: jongens : meisjes = 3 : 2.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Deel-geheel</strong>
+          <br />Een deel vergeleken met het geheel. Voorbeeld: 12 van 30 = 12 : 30 = 2 : 5 = 40%.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Evenredig</strong>
+          <br />Als één hoeveelheid ×k gaat, gaat de andere ook ×k. In een grafiek: rechte lijn door (0,0).
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Verhoudingstabel</strong>
+          <br />Netjes ×k of ÷k toepassen en tussenstappen bijhouden.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Dubbele getallenlijn</strong>
+          <br />Twee evenwijdige lijnen met bij elkaar horende waarden.
+        </ExampleBox>
+        <ExampleBox>
+          <strong>Schaal</strong>
+          <br />Kaart of model versus echt. Bijvoorbeeld 1 : 50 000 → 1 cm op kaart = 500 m echt.
+        </ExampleBox>
+      </div>
+    ),
+  },
+  {
+    id: "representaties",
+    title: "Representaties",
+    content: (
+      <>
+        <h3 className="text-lg font-semibold mt-2">1) Verhoudingstabel</h3>
+        <ExampleBox>
+          <p>
+            <strong>Voorbeeld:</strong> 3 pennen kosten €6. Wat kosten 5 pennen?
+          </p>
+          <SimpleTable headers={["stuks", "3", "1", "5"]} rows={[["prijs (€)", "6", "2", "10"]]} />
+          <p>Stap: ÷3 naar 1 stuk (€2), daarna ×5 → €10.</p>
+        </ExampleBox>
+
+        <h3 className="text-lg font-semibold mt-4">2) Dubbele getallenlijn</h3>
+        <ExampleBox>
+          <p>
+            <strong>Voorbeeld:</strong> 4 kg appels kost €7,50. Wat kost 2,5 kg?
+          </p>
+          <pre className="bg-slate-900 text-slate-100 text-xs md:text-sm rounded-lg p-3 overflow-auto">
+{`kg: 0 ───── 2 ───── 4
+€ : 0 ─── 3,75 ─── 7,50`}
+          </pre>
+          <p>Eerst naar 1 kg (7,50 ÷ 4 = 1,875), daarna naar 2,5 kg → €4,69.</p>
+        </ExampleBox>
+
+        <h3 className="text-lg font-semibold mt-4">3) Strookmodel (deel-geheel)</h3>
+        <ExampleBox>
+          <p>
+            <strong>Voorbeeld:</strong> In een klas is de verhouding jongens : meisjes = 3 : 2. Er zijn 25 leerlingen.
+          </p>
+          <p>Totaal delen = 3 + 2 = 5 → 25 ÷ 5 = 5 per deel. Jongens = 3×5 = 15, meisjes = 2×5 = 10.</p>
+        </ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "omzetten",
+    title: "Omzetten & vereenvoudigen",
+    content: (
+      <>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <h3 className="text-lg font-semibold">Vereenvoudigen</h3>
+            <ExampleBox>
+              <p>18 : 24 → beide ÷6 → 3 : 4.</p>
+            </ExampleBox>
+            <TipBox>
+              <strong>Truc:</strong> Gebruik de <em>grootste gemene deler</em> om meteen de kleinste vorm te krijgen.
+            </TipBox>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Gelijkwaardige verhoudingen</h3>
+            <ExampleBox>
+              <p>2 : 5 = 4 : 10 = 6 : 15 (vermenigvuldig of deel beide kanten met dezelfde factor).</p>
+            </ExampleBox>
+          </div>
+        </div>
+
+        <h3 className="text-lg font-semibold mt-4">Breuk ↔ verhouding ↔ percentage</h3>
+        <ExampleBox>
+          <ul className="list-disc ml-5 space-y-1">
+            <li>12 van 30 → 12/30 = 2/5 = 40% = verhouding 2 : 5.</li>
+            <li>0,25 = 1/4 = 25% = 1 : 4 (deel-geheel).</li>
+          </ul>
+        </ExampleBox>
+        <WarnBox>
+          <strong>Let op:</strong> Bij deel-geheel hoort het geheel = 100% (= alle delen samen).
+        </WarnBox>
+      </>
+    ),
+  },
+  {
+    id: "rekenen",
+    title: "Rekenen met verhoudingen",
+    content: (
+      <>
+        <h3 className="text-lg font-semibold">1) Schalen</h3>
+        <ExampleBox>
+          <p>
+            <strong>Voorbeeld:</strong> Recept voor 4 personen → 10 personen. Factor = 10/4 = 2,5. Alle hoeveelheden × 2,5.
+          </p>
+        </ExampleBox>
+
+        <h3 className="text-lg font-semibold mt-4">2) Verdeling naar verhouding</h3>
+        <ExampleBox>
+          <p>
+            <strong>Voorbeeld:</strong> Verdeel €84 in verhouding 3 : 4 : 5.
+          </p>
+          <ul className="list-disc ml-5 space-y-1">
+            <li>Som delen = 12 → 1 deel = €7.</li>
+            <li>Bedragen: 21, 28, 35.</li>
+          </ul>
+        </ExampleBox>
+
+        <h3 className="text-lg font-semibold mt-4">3) Snelheid / dichtheid / eenheidsprijs</h3>
+        <ExampleBox>
+          <p>150 km in 2 uur → 75 km/u. Benzine €1,89 per liter → 10 L kost €18,90.</p>
+        </ExampleBox>
+
+        <h3 className="text-lg font-semibold mt-4">4) Omgekeerd evenredig</h3>
+        <ExampleBox>
+          <p>
+            <strong>Voorbeeld:</strong> 6 arbeiders → 10 dagen. Tempo blijft gelijk, dus 6×10 = 60. Met 15 arbeiders: 60 ÷ 15 = 4 dagen.
+          </p>
+        </ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "procenten",
+    title: "Procenten",
+    content: (
+      <>
+        <h3 className="text-lg font-semibold">1) Basis</h3>
+        <ExampleBox>
+          <p>30% van 250 = 0,30 × 250 = 75.</p>
+        </ExampleBox>
+
+        <h3 className="text-lg font-semibold mt-4">2) Korting & btw</h3>
+        <ExampleBox>
+          <p>€80 met 25% korting → betaal 75% = €60.</p>
+          <p>€120 incl. 21% btw → deel door 1,21 ≈ €99,17.</p>
+        </ExampleBox>
+
+        <h3 className="text-lg font-semibold mt-4">3) Procentpunt vs procent</h3>
+        <ExampleBox>
+          <p>Van 20% naar 25% is +5 procentpunt. Relatieve stijging = 5/20 = 25%.</p>
+        </ExampleBox>
+
+        <h3 className="text-lg font-semibold mt-4">4) Na elkaar</h3>
+        <ExampleBox>
+          <p>+10% en daarna −10% → 1,1 × 0,9 = 0,99 → totaal −1%.</p>
+        </ExampleBox>
+        <TipBox>
+          <strong>Truc:</strong> Denk in factoren: +p% = ×(1 + p/100), −p% = ×(1 − p/100).
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "schaal",
+    title: "Schaal",
+    content: (
+      <>
+        <ExampleBox>
+          <p>
+            <strong>Schaal 1 : 50 000</strong> → 1 cm op kaart = 500 m echt. 7,2 cm → 7,2 × 500 m = 3,6 km.
+          </p>
+        </ExampleBox>
+        <ExampleBox>
+          <p>
+            <strong>Omgekeerd:</strong> 2 km echt → 200 000 cm → 200 000 ÷ 50 000 = 4 cm op kaart.
+          </p>
+        </ExampleBox>
+        <TipBox>
+          <strong>Stappenplan:</strong> Zet alle maten eerst om naar dezelfde eenheid, pas daarna de schaal toe.
+        </TipBox>
+      </>
+    ),
+  },
+  {
+    id: "recepten",
+    title: "Recepten & verdunnen",
+    content: (
+      <>
+        <h3 className="text-lg font-semibold">1) Recept aanpassen</h3>
+        <ExampleBox>
+          <p>Voor 6 personen heb je 300 g pasta nodig. Voor 14 personen → factor 14/6 ≈ 2,33 → 300 × 2,33 ≈ 700 g.</p>
+        </ExampleBox>
+
+        <h3 className="text-lg font-semibold mt-4">2) Verdunnen</h3>
+        <ExampleBox>
+          <p>Siroop : water = 1 : 7. Voor 2 liter drank → delen = 8 → 2 000 mL ÷ 8 = 250 mL siroop + 1 750 mL water.</p>
+        </ExampleBox>
+
+        <h3 className="text-lg font-semibold mt-4">3) Mengverhouding</h3>
+        <ExampleBox>
+          <p>Verf mengen 2 : 3. Nodig 1,25 L → delen = 5 → 1 deel = 0,25 L → A = 0,5 L, B = 0,75 L.</p>
+        </ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "oefenen",
+    title: "Oefenen & checks",
+    content: (
+      <>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <h3 className="text-lg font-semibold">Snelquiz</h3>
+            <ul className="list-disc ml-5 space-y-1 text-sm">
+              <li>Vereenvoudig 42 : 56.</li>
+              <li>Artikel €45 met 20% korting. Wat betaal je?</li>
+              <li>Recept 5 → 12 personen (150 g suiker → ?).</li>
+              <li>Schaal 1 : 25 000, kaart 9,6 cm → echt?</li>
+              <li>Verdeel €96 in 2 : 5.</li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold">Veelgemaakte fouten</h3>
+            <ul className="list-disc ml-5 space-y-1 text-sm">
+              <li><strong>Verkeerde grootheid:</strong> schrijf eenheden erbij.</li>
+              <li><strong>Niet naar 1 deel:</strong> reken eerst eenheidsprijs uit.</li>
+              <li><strong>Percentages optellen:</strong> werk met factoren.</li>
+              <li><strong>Schaal vergeten:</strong> zet eerst alles om naar dezelfde eenheid.</li>
+            </ul>
+          </div>
+        </div>
+      </>
+    ),
+  },
+];
+
 const domainData: Record<string, { title: string; subtitle: string; gradient: string; sections: Section[] }> = {
   getallen: {
     title: "Rekenslim: Getallen",
@@ -263,6 +536,12 @@ const domainData: Record<string, { title: string; subtitle: string; gradient: st
     subtitle: "Tabellen • Grafieken • Formules • Lineaire verbanden • Evenredigheid • Hellingsgetal • Startgetal",
     gradient: "from-primary to-purple-600",
     sections: verbandenSections,
+  },
+  verhoudingen: {
+    title: "Rekenslim: Verhoudingen",
+    subtitle: "Verhoudingstabel • Dubbele getallenlijn • Schalen • Percentages • Recepten • Verdeling naar verhouding",
+    gradient: "from-sky-600 to-cyan-600",
+    sections: verhoudingenSections,
   },
 };
 
