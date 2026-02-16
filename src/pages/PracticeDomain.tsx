@@ -1090,13 +1090,16 @@ const PracticeDomain = () => {
       <nav className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-3 flex gap-2 flex-wrap">
           {data.sections.map((s) => (
-            <a
+            <button
               key={s.id}
-              href={`#${s.id}`}
+              onClick={() => {
+                const el = document.getElementById(s.id);
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
               className="px-3 py-1.5 bg-background border border-border rounded-md text-sm text-primary hover:bg-accent transition-colors"
             >
               {s.title}
-            </a>
+            </button>
           ))}
         </div>
       </nav>
