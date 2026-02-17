@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Calculator, BookOpen, TrendingUp, Divide, ArrowLeft, Percent } from "lucide-react";
+import { Calculator, BookOpen, TrendingUp, Divide, ArrowLeft, Percent, Ruler } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 const domains = [
@@ -32,6 +32,13 @@ const domains = [
     description: "Tellers, noemers, gelijknamig maken en gemengde getallen",
     icon: Divide,
     color: "from-violet-500 to-violet-600",
+  },
+  {
+    id: "meten",
+    title: "Meten en meetkunde",
+    description: "Lengte, oppervlakte, inhoud, hoeken, driehoeken en symmetrie",
+    icon: Ruler,
+    color: "from-teal-500 to-teal-600",
   },
   {
     id: "verbanden",
