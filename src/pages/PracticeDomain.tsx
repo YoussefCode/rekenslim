@@ -1030,6 +1030,148 @@ const breukenSections: Section[] = [
   },
 ];
 
+const metenSections: Section[] = [
+  {
+    id: "lengte",
+    title: "Lengte",
+    content: (
+      <>
+        <p>Lengte meet hoe lang iets is. Je gebruikt altijd dezelfde vaste trap:</p>
+        <ExampleBox>mm → cm → dm → m → dam → hm → km</ExampleBox>
+        <TipBox><strong>Trucje ezelsbrug:</strong> "Mijn Cavia Draagt Mooie Hoedjes, Kijk!" → mm, cm, dm, m, hm, km.</TipBox>
+        <h3 className="text-lg font-semibold mt-4">Voorbeelden</h3>
+        <ExampleBox><strong>Voorbeeld 1:</strong><br />5,8 m → cm<br />1 meter = 100 cm → 5,8 × 100 = <strong>580 cm</strong></ExampleBox>
+        <ExampleBox><strong>Voorbeeld 2:</strong><br />420 cm → m<br />420 ÷ 100 = <strong>4,20 m</strong></ExampleBox>
+        <WarnBox><strong>Veelgemaakte fout:</strong> cm ↔ m is ×100 of ÷100, niet ×10!</WarnBox>
+      </>
+    ),
+  },
+  {
+    id: "oppervlakte",
+    title: "Oppervlakte",
+    content: (
+      <>
+        <p>Oppervlakte gaat over hoeveel ruimte een vlak inneemt (2D). Elke stap in het metriek stelsel is ×100 of ÷100.</p>
+        <h3 className="text-lg font-semibold mt-4">Belangrijke formules</h3>
+        <ExampleBox>Rechthoek: A = l × b</ExampleBox>
+        <ExampleBox>Vierkant: A = z²</ExampleBox>
+        <ExampleBox>Driehoek: A = ½ × b × h</ExampleBox>
+        <ExampleBox>Parallellogram: A = b × h</ExampleBox>
+        <h3 className="text-lg font-semibold mt-4">Voorbeelden</h3>
+        <ExampleBox><strong>Voorbeeld 1:</strong><br />Rechthoek van 12 cm × 7 cm → 12 × 7 = <strong>84 cm²</strong></ExampleBox>
+        <ExampleBox><strong>Voorbeeld 2 (verschillende eenheden):</strong><br />3 dm × 50 cm → beide naar cm<br />3 dm = 30 cm → 30 × 50 = <strong>1500 cm²</strong></ExampleBox>
+        <TipBox><strong>TRUCJE: DUBBEL DIMENSIE TRUC</strong><br />Bij oppervlakte heb je TWEE dimensies → elke stap ×100.</TipBox>
+      </>
+    ),
+  },
+  {
+    id: "inhoud",
+    title: "Inhoud",
+    content: (
+      <>
+        <p>Inhoud gaat over hoeveel iets kan bevatten (3D). Grote eenheden:</p>
+        <SimpleTable headers={["Omrekening"]} rows={[["1 L = 1 dm³"], ["1 m³ = 1000 L"], ["1000 ml = 1 L"]]} />
+        <TipBox><strong>TRUCJE: Melkpak-methode</strong><br />1 L = 1 melkpak. Een kubieke meter is 1000 melkpakken.</TipBox>
+        <h3 className="text-lg font-semibold mt-4">Voorbeelden</h3>
+        <ExampleBox><strong>Voorbeeld 1:</strong> 2500 ml → L<br />2500 ÷ 1000 = <strong>2,5 L</strong></ExampleBox>
+        <ExampleBox><strong>Voorbeeld 2:</strong> 3,5 m³ → L<br />3,5 × 1000 = <strong>3500 L</strong></ExampleBox>
+        <ExampleBox><strong>Voorbeeld 3 (blok):</strong><br />V = l × b × h = 4 m × 0,5 m × 2 m = <strong>4 m³</strong></ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "massa",
+    title: "Massa",
+    content: (
+      <>
+        <SimpleTable headers={["Omrekening"]} rows={[["1 kg = 1000 g"], ["1 g = 1000 mg"], ["1 ton = 1000 kg"]]} />
+        <TipBox><strong>TRUCJE:</strong> Groot → klein = ×. Klein → groot = ÷.</TipBox>
+        <ExampleBox><strong>Voorbeeld:</strong> 4,2 kg = 4200 g</ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "tijd",
+    title: "Tijd",
+    content: (
+      <>
+        <SimpleTable headers={["Omrekening"]} rows={[["1 min = 60 sec"], ["1 uur = 60 min"], ["1 dag = 24 uur"]]} />
+        <TipBox><strong>TRUCJE: Tijdlijn!</strong><br />Maak altijd tussenstappen.</TipBox>
+        <ExampleBox><strong>Voorbeeld:</strong><br />13:45 → 16:15 = 15 min + 2 uur + 15 min = <strong>2 uur 30 min</strong></ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "hoeken",
+    title: "Hoeken",
+    content: (
+      <>
+        <ExampleBox>
+          <ul className="list-disc ml-5 space-y-1">
+            <li>Scherp: &lt; 90°</li>
+            <li>Recht: 90°</li>
+            <li>Stomp: 90–180°</li>
+            <li>Gestrekt: 180°</li>
+          </ul>
+        </ExampleBox>
+        <TipBox><strong>TRUCJE: klokmethode</strong><br />• 3 uur = 90° • 6 uur = 180° • 9 uur = 270°</TipBox>
+      </>
+    ),
+  },
+  {
+    id: "driehoeken",
+    title: "Driehoeken",
+    content: (
+      <>
+        <ExampleBox>
+          <ul className="list-disc ml-5 space-y-1">
+            <li>Gelijkzijdig: 3 gelijke zijden, hoeken 60°</li>
+            <li>Gelijkbenig: 2 gelijke zijden</li>
+            <li>Rechthoekig: hoek van 90°</li>
+          </ul>
+        </ExampleBox>
+        <TipBox><strong>Hoekensom:</strong> Altijd 180°.</TipBox>
+        <ExampleBox><strong>Voorbeeld:</strong> Hoeken 45° en 65° → derde hoek = 180 − 45 − 65 = <strong>70°</strong></ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "cirkel",
+    title: "Cirkels",
+    content: (
+      <>
+        <ExampleBox>Omtrek cirkel = 2πr</ExampleBox>
+        <ExampleBox>Oppervlakte cirkel = πr²</ExampleBox>
+        <TipBox><strong>TRUCJE:</strong><br />• r = helft van diameter<br />• Voor snelle schatting: π ≈ 3</TipBox>
+        <ExampleBox><strong>Voorbeeld:</strong><br />r = 7 cm → A = π × 49 ≈ 3,14 × 49 = <strong>153,9 cm²</strong></ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "constructies",
+    title: "Constructies",
+    content: (
+      <>
+        <ExampleBox><strong>Constructie 1:</strong> Een lijn loodrecht op een andere lijn<br />Gebruik passer → boogjes boven en onder → verbind snijpunten.</ExampleBox>
+        <ExampleBox><strong>Constructie 2:</strong> Middelloodlijn<br />Boogjes links/rechts van twee punten → verbind snijpunten.</ExampleBox>
+      </>
+    ),
+  },
+  {
+    id: "symmetrie",
+    title: "Symmetrie",
+    content: (
+      <ExampleBox>
+        <ul className="list-disc ml-5 space-y-1">
+          <li>Lijnsymmetrie → spiegelen</li>
+          <li>Puntsymmetrie → 180° draaien</li>
+          <li>Draaisymmetrie → figuur past na rotatie</li>
+        </ul>
+      </ExampleBox>
+    ),
+  },
+];
+
 const domainData: Record<string, { title: string; subtitle: string; gradient: string; sections: Section[] }> = {
   getallen: {
     title: "Rekenslim: Getallen",
@@ -1060,6 +1202,12 @@ const domainData: Record<string, { title: string; subtitle: string; gradient: st
     subtitle: "Basis • Omzetten • Procent van een getal • Korting • BTW • Groei & daling • Procentpunten • Omgekeerd",
     gradient: "from-blue-500 to-blue-700",
     sections: procentenSections,
+  },
+  meten: {
+    title: "Rekenslim: Meten & Meetkunde",
+    subtitle: "Lengte • Oppervlakte • Inhoud • Massa • Tijd • Hoeken • Driehoeken • Cirkels • Constructies • Symmetrie",
+    gradient: "from-blue-500 to-blue-700",
+    sections: metenSections,
   },
 };
 
