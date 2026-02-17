@@ -413,6 +413,113 @@ const questionsByDomain: Record<string, DomainSet[]> = {
       ],
     },
   ],
+  meten: [
+    {
+      title: "Oppervlakte",
+      description: "Bereken de oppervlakte van vierkanten, cirkels en driehoeken.",
+      items: (() => {
+        const results: Question[] = [];
+        for (let i = 0; i < 60; i++) {
+          const s = ["square", "circle", "triangle"][i % 3];
+          const v = +(2 + (i % 4) * 0.7 + i * 0.015).toFixed(2);
+          if (s === "square") {
+            const ans = +(v * v).toFixed(2);
+            results.push({ q: `${i + 1}. Bereken de oppervlakte van het vierkant met zijde ${v} m.`, a: ans, exp: `Oppervlakte = ${v} × ${v} = ${ans} m².` });
+          } else if (s === "circle") {
+            const ans = +(3.14 * v * v).toFixed(2);
+            results.push({ q: `${i + 1}. Bereken de oppervlakte van de cirkel met straal ${v} m.`, a: ans, exp: `Oppervlakte = 3,14 × ${v}² = ${ans} m².` });
+          } else {
+            const h = +(v * 1.4).toFixed(2);
+            const ans = +(0.5 * v * h).toFixed(2);
+            results.push({ q: `${i + 1}. Bereken de oppervlakte van de driehoek met basis ${v} m en hoogte ${h} m.`, a: ans, exp: `Oppervlakte = 0,5 × ${v} × ${h} = ${ans} m².` });
+          }
+        }
+        return results;
+      })(),
+    },
+    {
+      title: "Omtrek",
+      description: "Bereken de omtrek van vierkanten, cirkels en driehoeken.",
+      items: (() => {
+        const results: Question[] = [];
+        for (let i = 0; i < 60; i++) {
+          const s = ["square", "circle", "triangle"][i % 3];
+          const v = +(2 + (i % 4) * 0.7 + i * 0.015).toFixed(2);
+          if (s === "square") {
+            const ans = +(4 * v).toFixed(2);
+            results.push({ q: `${i + 1}. Bereken de omtrek van het vierkant met zijde ${v} m.`, a: ans, exp: `Omtrek = 4 × ${v} = ${ans} m.` });
+          } else if (s === "circle") {
+            const ans = +(2 * 3.14 * v).toFixed(2);
+            results.push({ q: `${i + 1}. Bereken de omtrek van de cirkel met straal ${v} m.`, a: ans, exp: `Omtrek = 2 × π × r ≈ 2 × 3,14 × ${v} = ${ans} m.` });
+          } else {
+            const b = v;
+            const s2 = +(v * 1.2).toFixed(2);
+            const s3 = +(v * 1.4).toFixed(2);
+            const ans = +(b + s2 + s3).toFixed(2);
+            results.push({ q: `${i + 1}. Bereken de omtrek van de driehoek met zijden ${b} m, ${s2} m en ${s3} m.`, a: ans, exp: `Omtrek = ${b} + ${s2} + ${s3} = ${ans} m.` });
+          }
+        }
+        return results;
+      })(),
+    },
+    {
+      title: "Inhoud",
+      description: "Bereken de inhoud van kubussen, cilinders en prisma's.",
+      items: (() => {
+        const results: Question[] = [];
+        for (let i = 0; i < 60; i++) {
+          const s = ["cube", "cylinder", "prism"][i % 3];
+          const a = +(2 + (i % 5) * 0.6 + i * 0.01).toFixed(2);
+          const b = +(3 + (i % 4) * 0.4).toFixed(2);
+          const h = +(2 + (i % 3) * 0.5).toFixed(2);
+          if (s === "cube") {
+            const ans = +(a * a * a).toFixed(2);
+            results.push({ q: `${i + 1}. Bereken de inhoud van de kubus met ribbe ${a} m.`, a: ans, exp: `Inhoud kubus = ribbe³ = ${a} × ${a} × ${a} = ${ans} m³.` });
+          } else if (s === "cylinder") {
+            const ans = +(3.14 * a * a * h).toFixed(2);
+            results.push({ q: `${i + 1}. Bereken de inhoud van de cilinder met straal ${a} m en hoogte ${h} m.`, a: ans, exp: `Inhoud cilinder = πr²h ≈ 3,14 × ${a}² × ${h} = ${ans} m³.` });
+          } else {
+            const ans = +(0.5 * a * b * h).toFixed(2);
+            results.push({ q: `${i + 1}. Bereken de inhoud van het prisma met driehoekige basis (b=${a} m, h=${b} m) en hoogte ${h} m.`, a: ans, exp: `Inhoud prisma = (1/2 × b × h) × hoogte = 0,5×${a}×${b}×${h} = ${ans} m³.` });
+          }
+        }
+        return results;
+      })(),
+    },
+    {
+      title: "Omrekenen",
+      description: "Omrekenen van eenheden: km↔m, cm↔m, minuten↔seconden, snelheid.",
+      items: (() => {
+        const results: Question[] = [];
+        for (let i = 0; i < 60; i++) {
+          const type = i % 5;
+          if (type === 0) {
+            const km = +(2 + i * 0.1).toFixed(2);
+            const ans = +(km * 1000).toFixed(2);
+            results.push({ q: `${i + 1}. Zet ${km} km om naar meter.`, a: ans, exp: `${km} km × 1000 = ${ans} m.` });
+          } else if (type === 1) {
+            const m = +(500 + i * 3).toFixed(2);
+            const ans = +(m / 1000).toFixed(3);
+            results.push({ q: `${i + 1}. Zet ${m} m om naar kilometer.`, a: ans, exp: `${m} ÷ 1000 = ${ans} km.` });
+          } else if (type === 2) {
+            const min = 30 + i;
+            const ans = min * 60;
+            results.push({ q: `${i + 1}. Zet ${min} minuten om naar seconden.`, a: ans, exp: `${min} × 60 = ${ans} sec.` });
+          } else if (type === 3) {
+            const cm = 50 + i * 2;
+            const ans = +(cm / 100).toFixed(2);
+            results.push({ q: `${i + 1}. Zet ${cm} cm om naar meter.`, a: ans, exp: `${cm} ÷ 100 = ${ans} m.` });
+          } else {
+            const km = 10 + i;
+            const t = 2 + i * 0.1;
+            const ans = +(km / t).toFixed(2);
+            results.push({ q: `${i + 1}. Bereken snelheid: ${km} km in ${t} uur.`, a: ans, exp: `snelheid = afstand ÷ tijd = ${km} ÷ ${t} = ${ans} km/u.` });
+          }
+        }
+        return results;
+      })(),
+    },
+  ],
 };
 
 const QuizSet: React.FC<{ items: Question[] }> = ({ items }) => {
@@ -595,6 +702,10 @@ const PracticeQuestions = () => {
       ? "Breuken"
       : domain === "verbanden"
       ? "Verbanden"
+      : domain === "procenten"
+      ? "Procenten"
+      : domain === "meten"
+      ? "Meten en meetkunde"
       : domain;
   const totalQuestions = domainSets.reduce((sum, set) => sum + set.items.length, 0);
   const infoText = domainSets.length > 1 ? `${totalQuestions} vragen over ${domainSets.length} sets – automatische controle` : `${totalQuestions} vragen – automatische controle`;
