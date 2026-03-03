@@ -12,6 +12,7 @@ import Admin from "./pages/Admin";
 import Practice from "./pages/Practice";
 import PracticeDomain from "./pages/PracticeDomain";
 import PracticeQuestions from "./pages/PracticeQuestions";
+import DyscalculieTest from "./pages/DyscalculieTest";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/oefenen" element={<Practice />} />
             <Route path="/oefenen/:domain" element={<PracticeDomain />} />
             <Route path="/oefenen/:domain/vragen" element={<PracticeQuestions />} />
+            <Route path="/dyscalculie-test" element={<DyscalculieTest />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
