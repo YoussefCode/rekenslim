@@ -24,7 +24,7 @@ const domains = [
     title: "Procenten",
     description: "Percentages omzetten, korting, btw en groei",
     icon: Percent,
-    color: "from-amber-500 to-orange-500",
+    color: "from-primary to-primary/80",
   },
   {
     id: "breuken",
