@@ -266,8 +266,8 @@ const DyscalculieTest = () => {
                 </Button>
               </div>
             ) : (
-              <div className="bg-blue-100 p-6 rounded-xl space-y-4">
-                <h3 className="text-xl font-bold text-blue-900">Diagnostisch Rapport</h3>
+              <div className="bg-primary/10 p-6 rounded-xl space-y-4">
+                <h3 className="text-xl font-bold text-primary">Diagnostisch Rapport</h3>
                 <p className="text-lg">
                   Analyse:{" "}
                   <span className={riskHigh ? "text-red-600 font-bold" : "text-green-600 font-bold"}>
