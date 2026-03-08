@@ -1194,7 +1194,7 @@ const domainData: Record<string, { title: string; subtitle: string; gradient: st
   breuken: {
     title: "Rekenslim: Breuken",
     subtitle: "Vereenvoudigen • Gelijknamig maken • Optellen • Aftrekken • Vermenigvuldigen • Delen • Gemengde getallen",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: breukenSections,
   },
   procenten: {
