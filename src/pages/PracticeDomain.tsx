@@ -1182,7 +1182,7 @@ const domainData: Record<string, { title: string; subtitle: string; gradient: st
   verbanden: {
     title: "Rekenslim: Verbanden",
     subtitle: "Tabellen • Grafieken • Formules • Lineaire verbanden • Evenredigheid • Hellingsgetal • Startgetal",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: verbandenSections,
   },
   verhoudingen: {
