@@ -117,9 +117,16 @@ const StudentDashboard = () => {
   const submitAnswer = () => {
     if (selectedAnswer === null) return;
     setShowResult(true);
-    if (selectedAnswer === questions[currentQ].correct_answer) {
-      setScore((s) => s + 1);
-    }
+    const q = questions[currentQ];
+    const isCorrect = selectedAnswer === q.correct_answer;
+    if (isCorrect) setScore((s) => s + 1);
+    setQuizAnswers((prev) => [...prev, {
+      questionText: q.question_text,
+      selectedAnswer,
+      correctAnswer: q.correct_answer,
+      selectedOption: q.options[selectedAnswer] || String(selectedAnswer),
+      correctOption: q.options[q.correct_answer] || String(q.correct_answer),
+    }]);
   };
 
   const nextQuestion = () => {
@@ -131,6 +138,24 @@ const StudentDashboard = () => {
       setCurrentQ((c) => c + 1);
     }
   };
+
+  // Send results email when quiz finishes
+  useEffect(() => {
+    if (quizFinished && !resultsSent && selectedDomain && user) {
+      setResultsSent(true);
+      supabase.functions.invoke("send-student-quiz-results", {
+        body: {
+          studentEmail: user.email,
+          domainName: selectedDomain.domain_name,
+          score,
+          totalQuestions: questions.length,
+          questions: quizAnswers,
+        },
+      }).then(({ error }) => {
+        if (error) console.error("Failed to send results email:", error);
+      });
+    }
+  }, [quizFinished]);
 
   if (authLoading || loading) {
     return (
