@@ -285,6 +285,7 @@ export type Database = {
               updated_at: string
             }[]
           }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never
