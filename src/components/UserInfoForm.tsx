@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +25,7 @@ interface UserInfoFormProps {
 }
 
 const UserInfoForm = ({ onSubmit }: UserInfoFormProps) => {
+  const navigate = useNavigate();
   const form = useForm<UserInfo>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -125,6 +128,10 @@ const UserInfoForm = ({ onSubmit }: UserInfoFormProps) => {
 
             <Button type="submit" className="w-full">
               Start Quiz
+            </Button>
+
+            <Button type="button" variant="ghost" className="w-full" onClick={() => navigate(-1)}>
+              <ArrowLeft className="mr-2 h-4 w-4" /> Terug
             </Button>
           </form>
         </Form>
