@@ -343,7 +343,7 @@ const DyscalculieTest = () => {
               onChange={(e) => setAnswer(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="?"
-              className="text-4xl font-bold text-center w-48 h-16 border-4 border-blue-400 rounded-2xl text-blue-900"
+              className="text-4xl font-bold text-center w-48 h-16 border-4 border-primary/60 rounded-2xl text-primary"
             />
           </div>
 

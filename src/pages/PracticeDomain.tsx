@@ -1206,7 +1206,7 @@ const domainData: Record<string, { title: string; subtitle: string; gradient: st
   meten: {
     title: "Rekenslim: Meten & Meetkunde",
     subtitle: "Lengte • Oppervlakte • Inhoud • Massa • Tijd • Hoeken • Driehoeken • Cirkels • Constructies • Symmetrie",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: metenSections,
   },
 };

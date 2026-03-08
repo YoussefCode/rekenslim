@@ -20,7 +20,7 @@ const QuizSelection = () => {
       title: "Test 2F", 
       description: "Gevorderde rekenvaardigheden voor niveau 2F",
       icon: TrendingUp,
-      color: "from-green-500 to-green-600",
+      color: "from-primary to-primary/80",
     }
   ];
 

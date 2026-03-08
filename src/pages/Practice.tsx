@@ -45,7 +45,7 @@ const domains = [
     title: "Verbanden",
     description: "Formules, tabellen en grafieken",
     icon: BookOpen,
-    color: "from-orange-500 to-orange-600",
+    color: "from-primary to-primary/80",
   },
 ];
 
