@@ -276,7 +276,7 @@ const DyscalculieTest = () => {
                 </p>
                 <p>Omdraai-fouten: {omdraaiFouten}</p>
                 <p>Totaal fout/te laat: {totaalFout}</p>
-                <hr className="border-blue-300" />
+                <hr className="border-primary/30" />
                 <div className="space-y-1 text-sm">
                   {fouten.map((f, i) => (
                     <p key={i}>
