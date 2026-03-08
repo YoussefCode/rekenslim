@@ -50,6 +50,8 @@ const StudentDashboard = () => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [quizFinished, setQuizFinished] = useState(false);
+  const [quizAnswers, setQuizAnswers] = useState<{ questionText: string; selectedAnswer: number; correctAnswer: number; selectedOption: string; correctOption: string }[]>([]);
+  const [resultsSent, setResultsSent] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
