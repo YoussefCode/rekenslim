@@ -110,6 +110,8 @@ const StudentDashboard = () => {
     setSelectedAnswer(null);
     setShowResult(false);
     setQuizFinished(false);
+    setQuizAnswers([]);
+    setResultsSent(false);
   };
 
   const submitAnswer = () => {
