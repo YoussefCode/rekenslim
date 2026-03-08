@@ -81,6 +81,12 @@ const Auth = () => {
           description: error.message,
           variant: "destructive",
         });
+      } else if (data?.user?.identities?.length === 0) {
+        toast({
+          title: "Account bestaat al",
+          description: "Er bestaat al een account met dit e-mailadres. Ga naar Inloggen.",
+          variant: "destructive",
+        });
       } else {
         toast({
           title: "Registratie succesvol",
