@@ -280,6 +280,10 @@ const Admin = () => {
             <h1 className="text-3xl font-bold">Admin Beheer</h1>
             <p className="text-muted-foreground">Beheer quiz vragen en website content</p>
           </div>
+          <Button onClick={() => window.location.hash = '#/admin/leerlingen'} variant="default">
+            <Users className="w-4 h-4 mr-2" />
+            Leerling Beheer
+          </Button>
         </div>
 
         <Tabs defaultValue="questions" className="w-full">
