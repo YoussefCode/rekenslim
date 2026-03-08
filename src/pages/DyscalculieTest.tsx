@@ -229,10 +229,10 @@ const DyscalculieTest = () => {
     const riskHigh = omdraaiFouten >= 4 || totaalFout >= 8;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl bg-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl bg-primary/5">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold text-blue-900">
+            <CardTitle className="text-3xl font-bold text-primary">
               Test Afgerond
             </CardTitle>
           </CardHeader>
