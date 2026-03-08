@@ -41,6 +41,77 @@ export type Database = {
         }
         Relationships: []
       }
+      practice_questions: {
+        Row: {
+          answer: string
+          created_at: string
+          explanation: string | null
+          id: string
+          practice_set_id: string
+          question_text: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          practice_set_id: string
+          question_text: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          practice_set_id?: string
+          question_text?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practice_questions_practice_set_id_fkey"
+            columns: ["practice_set_id"]
+            isOneToOne: false
+            referencedRelation: "practice_sets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      practice_sets: {
+        Row: {
+          created_at: string
+          description: string | null
+          domain: string
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          domain: string
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          domain?: string
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
