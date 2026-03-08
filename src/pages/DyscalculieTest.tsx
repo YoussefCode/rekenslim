@@ -315,8 +315,8 @@ const DyscalculieTest = () => {
   const timerPercent = (timeLeft / TIMER_SECONDS) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl bg-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center p-4">
+      <Card className="w-full max-w-xl bg-primary/5">
         <CardContent className="pt-8 space-y-6">
           <p className="text-center text-muted-foreground font-bold">
             Vraag {current + 1} van {vragenPool.length}
