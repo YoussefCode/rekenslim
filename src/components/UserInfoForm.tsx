@@ -129,6 +129,10 @@ const UserInfoForm = ({ onSubmit }: UserInfoFormProps) => {
             <Button type="submit" className="w-full">
               Start Quiz
             </Button>
+
+            <Button type="button" variant="ghost" className="w-full" onClick={() => navigate(-1)}>
+              <ArrowLeft className="mr-2 h-4 w-4" /> Terug
+            </Button>
           </form>
         </Form>
       </CardContent>
