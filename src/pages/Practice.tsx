@@ -31,7 +31,7 @@ const domains = [
     title: "Breuken",
     description: "Tellers, noemers, gelijknamig maken en gemengde getallen",
     icon: Divide,
-    color: "from-violet-500 to-violet-600",
+    color: "from-primary to-primary/80",
   },
   {
     id: "meten",
