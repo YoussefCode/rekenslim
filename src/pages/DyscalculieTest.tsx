@@ -261,7 +261,7 @@ const DyscalculieTest = () => {
                       variant: "destructive",
                     });
                   }
-                }} className="bg-blue-900 hover:bg-blue-800">
+                }} className="bg-primary hover:bg-primary/90">
                   Docentenverslag openen
                 </Button>
               </div>
