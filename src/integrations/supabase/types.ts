@@ -149,6 +149,112 @@ export type Database = {
         }
         Relationships: []
       }
+      student_domains: {
+        Row: {
+          created_at: string
+          description: string | null
+          domain_name: string
+          id: string
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          domain_name: string
+          id?: string
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          domain_name?: string
+          id?: string
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      student_materials: {
+        Row: {
+          content: string | null
+          created_at: string
+          file_url: string | null
+          id: string
+          student_domain_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          student_domain_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          student_domain_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_materials_student_domain_id_fkey"
+            columns: ["student_domain_id"]
+            isOneToOne: false
+            referencedRelation: "student_domains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_questions: {
+        Row: {
+          correct_answer: number
+          created_at: string
+          explanation: string | null
+          id: string
+          options: Json
+          question_text: string
+          student_domain_id: string
+          updated_at: string
+        }
+        Insert: {
+          correct_answer: number
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: Json
+          question_text: string
+          student_domain_id: string
+          updated_at?: string
+        }
+        Update: {
+          correct_answer?: number
+          created_at?: string
+          explanation?: string | null
+          id?: string
+          options?: Json
+          question_text?: string
+          student_domain_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_questions_student_domain_id_fkey"
+            columns: ["student_domain_id"]
+            isOneToOne: false
+            referencedRelation: "student_domains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
