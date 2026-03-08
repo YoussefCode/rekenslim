@@ -238,7 +238,7 @@ const DyscalculieTest = () => {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="text-center">
-              <p className="text-4xl font-bold text-blue-800">
+              <p className="text-4xl font-bold text-primary">
                 {goed} <span className="text-2xl text-muted-foreground">/ {vragenPool.length}</span>
               </p>
               {emailSent && (
