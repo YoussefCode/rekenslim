@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowLeft } from 'lucide-react';
 
 const Auth = () => {
   const [email, setEmail] = useState('');
@@ -179,6 +180,11 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
+      <div className="mt-4 text-center">
+        <Button variant="ghost" onClick={() => navigate('/')}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Terug naar home
+        </Button>
+      </div>
     </div>
   );
 };
