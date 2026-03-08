@@ -12,6 +12,7 @@ import UserInfoForm, { UserInfo } from "@/components/UserInfoForm";
 import { useContent } from "@/hooks/useContent";
 import FractionDisplay from "@/components/FractionDisplay";
 import DomainStartScreen from "@/components/DomainStartScreen";
+import { ArrowLeft } from "lucide-react";
 
 interface Question {
   id: string;
