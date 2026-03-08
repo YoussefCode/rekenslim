@@ -17,7 +17,7 @@ const domains = [
     title: "Verhoudingen",
     description: "Verhoudingstabellen, procenten en schaal",
     icon: TrendingUp,
-    color: "from-green-500 to-green-600",
+    color: "from-primary to-primary/80",
   },
   {
     id: "procenten",
