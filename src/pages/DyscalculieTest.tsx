@@ -324,7 +324,7 @@ const DyscalculieTest = () => {
 
           <div className="w-full h-3.5 bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full bg-red-500 transition-all duration-1000 ease-linear"
+              className="h-full bg-destructive transition-all duration-1000 ease-linear"
               style={{ width: `${timerPercent}%` }}
             />
           </div>
