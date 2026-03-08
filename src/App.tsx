@@ -14,6 +14,7 @@ import PracticeDomain from "./pages/PracticeDomain";
 import PracticeQuestions from "./pages/PracticeQuestions";
 import DyscalculieTest from "./pages/DyscalculieTest";
 import AdminStudents from "./pages/AdminStudents";
+import AdminPractice from "./pages/AdminPractice";
 import StudentDashboard from "./pages/StudentDashboard";
 import NotFound from "./pages/NotFound";
 
