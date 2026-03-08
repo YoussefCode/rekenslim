@@ -330,7 +330,7 @@ const DyscalculieTest = () => {
           </div>
 
           <div className="min-h-[120px] flex items-center justify-center">
-            <p className="text-4xl font-black text-blue-900 text-center leading-tight">
+            <p className="text-4xl font-black text-primary text-center leading-tight">
               {vragenPool[current].q}
             </p>
           </div>
