@@ -219,6 +219,11 @@ const DyscalculieTest = () => {
             Dyscalculie Screening
           </h1>
           <UserInfoForm onSubmit={setUserInfo} />
+          <div className="mt-4 text-center">
+            <Button variant="ghost" onClick={() => navigate('/')} className="text-white hover:text-white/80">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Terug naar home
+            </Button>
+          </div>
         </div>
       </div>
     );

@@ -180,6 +180,11 @@ const Auth = () => {
           </Tabs>
         </CardContent>
       </Card>
+      <div className="mt-4 text-center">
+        <Button variant="ghost" onClick={() => navigate('/')}>
+          <ArrowLeft className="mr-2 h-4 w-4" /> Terug naar home
+        </Button>
+      </div>
     </div>
   );
 };

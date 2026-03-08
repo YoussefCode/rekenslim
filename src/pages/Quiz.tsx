@@ -375,7 +375,12 @@ const Quiz = () => {
       <div className="max-w-2xl mx-auto">
         <div className="mb-6 space-y-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold">{getContent('quiz_title', `Rekenquiz ${level === '2f' ? 'Niveau 2F' : 'Basis'}`)}</h1>
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="icon" onClick={() => navigate('/quiz-selection')}>
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+              <h1 className="text-2xl font-bold">{getContent('quiz_title', `Rekenquiz ${level === '2f' ? 'Niveau 2F' : 'Basis'}`)}</h1>
+            </div>
             <span className="text-sm text-muted-foreground">
               {(level === 'basis' || level === 'f2') && domainOrder.length > 0 ? 
                 `Domein ${currentDomainIndex + 1}/${domainOrder.length} - Vraag ${currentQuestion + 1}/${getCurrentQuestions().length}` :
