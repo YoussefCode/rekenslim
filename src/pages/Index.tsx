@@ -47,7 +47,7 @@ const Index = () => {
                   <Calculator className="mr-2 h-4 w-4" />
                   Start quiz
                 </Button>
-                <Button onClick={() => navigate('/dyscalculie-test')} size="lg" className="hover-scale bg-blue-900 hover:bg-blue-800">
+                <Button onClick={() => navigate('/dyscalculie-test')} size="lg" className="hover-scale bg-primary/90 hover:bg-primary/80">
                   <Brain className="mr-2 h-4 w-4" />
                   Maak dyscalculie test
                 </Button>

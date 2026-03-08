@@ -13,14 +13,14 @@ const QuizSelection = () => {
       title: "Test 1F",
       description: "Test je basisvaardigheden in rekenen niveau 1F",
       icon: Calculator,
-      color: "from-blue-500 to-blue-600",
+      color: "from-primary to-primary/80",
     },
     {
       id: "2f",
       title: "Test 2F", 
       description: "Gevorderde rekenvaardigheden voor niveau 2F",
       icon: TrendingUp,
-      color: "from-green-500 to-green-600",
+      color: "from-primary to-primary/80",
     }
   ];
 

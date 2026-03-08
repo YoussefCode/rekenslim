@@ -212,7 +212,7 @@ const DyscalculieTest = () => {
 
   if (!userInfo) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
           <h1 className="text-3xl font-black text-white text-center mb-6 uppercase tracking-wide">
             Dyscalculie Screening
@@ -229,16 +229,16 @@ const DyscalculieTest = () => {
     const riskHigh = omdraaiFouten >= 4 || totaalFout >= 8;
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl bg-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl bg-primary/5">
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold text-blue-900">
+            <CardTitle className="text-3xl font-bold text-primary">
               Test Afgerond
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="text-center">
-              <p className="text-4xl font-bold text-blue-800">
+              <p className="text-4xl font-bold text-primary">
                 {goed} <span className="text-2xl text-muted-foreground">/ {vragenPool.length}</span>
               </p>
               {emailSent && (
@@ -261,13 +261,13 @@ const DyscalculieTest = () => {
                       variant: "destructive",
                     });
                   }
-                }} className="bg-blue-900 hover:bg-blue-800">
+                }} className="bg-primary hover:bg-primary/90">
                   Docentenverslag openen
                 </Button>
               </div>
             ) : (
-              <div className="bg-blue-100 p-6 rounded-xl space-y-4">
-                <h3 className="text-xl font-bold text-blue-900">Diagnostisch Rapport</h3>
+              <div className="bg-primary/10 p-6 rounded-xl space-y-4">
+                <h3 className="text-xl font-bold text-primary">Diagnostisch Rapport</h3>
                 <p className="text-lg">
                   Analyse:{" "}
                   <span className={riskHigh ? "text-red-600 font-bold" : "text-green-600 font-bold"}>
@@ -276,7 +276,7 @@ const DyscalculieTest = () => {
                 </p>
                 <p>Omdraai-fouten: {omdraaiFouten}</p>
                 <p>Totaal fout/te laat: {totaalFout}</p>
-                <hr className="border-blue-300" />
+                <hr className="border-primary/30" />
                 <div className="space-y-1 text-sm">
                   {fouten.map((f, i) => (
                     <p key={i}>
@@ -315,8 +315,8 @@ const DyscalculieTest = () => {
   const timerPercent = (timeLeft / TIMER_SECONDS) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl bg-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center p-4">
+      <Card className="w-full max-w-xl bg-primary/5">
         <CardContent className="pt-8 space-y-6">
           <p className="text-center text-muted-foreground font-bold">
             Vraag {current + 1} van {vragenPool.length}
@@ -324,13 +324,13 @@ const DyscalculieTest = () => {
 
           <div className="w-full h-3.5 bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full bg-red-500 transition-all duration-1000 ease-linear"
+              className="h-full bg-destructive transition-all duration-1000 ease-linear"
               style={{ width: `${timerPercent}%` }}
             />
           </div>
 
           <div className="min-h-[120px] flex items-center justify-center">
-            <p className="text-4xl font-black text-blue-900 text-center leading-tight">
+            <p className="text-4xl font-black text-primary text-center leading-tight">
               {vragenPool[current].q}
             </p>
           </div>
@@ -343,7 +343,7 @@ const DyscalculieTest = () => {
               onChange={(e) => setAnswer(e.target.value)}
               onKeyDown={handleKeyPress}
               placeholder="?"
-              className="text-4xl font-bold text-center w-48 h-16 border-4 border-blue-400 rounded-2xl text-blue-900"
+              className="text-4xl font-bold text-center w-48 h-16 border-4 border-primary/60 rounded-2xl text-primary"
             />
           </div>
 

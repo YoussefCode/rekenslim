@@ -1176,37 +1176,37 @@ const domainData: Record<string, { title: string; subtitle: string; gradient: st
   getallen: {
     title: "Rekenslim: Getallen",
     subtitle: "Optellen • Aftrekken • Vermenigvuldigen • Delen • Percentages • Breuken • Afronden",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: getallenSections,
   },
   verbanden: {
     title: "Rekenslim: Verbanden",
     subtitle: "Tabellen • Grafieken • Formules • Lineaire verbanden • Evenredigheid • Hellingsgetal • Startgetal",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: verbandenSections,
   },
   verhoudingen: {
     title: "Rekenslim: Verhoudingen",
     subtitle: "Verhoudingstabel • Dubbele getallenlijn • Schalen • Percentages • Recepten • Verdeling naar verhouding",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: verhoudingenSections,
   },
   breuken: {
     title: "Rekenslim: Breuken",
     subtitle: "Vereenvoudigen • Gelijknamig maken • Optellen • Aftrekken • Vermenigvuldigen • Delen • Gemengde getallen",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: breukenSections,
   },
   procenten: {
     title: "Rekenslim: Procenten",
     subtitle: "Basis • Omzetten • Procent van een getal • Korting • BTW • Groei & daling • Procentpunten • Omgekeerd",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: procentenSections,
   },
   meten: {
     title: "Rekenslim: Meten & Meetkunde",
     subtitle: "Lengte • Oppervlakte • Inhoud • Massa • Tijd • Hoeken • Driehoeken • Cirkels • Constructies • Symmetrie",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: metenSections,
   },
 };
