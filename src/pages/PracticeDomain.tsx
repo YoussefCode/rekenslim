@@ -1188,7 +1188,7 @@ const domainData: Record<string, { title: string; subtitle: string; gradient: st
   verhoudingen: {
     title: "Rekenslim: Verhoudingen",
     subtitle: "Verhoudingstabel • Dubbele getallenlijn • Schalen • Percentages • Recepten • Verdeling naar verhouding",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: verhoudingenSections,
   },
   breuken: {
