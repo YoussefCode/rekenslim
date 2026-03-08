@@ -1200,7 +1200,7 @@ const domainData: Record<string, { title: string; subtitle: string; gradient: st
   procenten: {
     title: "Rekenslim: Procenten",
     subtitle: "Basis • Omzetten • Procent van een getal • Korting • BTW • Groei & daling • Procentpunten • Omgekeerd",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: procentenSections,
   },
   meten: {
