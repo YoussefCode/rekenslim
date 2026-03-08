@@ -38,7 +38,7 @@ const domains = [
     title: "Meten en meetkunde",
     description: "Lengte, oppervlakte, inhoud, hoeken, driehoeken en symmetrie",
     icon: Ruler,
-    color: "from-teal-500 to-teal-600",
+    color: "from-primary to-primary/80",
   },
   {
     id: "verbanden",
