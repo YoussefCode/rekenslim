@@ -1176,7 +1176,7 @@ const domainData: Record<string, { title: string; subtitle: string; gradient: st
   getallen: {
     title: "Rekenslim: Getallen",
     subtitle: "Optellen • Aftrekken • Vermenigvuldigen • Delen • Percentages • Breuken • Afronden",
-    gradient: "from-blue-500 to-blue-700",
+    gradient: "from-primary to-primary/80",
     sections: getallenSections,
   },
   verbanden: {
