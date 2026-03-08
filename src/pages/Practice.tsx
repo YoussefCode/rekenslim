@@ -10,7 +10,7 @@ const domains = [
     title: "Getallen",
     description: "Rekenen met hele getallen, kommagetallen en percentages",
     icon: Calculator,
-    color: "from-blue-500 to-blue-600",
+    color: "from-primary to-primary/80",
   },
   {
     id: "verhoudingen",
