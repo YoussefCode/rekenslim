@@ -67,7 +67,7 @@ const Auth = () => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -79,6 +79,12 @@ const Auth = () => {
         toast({
           title: "Registratie mislukt",
           description: error.message,
+          variant: "destructive",
+        });
+      } else if (data?.user?.identities?.length === 0) {
+        toast({
+          title: "Account bestaat al",
+          description: "Er bestaat al een account met dit e-mailadres. Ga naar Inloggen.",
           variant: "destructive",
         });
       } else {
