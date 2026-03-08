@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.send-dyscalculie-results]
 verify_jwt = false
+
+[functions.send-student-quiz-results]
+verify_jwt = false
