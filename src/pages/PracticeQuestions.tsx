@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { supabase } from "@/integrations/supabase/client";
 
 type Question = { q: string; a: number | string; exp?: string };
 type DomainSet = { title: string; description?: string; items: Question[] };
@@ -683,7 +684,64 @@ const QuizSet: React.FC<{ items: Question[] }> = ({ items }) => {
 const PracticeQuestions = () => {
   const { domain } = useParams<{ domain: string }>();
   const navigate = useNavigate();
-  const domainSets = questionsByDomain[domain || ""] || [];
+  const [dbSets, setDbSets] = useState<DomainSet[] | null>(null);
+  const [loadingDb, setLoadingDb] = useState(true);
+
+  useEffect(() => {
+    const fetchFromDb = async () => {
+      try {
+        const { data: setsData, error: setsError } = await supabase
+          .from('practice_sets')
+          .select('*')
+          .eq('domain', domain || '')
+          .order('sort_order', { ascending: true });
+        if (setsError) throw setsError;
+
+        if (setsData && setsData.length > 0) {
+          const { data: qData, error: qError } = await supabase
+            .from('practice_questions')
+            .select('*')
+            .in('practice_set_id', setsData.map(s => s.id))
+            .order('sort_order', { ascending: true });
+          if (qError) throw qError;
+
+          const grouped: Record<string, any[]> = {};
+          (qData || []).forEach(q => {
+            if (!grouped[q.practice_set_id]) grouped[q.practice_set_id] = [];
+            grouped[q.practice_set_id].push(q);
+          });
+
+          const result: DomainSet[] = setsData.map(s => ({
+            title: s.title,
+            description: s.description,
+            items: (grouped[s.id] || []).map((q: any) => ({
+              q: q.question_text,
+              a: isNaN(Number(q.answer)) ? q.answer : Number(q.answer),
+              exp: q.explanation,
+            })),
+          }));
+          setDbSets(result);
+        } else {
+          setDbSets(null);
+        }
+      } catch {
+        setDbSets(null);
+      } finally {
+        setLoadingDb(false);
+      }
+    };
+    fetchFromDb();
+  }, [domain]);
+
+  if (loadingDb) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Laden...</p>
+      </div>
+    );
+  }
+
+  const domainSets = dbSets && dbSets.length > 0 ? dbSets : (questionsByDomain[domain || ""] || []);
 
   if (domainSets.length === 0) {
     return (
