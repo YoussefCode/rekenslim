@@ -13,6 +13,8 @@ import Practice from "./pages/Practice";
 import PracticeDomain from "./pages/PracticeDomain";
 import PracticeQuestions from "./pages/PracticeQuestions";
 import DyscalculieTest from "./pages/DyscalculieTest";
+import AdminStudents from "./pages/AdminStudents";
+import StudentDashboard from "./pages/StudentDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
