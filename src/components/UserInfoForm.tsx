@@ -25,6 +25,7 @@ interface UserInfoFormProps {
 }
 
 const UserInfoForm = ({ onSubmit }: UserInfoFormProps) => {
+  const navigate = useNavigate();
   const form = useForm<UserInfo>({
     resolver: zodResolver(formSchema),
     defaultValues: {
