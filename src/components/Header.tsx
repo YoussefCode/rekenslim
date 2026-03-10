@@ -25,19 +25,22 @@ const Header = () => {
               Home
             </Link>
             
-            {profile?.role === 'admin' && <>
-                <Link to="/admin" className="hover:opacity-80 transition-opacity">
-                  Admin
-                </Link>
-                {user && <Button variant="secondary" size="sm" onClick={signOut}>
-                    Uitloggen
-                  </Button>}
-              </>}
-            {!user && <Link to="/auth">
+            {profile?.role === 'admin' && (
+              <Link to="/admin" className="hover:opacity-80 transition-opacity">
+                Admin
+              </Link>
+            )}
+            {user ? (
+              <Button variant="secondary" size="sm" onClick={signOut}>
+                Uitloggen
+              </Button>
+            ) : (
+              <Link to="/auth">
                 <Button variant="secondary" size="sm">
                   Inloggen
                 </Button>
-              </Link>}
+              </Link>
+            )}
           </nav>
         </div>
       </div>
