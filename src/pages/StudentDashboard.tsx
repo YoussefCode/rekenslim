@@ -23,6 +23,8 @@ const StudentDashboard = () => {
   const [domains, setDomains] = useState<StudentDomain[]>([]);
   const [selectedDomain, setSelectedDomain] = useState<StudentDomain | null>(null);
   const [loading, setLoading] = useState(true);
+  const [htmlContent, setHtmlContent] = useState<string | null>(null);
+  const [loadingHtml, setLoadingHtml] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
