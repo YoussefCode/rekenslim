@@ -1,22 +1,16 @@
-# Welcome to your Lovable project
+# Rekenslim
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/0591a117-37b6-4629-b6b6-fb39a79be927
+Interactieve rekenomgeving gebouwd met React + TypeScript + Vite.
 
 ## How can I edit this code?
 
 There are several ways of editing your application.
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/0591a117-37b6-4629-b6b6-fb39a79be927) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
 **Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+If you want to work locally using your own IDE, you can clone this repo and push changes.
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -60,14 +54,102 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## Nieuw domein toevoegen (stap voor stap)
 
-Simply open [Lovable](https://lovable.dev/projects/0591a117-37b6-4629-b6b6-fb39a79be927) and click on Share -> Publish.
+Wil je een nieuw domein toevoegen op basis van een eigen HTML-bestand (uitleg + oefenvragen)?
+Gebruik dan deze workflow.
 
-## Can I connect a custom domain to my Lovable project?
+### 1) Kies een domein-id (slug)
 
-Yes, you can!
+Kies een korte, unieke id in kleine letters, bijvoorbeeld:
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- `procenten`
+- `meten`
+- `kansen`
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Deze id komt terug in routes zoals `/#/oefenen/<domein-id>`.
+
+### 2) Voeg het domein toe aan de domeinkeuze
+
+Bestand: `src/pages/Practice.tsx`
+
+Voeg in de `domains` array een nieuw object toe met:
+
+- `id`
+- `title`
+- `description`
+- `icon`
+- `color`
+
+Voorbeeld:
+
+```ts
+{
+	id: "meten",
+	title: "Meten",
+	description: "Lengte, inhoud, oppervlakte en tijd",
+	icon: Ruler,
+	color: "from-cyan-500 to-blue-500",
+}
+```
+
+### 3) Zet je HTML-uitleg om naar sections
+
+Bestand: `src/pages/PracticeDomain.tsx`
+
+1. Maak een nieuwe array, bijvoorbeeld `const metenSections: Section[] = [...]`.
+2. Elke HTML-sectie wordt één object:
+	 - `id`: korte anchor (bijv. `basis`, `formules`, `oefenen`)
+	 - `title`: titel van die sectie
+	 - `content`: JSX-inhoud
+3. Gebruik bestaande UI-blokken voor consistente stijl:
+	 - `ExampleBox`
+	 - `TipBox`
+	 - `WarnBox`
+	 - `NoteBox`
+	 - `SimpleTable`
+
+### 4) Koppel je sections aan `domainData`
+
+In hetzelfde bestand (`src/pages/PracticeDomain.tsx`) voeg je in `domainData` je nieuwe key toe:
+
+```ts
+meten: {
+	title: "Rekenslim: Meten",
+	subtitle: "Lengte • Oppervlakte • Inhoud • Tijd",
+	gradient: "from-cyan-600 to-blue-600",
+	sections: metenSections,
+},
+```
+
+### 5) Voeg de oefenvragen toe
+
+Bestand: `src/pages/PracticeQuestions.tsx`
+
+Voeg in `questionsByDomain` een nieuwe key toe met jouw domein-id, bijvoorbeeld:
+
+```ts
+meten: [
+	{
+		title: "Meten",
+		description: "Eenheden omrekenen en toepassen",
+		items: [
+			{ q: "1. 2,5 m = ... cm", a: 250, exp: "1 m = 100 cm, dus 2,5 m = 250 cm." },
+		],
+	},
+],
+```
+
+Per vraag gebruik je:
+
+- `q`: de vraag
+- `a`: het juiste antwoord (nummer of ratio-string zoals `"3:2"`)
+- `exp`: korte uitleg
+
+### 6) Routing (belangrijk)
+
+De app gebruikt `HashRouter`.
+Dat betekent dat directe links en refresh werken via URLs met `#`, zoals:
+
+- `/#/oefenen/meten`
+- `/#/oefenen/meten/vragen`
