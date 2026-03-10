@@ -112,8 +112,7 @@ const Auth = () => {
     }
   };
 
-  const handleResetLink = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleResetLink = async () => {
     if (!forgotEmail.trim()) {
       toast({
         title: 'Email ontbreekt',
@@ -215,7 +214,7 @@ const Auth = () => {
                   </Button>
 
                   {forgotOpen && (
-                    <form onSubmit={handleResetLink} className="space-y-2">
+                    <div className="space-y-2">
                       <div className="space-y-1 text-left">
                         <Label htmlFor="forgot-email">E-mailadres voor reset</Label>
                         <Input
@@ -227,10 +226,15 @@ const Auth = () => {
                           required
                         />
                       </div>
-                      <Button type="submit" className="w-full" disabled={resetLoading}>
+                      <Button
+                        type="button"
+                        className="w-full"
+                        disabled={resetLoading}
+                        onClick={handleResetLink}
+                      >
                         {resetLoading ? 'Versturen...' : 'Stuur resetlink'}
                       </Button>
-                    </form>
+                    </div>
                   )}
                 </div>
               </form>
