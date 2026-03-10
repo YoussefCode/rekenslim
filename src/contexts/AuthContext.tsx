@@ -66,7 +66,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    setLoading(true);
+
+    const { error } = await supabase.auth.signOut();
+
+    // Immediately clear local auth state so the UI updates even if the auth listener lags
+    setUser(null);
+    setSession(null);
+    setProfile(null);
+
+    if (error) {
+      console.error('Error signing out:', error);
+    }
+
+    setLoading(false);
   };
 
   const value: AuthContextType = {
