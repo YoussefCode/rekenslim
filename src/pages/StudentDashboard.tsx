@@ -155,7 +155,7 @@ const StudentDashboard = () => {
               <Card
                 key={d.id}
                 className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => setSelectedDomain(d)}
+                onClick={() => handleSelectDomain(d)}
               >
                 <CardContent className="py-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
