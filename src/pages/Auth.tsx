@@ -197,16 +197,41 @@ const Auth = () => {
                   {loading ? 'Bezig met inloggen...' : 'Inloggen'}
                 </Button>
                 <div className="text-sm text-muted-foreground text-center space-y-2">
-                  <p>Wachtwoord vergeten? Verstuur een resetlink.</p>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="link"
                     className="w-full"
-                    onClick={handleResetLink}
-                    disabled={resetLoading || !email}
+                    onClick={() => {
+                      setForgotOpen((open) => {
+                        const next = !open;
+                        if (next && !forgotEmail) {
+                          setForgotEmail(email);
+                        }
+                        return next;
+                      });
+                    }}
                   >
-                    {resetLoading ? 'Versturen...' : 'Stuur resetlink'}
+                    Wachtwoord vergeten?
                   </Button>
+
+                  {forgotOpen && (
+                    <form onSubmit={handleResetLink} className="space-y-2">
+                      <div className="space-y-1 text-left">
+                        <Label htmlFor="forgot-email">E-mailadres voor reset</Label>
+                        <Input
+                          id="forgot-email"
+                          type="email"
+                          value={forgotEmail}
+                          onChange={(e) => setForgotEmail(e.target.value)}
+                          placeholder="naam@voorbeeld.nl"
+                          required
+                        />
+                      </div>
+                      <Button type="submit" className="w-full" disabled={resetLoading}>
+                        {resetLoading ? 'Versturen...' : 'Stuur resetlink'}
+                      </Button>
+                    </form>
+                  )}
                 </div>
               </form>
             </TabsContent>
