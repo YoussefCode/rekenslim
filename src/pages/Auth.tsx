@@ -13,6 +13,7 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -105,6 +106,39 @@ const Auth = () => {
     }
   };
 
+  const handleResetLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetLoading(true);
+
+    try {
+      const redirectTo = `${window.location.origin}/#/magic-link`;
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo,
+      });
+
+      if (error) {
+        toast({
+          title: 'Resetlink versturen mislukt',
+          description: error.message,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: 'Resetlink verstuurd',
+          description: 'Check je e-mail en klik de link binnen enkele minuten.',
+        });
+      }
+    } catch (error) {
+      toast({
+        title: 'Fout',
+        description: 'Er is iets misgegaan bij het versturen van de resetlink.',
+        variant: 'destructive',
+      });
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
@@ -147,6 +181,18 @@ const Auth = () => {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? 'Bezig met inloggen...' : 'Inloggen'}
                 </Button>
+                <div className="text-sm text-muted-foreground text-center space-y-2">
+                  <p>Wachtwoord vergeten? Verstuur een resetlink.</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleResetLink}
+                    disabled={resetLoading || !email}
+                  >
+                    {resetLoading ? 'Versturen...' : 'Stuur resetlink'}
+                  </Button>
+                </div>
               </form>
             </TabsContent>
             

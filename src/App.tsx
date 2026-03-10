@@ -17,6 +17,8 @@ import AdminStudents from "./pages/AdminStudents";
 import AdminPractice from "./pages/AdminPractice";
 import StudentDashboard from "./pages/StudentDashboard";
 import NotFound from "./pages/NotFound";
+import AuthReset from "./pages/AuthReset";
+import MagicLinkRelay from "./pages/MagicLinkRelay";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ const App = () => (
             <Route path="/quiz-selection" element={<QuizSelection />} />
             <Route path="/quiz/:level" element={<Quiz />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/magic-link" element={<MagicLinkRelay />} />
+            <Route path="/auth-reset" element={<AuthReset />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/oefenen" element={<Practice />} />
             <Route path="/oefenen/:domain" element={<PracticeDomain />} />
