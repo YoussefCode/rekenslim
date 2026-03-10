@@ -133,7 +133,7 @@ const Auth = () => {
         console.error('Resetlink versturen mislukt:', error);
         toast({
           title: 'Resetlink versturen mislukt',
-          description: 'Wacht even en probeer het opnieuw.',
+          description: error.message || 'Wacht even en probeer het opnieuw.',
           variant: 'destructive',
         });
       } else {
