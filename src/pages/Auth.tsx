@@ -14,6 +14,8 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState('');
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -39,9 +41,10 @@ const Auth = () => {
       });
 
       if (error) {
+        console.error('Inloggen mislukt:', error);
         toast({
           title: "Inloggen mislukt",
-          description: error.message,
+          description: "Controleer je gegevens en probeer opnieuw.",
           variant: "destructive",
         });
       } else {
@@ -52,9 +55,10 @@ const Auth = () => {
         navigate('/');
       }
     } catch (error) {
+      console.error('Onbekende fout bij inloggen:', error);
       toast({
         title: "Fout",
-        description: "Er is iets misgegaan",
+        description: "Er is iets misgegaan. Probeer het opnieuw.",
         variant: "destructive",
       });
     } finally {
@@ -78,9 +82,10 @@ const Auth = () => {
       });
 
       if (error) {
+        console.error('Registratie mislukt:', error);
         toast({
           title: "Registratie mislukt",
-          description: error.message,
+          description: "Er is iets misgegaan. Probeer het opnieuw.",
           variant: "destructive",
         });
       } else if (data?.user?.identities?.length === 0) {
@@ -96,9 +101,10 @@ const Auth = () => {
         });
       }
     } catch (error) {
+      console.error('Onbekende fout bij registreren:', error);
       toast({
         title: "Fout",
-        description: "Er is iets misgegaan",
+        description: "Er is iets misgegaan. Probeer het opnieuw.",
         variant: "destructive",
       });
     } finally {
@@ -108,18 +114,27 @@ const Auth = () => {
 
   const handleResetLink = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!forgotEmail.trim()) {
+      toast({
+        title: 'Email ontbreekt',
+        description: 'Vul je e-mailadres in om een resetlink te ontvangen.',
+        variant: 'destructive',
+      });
+      return;
+    }
     setResetLoading(true);
 
     try {
       const redirectTo = `${window.location.origin}/#/magic-link`;
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
         redirectTo,
       });
 
       if (error) {
+        console.error('Resetlink versturen mislukt:', error);
         toast({
           title: 'Resetlink versturen mislukt',
-          description: error.message,
+          description: 'Wacht even en probeer het opnieuw.',
           variant: 'destructive',
         });
       } else {

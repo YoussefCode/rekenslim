@@ -47,9 +47,10 @@ const AuthReset = () => {
     try {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) {
+        console.error('Wachtwoord bijwerken mislukt:', error);
         toast({
           title: 'Bijwerken mislukt',
-          description: error.message,
+          description: 'Probeer het opnieuw.',
           variant: 'destructive',
         });
       } else {
@@ -60,9 +61,10 @@ const AuthReset = () => {
         navigate('/auth');
       }
     } catch (error) {
+      console.error('Onbekende fout bij resetten:', error);
       toast({
         title: 'Fout',
-        description: 'Er ging iets mis bij het bijwerken van je wachtwoord.',
+        description: 'Er ging iets mis. Probeer het opnieuw.',
         variant: 'destructive',
       });
     } finally {
