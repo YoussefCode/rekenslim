@@ -1,0 +1,1 @@
+ALTER TABLE public.student_domains ADD COLUMN html_file_url text DEFAULT NULL;
