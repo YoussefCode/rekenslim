@@ -58,47 +58,71 @@ const StudentDashboard = () => {
     );
   }
 
+  const fetchHtmlContent = async (url: string) => {
+    setLoadingHtml(true);
+    try {
+      const response = await fetch(url);
+      const text = await response.text();
+      setHtmlContent(text);
+    } catch {
+      toast({ title: "Fout bij laden HTML", variant: "destructive" });
+      setHtmlContent(null);
+    } finally {
+      setLoadingHtml(false);
+    }
+  };
+
+  const handleSelectDomain = (domain: StudentDomain) => {
+    setSelectedDomain(domain);
+    if (domain.html_file_url) {
+      fetchHtmlContent(domain.html_file_url);
+    } else {
+      setHtmlContent(null);
+    }
+  };
+
+  const handleBack = () => {
+    setSelectedDomain(null);
+    setHtmlContent(null);
+  };
+
   // Domain detail: show HTML in iframe
   if (selectedDomain) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <Header />
-        <div className="container mx-auto px-4 py-8 max-w-5xl">
+        <div className="px-4 py-2">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setSelectedDomain(null)}
-            className="mb-4"
+            onClick={handleBack}
+            className="mb-2"
           >
             <ArrowLeft className="h-4 w-4 mr-1" /> Terug naar domeinen
           </Button>
+        </div>
 
-          <h1 className="text-2xl font-bold text-foreground mb-2">
-            {selectedDomain.domain_name}
-          </h1>
-          {selectedDomain.description && (
-            <p className="text-muted-foreground mb-4">{selectedDomain.description}</p>
-          )}
-
-          {selectedDomain.html_file_url ? (
-            <div className="border rounded-lg overflow-hidden bg-white">
-              <iframe
-                src={selectedDomain.html_file_url}
-                className="w-full border-0"
-                style={{ minHeight: "80vh" }}
-                title={selectedDomain.domain_name}
-                sandbox="allow-scripts allow-same-origin"
-              />
-            </div>
-          ) : (
+        {loadingHtml ? (
+          <div className="flex-1 flex items-center justify-center">
+            <p>Laden...</p>
+          </div>
+        ) : htmlContent ? (
+          <iframe
+            srcDoc={htmlContent}
+            className="flex-1 w-full border-0"
+            title={selectedDomain.domain_name}
+            sandbox="allow-scripts"
+          />
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
             <Card>
               <CardContent className="py-12 text-center text-muted-foreground">
                 <p>Er is nog geen inhoud beschikbaar voor dit domein.</p>
                 <p className="text-sm">Neem contact op met je docent.</p>
               </CardContent>
             </Card>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     );
   }
