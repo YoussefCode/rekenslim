@@ -1,17 +1,16 @@
-import { defineConfig } from "vite";
+import { defineConfig, type PluginOption } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
-// https://vitejs.dev/config/
+
 export default defineConfig(async ({ mode }) => {
-  // Only load the optional Lovable plugin in development to avoid build-time module errors
-  const devPlugins = [] as unknown[];
+  const devPlugins: PluginOption[] = [];
 
   if (mode === 'development') {
     try {
       const { componentTagger } = await import('lovable-tagger');
       devPlugins.push(componentTagger());
-    } catch (error) {
-      console.warn('lovable-tagger not installed; skipping dev-only tagger plugin');
+    } catch {
+      // lovable-tagger not installed
     }
   }
 
@@ -23,7 +22,7 @@ export default defineConfig(async ({ mode }) => {
     plugins: [
       react(),
       ...devPlugins,
-    ].filter(Boolean),
+    ],
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),
@@ -31,5 +30,3 @@ export default defineConfig(async ({ mode }) => {
     },
   };
 });
-
-  
