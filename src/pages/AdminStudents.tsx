@@ -19,6 +19,8 @@ interface Student {
   user_id: string;
   email: string;
   role: string;
+  first_name: string;
+  last_name: string;
 }
 
 interface StudentDomain {
@@ -62,9 +64,9 @@ const AdminStudents = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("user_id, email, role")
+        .select("user_id, email, role, first_name, last_name")
         .eq("role", "student")
-        .order("email");
+        .order("first_name");
       if (error) throw error;
       setStudents(data || []);
     } catch {
@@ -213,7 +215,14 @@ const AdminStudents = () => {
                           : "hover:bg-muted"
                       }`}
                     >
-                      {s.email}
+                      <span className="font-medium">
+                        {s.first_name || s.last_name
+                          ? `${s.first_name} ${s.last_name}`.trim()
+                          : s.email}
+                      </span>
+                      {(s.first_name || s.last_name) && (
+                        <span className="block text-xs opacity-70">{s.email}</span>
+                      )}
                     </button>
                   ))
                 )}
@@ -235,7 +244,9 @@ const AdminStudents = () => {
                 <Card>
                   <CardHeader className="pb-3 flex flex-row items-center justify-between">
                     <CardTitle className="text-lg">
-                      Domeinen van {selectedStudent.email}
+                      Domeinen van {selectedStudent.first_name || selectedStudent.last_name
+                        ? `${selectedStudent.first_name} ${selectedStudent.last_name}`.trim()
+                        : selectedStudent.email}
                     </CardTitle>
                     <Dialog open={domainDialogOpen} onOpenChange={setDomainDialogOpen}>
                       <DialogTrigger asChild>
