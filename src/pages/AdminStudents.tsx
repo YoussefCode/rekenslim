@@ -64,9 +64,9 @@ const AdminStudents = () => {
     try {
       const { data, error } = await supabase
         .from("profiles")
-        .select("user_id, email, role")
+        .select("user_id, email, role, first_name, last_name")
         .eq("role", "student")
-        .order("email");
+        .order("first_name");
       if (error) throw error;
       setStudents(data || []);
     } catch {
