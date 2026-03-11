@@ -215,7 +215,14 @@ const AdminStudents = () => {
                           : "hover:bg-muted"
                       }`}
                     >
-                      {s.email}
+                      <span className="font-medium">
+                        {s.first_name || s.last_name
+                          ? `${s.first_name} ${s.last_name}`.trim()
+                          : s.email}
+                      </span>
+                      {(s.first_name || s.last_name) && (
+                        <span className="block text-xs opacity-70">{s.email}</span>
+                      )}
                     </button>
                   ))
                 )}
