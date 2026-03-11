@@ -244,7 +244,9 @@ const AdminStudents = () => {
                 <Card>
                   <CardHeader className="pb-3 flex flex-row items-center justify-between">
                     <CardTitle className="text-lg">
-                      Domeinen van {selectedStudent.email}
+                      Domeinen van {selectedStudent.first_name || selectedStudent.last_name
+                        ? `${selectedStudent.first_name} ${selectedStudent.last_name}`.trim()
+                        : selectedStudent.email}
                     </CardTitle>
                     <Dialog open={domainDialogOpen} onOpenChange={setDomainDialogOpen}>
                       <DialogTrigger asChild>
