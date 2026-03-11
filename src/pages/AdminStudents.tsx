@@ -41,6 +41,8 @@ const AdminStudents = () => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [domains, setDomains] = useState<StudentDomain[]>([]);
   const [loading, setLoading] = useState(true);
+  const [studentFirstName, setStudentFirstName] = useState("");
+  const [studentLastName, setStudentLastName] = useState("");
 
   // Dialog states
   const [domainDialogOpen, setDomainDialogOpen] = useState(false);
@@ -91,7 +93,30 @@ const AdminStudents = () => {
 
   const selectStudent = (student: Student) => {
     setSelectedStudent(student);
+    setStudentFirstName(student.first_name || "");
+    setStudentLastName(student.last_name || "");
     fetchDomains(student.user_id);
+  };
+
+  const saveStudentName = async () => {
+    if (!selectedStudent) return;
+    try {
+      await supabase
+        .from("profiles")
+        .update({
+          first_name: studentFirstName.trim(),
+          last_name: studentLastName.trim(),
+        })
+        .eq("user_id", selectedStudent.user_id);
+
+      toast({ title: "Naam bijgewerkt" });
+      setSelectedStudent((prev) =>
+        prev ? { ...prev, first_name: studentFirstName, last_name: studentLastName } : prev
+      );
+      fetchStudents();
+    } catch {
+      toast({ title: "Fout bij opslaan naam", variant: "destructive" });
+    }
   };
 
   const saveDomain = async () => {
@@ -241,6 +266,37 @@ const AdminStudents = () => {
               </Card>
             ) : (
               <div className="space-y-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-lg">Leerlinggegevens</CardTitle>
+                  </CardHeader>
+                  <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="student-first-name">Voornaam</Label>
+                      <Input
+                        id="student-first-name"
+                        value={studentFirstName}
+                        onChange={(e) => setStudentFirstName(e.target.value)}
+                        placeholder="Voornaam"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="student-last-name">Achternaam</Label>
+                      <Input
+                        id="student-last-name"
+                        value={studentLastName}
+                        onChange={(e) => setStudentLastName(e.target.value)}
+                        placeholder="Achternaam"
+                      />
+                    </div>
+                    <div className="md:col-span-2 flex justify-end">
+                      <Button onClick={saveStudentName}>
+                        Sla naam op
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 <Card>
                   <CardHeader className="pb-3 flex flex-row items-center justify-between">
                     <CardTitle className="text-lg">
