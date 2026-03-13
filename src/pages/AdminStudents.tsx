@@ -32,6 +32,13 @@ interface StudentDomain {
   created_at: string;
 }
 
+interface DomainResult {
+  id: string;
+  student_domain_id: string;
+  result_data: Record<string, any>;
+  submitted_at: string;
+}
+
 const AdminStudents = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
