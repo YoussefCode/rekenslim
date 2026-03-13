@@ -50,13 +50,28 @@ const StudentDashboard = () => {
     }
   };
 
-  if (authLoading || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Laden...</p>
-      </div>
-    );
-  }
+  // Listen for postMessage results from iframe
+  useEffect(() => {
+    if (!selectedDomain || !user) return;
+
+    const handleMessage = async (event: MessageEvent) => {
+      if (event.data && event.data.type === 'domain-result' && event.data.result) {
+        try {
+          await supabase.from('student_domain_results' as any).insert({
+            student_domain_id: selectedDomain.id,
+            student_id: user.id,
+            result_data: event.data.result,
+          });
+          toast({ title: 'Resultaat opgeslagen!' });
+        } catch {
+          toast({ title: 'Fout bij opslaan resultaat', variant: 'destructive' });
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [selectedDomain, user, toast]);
 
   const fetchHtmlContent = async (url: string) => {
     setLoadingHtml(true);
@@ -86,29 +101,13 @@ const StudentDashboard = () => {
     setHtmlContent(null);
   };
 
-  // Listen for postMessage results from iframe
-  useEffect(() => {
-    if (!selectedDomain || !user) return;
-
-    const handleMessage = async (event: MessageEvent) => {
-      // Accept messages with type 'domain-result'
-      if (event.data && event.data.type === 'domain-result' && event.data.result) {
-        try {
-          await supabase.from('student_domain_results').insert({
-            student_domain_id: selectedDomain.id,
-            student_id: user.id,
-            result_data: event.data.result,
-          });
-          toast({ title: 'Resultaat opgeslagen!' });
-        } catch {
-          toast({ title: 'Fout bij opslaan resultaat', variant: 'destructive' });
-        }
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [selectedDomain, user, toast]);
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Laden...</p>
+      </div>
+    );
+  }
 
   // Domain detail: show HTML in iframe
   if (selectedDomain) {
@@ -116,12 +115,7 @@ const StudentDashboard = () => {
       <div className="min-h-screen bg-background flex flex-col">
         <Header />
         <div className="px-4 py-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleBack}
-            className="mb-2"
-          >
+          <Button variant="ghost" size="sm" onClick={handleBack} className="mb-2">
             <ArrowLeft className="h-4 w-4 mr-1" /> Terug naar domeinen
           </Button>
         </div>
