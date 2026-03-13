@@ -469,6 +469,34 @@ const AdminStudents = () => {
                                   </a>
                                 </div>
                               )}
+
+                              {/* Results section */}
+                              {(domainResults[d.id] || []).length > 0 && (
+                                <div className="mt-3 border-t pt-3">
+                                  <button
+                                    className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                    onClick={() => setExpandedResults((prev) => ({ ...prev, [d.id]: !prev[d.id] }))}
+                                  >
+                                    <BarChart3 className="h-3 w-3" />
+                                    {domainResults[d.id].length} resultaat{domainResults[d.id].length !== 1 ? 'en' : ''}
+                                    {expandedResults[d.id] ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                                  </button>
+                                  {expandedResults[d.id] && (
+                                    <div className="mt-2 space-y-2 max-h-64 overflow-y-auto">
+                                      {domainResults[d.id].map((r) => (
+                                        <div key={r.id} className="bg-muted rounded-md p-2 text-xs">
+                                          <p className="text-muted-foreground mb-1">
+                                            {new Date(r.submitted_at).toLocaleString('nl-NL')}
+                                          </p>
+                                          <pre className="whitespace-pre-wrap break-words text-foreground">
+                                            {JSON.stringify(r.result_data, null, 2)}
+                                          </pre>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
                             </CardContent>
                           </Card>
                         ))}
