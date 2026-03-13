@@ -50,6 +50,8 @@ const AdminStudents = () => {
   const [loading, setLoading] = useState(true);
   const [studentFirstName, setStudentFirstName] = useState("");
   const [studentLastName, setStudentLastName] = useState("");
+  const [domainResults, setDomainResults] = useState<Record<string, DomainResult[]>>({});
+  const [expandedResults, setExpandedResults] = useState<Record<string, boolean>>({});
 
   // Dialog states
   const [domainDialogOpen, setDomainDialogOpen] = useState(false);
