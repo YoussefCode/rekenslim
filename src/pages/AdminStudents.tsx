@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  ArrowLeft, Plus, Trash2, Edit, Users, BookOpen, Upload, FileCode
+  ArrowLeft, Plus, Trash2, Edit, Users, BookOpen, Upload, FileCode, BarChart3, ChevronDown, ChevronUp
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger

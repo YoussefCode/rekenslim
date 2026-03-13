@@ -86,6 +86,30 @@ const StudentDashboard = () => {
     setHtmlContent(null);
   };
 
+  // Listen for postMessage results from iframe
+  useEffect(() => {
+    if (!selectedDomain || !user) return;
+
+    const handleMessage = async (event: MessageEvent) => {
+      // Accept messages with type 'domain-result'
+      if (event.data && event.data.type === 'domain-result' && event.data.result) {
+        try {
+          await supabase.from('student_domain_results').insert({
+            student_domain_id: selectedDomain.id,
+            student_id: user.id,
+            result_data: event.data.result,
+          });
+          toast({ title: 'Resultaat opgeslagen!' });
+        } catch {
+          toast({ title: 'Fout bij opslaan resultaat', variant: 'destructive' });
+        }
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [selectedDomain, user, toast]);
+
   // Domain detail: show HTML in iframe
   if (selectedDomain) {
     return (
@@ -111,7 +135,7 @@ const StudentDashboard = () => {
             srcDoc={htmlContent}
             className="flex-1 w-full border-0"
             title={selectedDomain.domain_name}
-            sandbox="allow-scripts"
+            sandbox="allow-scripts allow-same-origin"
           />
         ) : (
           <div className="flex-1 flex items-center justify-center">
