@@ -1,22 +1,76 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const MagicLinkRelay = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [verifying, setVerifying] = useState(false);
 
-  // The Supabase redirect with hash router ends up like: #/magic-link#access_token=...&type=recovery
-  const tokenHash = useMemo(() => {
-    const full = window.location.hash; // e.g. "#/magic-link#access_token=..."
-    const secondHashIndex = full.indexOf('#', 1);
-    if (secondHashIndex === -1) return '';
-    return full.slice(secondHashIndex + 1); // access_token=...&type=...
+  const linkData = useMemo(() => {
+    const fullHash = window.location.hash; // e.g. "#/magic-link?token_hash=...&type=recovery" or "#/magic-link#access_token=..."
+
+    // Legacy Supabase redirect flow: #/magic-link#access_token=...&type=recovery
+    const secondHashIndex = fullHash.indexOf('#', 1);
+    const legacyToken = secondHashIndex === -1 ? '' : fullHash.slice(secondHashIndex + 1);
+
+    // Custom relay flow: #/magic-link?token_hash=...&type=recovery
+    const routePart = secondHashIndex === -1 ? fullHash.slice(1) : fullHash.slice(1, secondHashIndex);
+    const queryIndex = routePart.indexOf('?');
+    const hashQuery = queryIndex === -1 ? '' : routePart.slice(queryIndex + 1);
+
+    // Also support non-hash query params as fallback
+    const searchQuery = window.location.search.startsWith('?')
+      ? window.location.search.slice(1)
+      : '';
+
+    const params = new URLSearchParams(hashQuery || searchQuery);
+    const tokenHash = params.get('token_hash') || '';
+    const type = params.get('type') || '';
+
+    return {
+      legacyToken,
+      tokenHash,
+      type,
+    };
   }, []);
 
-  const hasToken = tokenHash.length > 0;
-  const forwardUrl = `${window.location.origin}/#/auth-reset#${tokenHash}`;
+  const hasLegacyToken = linkData.legacyToken.length > 0;
+  const hasTokenHashRecovery = linkData.tokenHash.length > 0 && linkData.type === 'recovery';
+  const hasToken = hasLegacyToken || hasTokenHashRecovery;
+
+  const forwardLegacyUrl = `${window.location.origin}/#/auth-reset#${linkData.legacyToken}`;
+
+  const handleContinue = async () => {
+    if (hasLegacyToken) {
+      window.location.href = forwardLegacyUrl;
+      return;
+    }
+
+    if (!hasTokenHashRecovery) return;
+
+    setVerifying(true);
+    const { error } = await supabase.auth.verifyOtp({
+      type: 'recovery',
+      token_hash: linkData.tokenHash,
+    });
+
+    if (error) {
+      toast({
+        title: 'Resetlink ongeldig',
+        description: 'Vraag een nieuwe resetlink aan en klik die direct aan.',
+        variant: 'destructive',
+      });
+      setVerifying(false);
+      return;
+    }
+
+    navigate('/auth-reset', { replace: true });
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
@@ -30,8 +84,8 @@ const MagicLinkRelay = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {hasToken ? (
-            <Button className="w-full" onClick={() => (window.location.href = forwardUrl)}>
-              Ga verder <ArrowRight className="ml-2 h-4 w-4" />
+            <Button className="w-full" onClick={handleContinue} disabled={verifying}>
+              {verifying ? 'Bevestigen...' : 'Ga verder'} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
             <div className="text-sm text-muted-foreground text-center space-y-3">
@@ -44,7 +98,7 @@ const MagicLinkRelay = () => {
         </CardContent>
       </Card>
       <div className="mt-4 text-center">
-        <Button variant="ghost" onClick={() => navigate('/')}> 
+        <Button variant="ghost" onClick={() => navigate('/')}>
           <ArrowLeft className="mr-2 h-4 w-4" /> Terug naar home
         </Button>
       </div>
