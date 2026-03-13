@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  ArrowLeft, Plus, Trash2, Edit, Users, BookOpen, Upload, FileCode
+  ArrowLeft, Plus, Trash2, Edit, Users, BookOpen, Upload, FileCode, BarChart3, ChevronDown, ChevronUp
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
@@ -32,6 +32,13 @@ interface StudentDomain {
   created_at: string;
 }
 
+interface DomainResult {
+  id: string;
+  student_domain_id: string;
+  result_data: Record<string, any>;
+  submitted_at: string;
+}
+
 const AdminStudents = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -43,6 +50,8 @@ const AdminStudents = () => {
   const [loading, setLoading] = useState(true);
   const [studentFirstName, setStudentFirstName] = useState("");
   const [studentLastName, setStudentLastName] = useState("");
+  const [domainResults, setDomainResults] = useState<Record<string, DomainResult[]>>({});
+  const [expandedResults, setExpandedResults] = useState<Record<string, boolean>>({});
 
   // Dialog states
   const [domainDialogOpen, setDomainDialogOpen] = useState(false);
@@ -88,7 +97,27 @@ const AdminStudents = () => {
       toast({ title: "Fout bij laden domeinen", variant: "destructive" });
       return;
     }
-    setDomains((data as StudentDomain[]) || []);
+    const domainList = (data as StudentDomain[]) || [];
+    setDomains(domainList);
+
+    // Fetch results for all domains
+    if (domainList.length > 0) {
+      const domainIds = domainList.map((d) => d.id);
+      const { data: resultsData } = await supabase
+        .from("student_domain_results" as any)
+        .select("id, student_domain_id, result_data, submitted_at")
+        .in("student_domain_id", domainIds)
+        .order("submitted_at", { ascending: false });
+
+      const grouped: Record<string, DomainResult[]> = {};
+      ((resultsData as any[]) || []).forEach((r: any) => {
+        if (!grouped[r.student_domain_id]) grouped[r.student_domain_id] = [];
+        grouped[r.student_domain_id].push(r);
+      });
+      setDomainResults(grouped);
+    } else {
+      setDomainResults({});
+    }
   }, [toast]);
 
   const selectStudent = (student: Student) => {
@@ -438,6 +467,34 @@ const AdminStudents = () => {
                                   >
                                     Bekijk HTML bestand →
                                   </a>
+                                </div>
+                              )}
+
+                              {/* Results section */}
+                              {(domainResults[d.id] || []).length > 0 && (
+                                <div className="mt-3 border-t pt-3">
+                                  <button
+                                    className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                    onClick={() => setExpandedResults((prev) => ({ ...prev, [d.id]: !prev[d.id] }))}
+                                  >
+                                    <BarChart3 className="h-3 w-3" />
+                                    {domainResults[d.id].length} resultaat{domainResults[d.id].length !== 1 ? 'en' : ''}
+                                    {expandedResults[d.id] ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                                  </button>
+                                  {expandedResults[d.id] && (
+                                    <div className="mt-2 space-y-2 max-h-64 overflow-y-auto">
+                                      {domainResults[d.id].map((r) => (
+                                        <div key={r.id} className="bg-muted rounded-md p-2 text-xs">
+                                          <p className="text-muted-foreground mb-1">
+                                            {new Date(r.submitted_at).toLocaleString('nl-NL')}
+                                          </p>
+                                          <pre className="whitespace-pre-wrap break-words text-foreground">
+                                            {JSON.stringify(r.result_data, null, 2)}
+                                          </pre>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </CardContent>

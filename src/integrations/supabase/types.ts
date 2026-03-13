@@ -226,6 +226,38 @@ export type Database = {
         }
         Relationships: []
       }
+      student_domain_results: {
+        Row: {
+          id: string
+          result_data: Json
+          student_domain_id: string
+          student_id: string
+          submitted_at: string
+        }
+        Insert: {
+          id?: string
+          result_data?: Json
+          student_domain_id: string
+          student_id: string
+          submitted_at?: string
+        }
+        Update: {
+          id?: string
+          result_data?: Json
+          student_domain_id?: string
+          student_id?: string
+          submitted_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_domain_results_student_domain_id_fkey"
+            columns: ["student_domain_id"]
+            isOneToOne: false
+            referencedRelation: "student_domains"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_domains: {
         Row: {
           created_at: string
