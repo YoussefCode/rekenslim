@@ -97,7 +97,27 @@ const AdminStudents = () => {
       toast({ title: "Fout bij laden domeinen", variant: "destructive" });
       return;
     }
-    setDomains((data as StudentDomain[]) || []);
+    const domainList = (data as StudentDomain[]) || [];
+    setDomains(domainList);
+
+    // Fetch results for all domains
+    if (domainList.length > 0) {
+      const domainIds = domainList.map((d) => d.id);
+      const { data: resultsData } = await supabase
+        .from("student_domain_results" as any)
+        .select("id, student_domain_id, result_data, submitted_at")
+        .in("student_domain_id", domainIds)
+        .order("submitted_at", { ascending: false });
+
+      const grouped: Record<string, DomainResult[]> = {};
+      ((resultsData as any[]) || []).forEach((r: any) => {
+        if (!grouped[r.student_domain_id]) grouped[r.student_domain_id] = [];
+        grouped[r.student_domain_id].push(r);
+      });
+      setDomainResults(grouped);
+    } else {
+      setDomainResults({});
+    }
   }, [toast]);
 
   const selectStudent = (student: Student) => {
