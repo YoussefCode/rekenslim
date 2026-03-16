@@ -14,6 +14,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
+import DomainResultCard from "@/components/DomainResultCard";
 
 interface Student {
   user_id: string;
@@ -482,16 +483,13 @@ const AdminStudents = () => {
                                     {expandedResults[d.id] ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
                                   </button>
                                   {expandedResults[d.id] && (
-                                    <div className="mt-2 space-y-2 max-h-64 overflow-y-auto">
+                                    <div className="mt-2 space-y-2 max-h-96 overflow-y-auto">
                                       {domainResults[d.id].map((r) => (
-                                        <div key={r.id} className="bg-muted rounded-md p-2 text-xs">
-                                          <p className="text-muted-foreground mb-1">
-                                            {new Date(r.submitted_at).toLocaleString('nl-NL')}
-                                          </p>
-                                          <pre className="whitespace-pre-wrap break-words text-foreground">
-                                            {JSON.stringify(r.result_data, null, 2)}
-                                          </pre>
-                                        </div>
+                                        <DomainResultCard
+                                          key={r.id}
+                                          resultData={r.result_data}
+                                          submittedAt={r.submitted_at}
+                                        />
                                       ))}
                                     </div>
                                   )}
