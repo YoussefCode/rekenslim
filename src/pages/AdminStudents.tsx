@@ -14,6 +14,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
+import DomainResultCard from "@/components/DomainResultCard";
 
 interface Student {
   user_id: string;
