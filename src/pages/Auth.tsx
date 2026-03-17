@@ -217,7 +217,7 @@ const Auth = () => {
                       });
                     }}
                   >
-                    Wachtwoord vergeten?
+                    Wachtwoord resetten?
                   </Button>
 
                   {forgotOpen && (
