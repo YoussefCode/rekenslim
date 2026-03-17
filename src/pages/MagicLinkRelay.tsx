@@ -40,10 +40,22 @@ const MagicLinkRelay = () => {
   }, []);
 
   const hasLegacyToken = linkData.legacyToken.length > 0;
-  const hasTokenHashRecovery = linkData.tokenHash.length > 0 && linkData.type === 'recovery';
-  const hasToken = hasLegacyToken || hasTokenHashRecovery;
+  const isRecoveryFlow = linkData.type === 'recovery';
+  const isSignupFlow = linkData.type === 'signup';
+  const activeType = isSignupFlow ? 'signup' : isRecoveryFlow ? 'recovery' : '';
+  const hasTokenHash = linkData.tokenHash.length > 0 && activeType.length > 0;
+  const hasToken = hasLegacyToken || hasTokenHash;
 
   const forwardLegacyUrl = `${window.location.origin}/#/auth-reset#${linkData.legacyToken}`;
+  const heading = isSignupFlow ? 'Bevestig je account' : 'Reset je wachtwoord';
+  const description = isSignupFlow
+    ? 'Klik hieronder om je account te activeren en toegang te krijgen tot Rekenslim.'
+    : 'Klik hieronder om door te gaan naar het reset-scherm. Dit voorkomt dat e-mail scanners de link al verbruiken.';
+  const buttonLabel = verifying
+    ? 'Bevestigen...'
+    : isSignupFlow
+      ? 'Account bevestigen'
+      : 'Ga verder';
 
   const handleContinue = async () => {
     if (hasLegacyToken) {
@@ -51,21 +63,35 @@ const MagicLinkRelay = () => {
       return;
     }
 
-    if (!hasTokenHashRecovery) return;
+    if (!hasTokenHash) return;
 
     setVerifying(true);
     const { error } = await supabase.auth.verifyOtp({
-      type: 'recovery',
+      type: activeType as 'signup' | 'recovery',
       token_hash: linkData.tokenHash,
     });
 
     if (error) {
       toast({
-        title: 'Resetlink ongeldig',
-        description: 'Vraag een nieuwe resetlink aan en klik die direct aan.',
+        title: isSignupFlow ? 'Bevestigen mislukt' : 'Resetlink ongeldig',
+        description: isSignupFlow
+          ? 'Vraag een nieuwe bevestigingsmail aan en klik de link direct aan.'
+          : 'Vraag een nieuwe resetlink aan en klik die direct aan.',
         variant: 'destructive',
       });
       setVerifying(false);
+      return;
+    }
+
+    toast({
+      title: isSignupFlow ? 'Account bevestigd' : 'Token bevestigd',
+      description: isSignupFlow
+        ? 'Je account is geactiveerd. Je kunt meteen inloggen.'
+        : 'Ga verder met het instellen van je wachtwoord.',
+    });
+
+    if (isSignupFlow) {
+      navigate('/auth-confirm', { replace: true, state: { verified: true } });
       return;
     }
 
@@ -76,20 +102,21 @@ const MagicLinkRelay = () => {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
-          <CardTitle className="text-2xl font-bold">Reset je wachtwoord</CardTitle>
-          <CardDescription>
-            Klik hieronder om door te gaan naar het reset-scherm.
-            Dit voorkomt dat e-mail scanners de link al verbruiken.
-          </CardDescription>
+          <CardTitle className="text-2xl font-bold">{heading}</CardTitle>
+          <CardDescription>{description}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {hasToken ? (
             <Button className="w-full" onClick={handleContinue} disabled={verifying}>
-              {verifying ? 'Bevestigen...' : 'Ga verder'} <ArrowRight className="ml-2 h-4 w-4" />
+              {buttonLabel} <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
             <div className="text-sm text-muted-foreground text-center space-y-3">
-              <p>Geen geldige resetlink gevonden. Vraag een nieuwe resetlink aan en klik hem direct aan.</p>
+              <p>
+                {isSignupFlow
+                  ? 'Geen geldige bevestigingslink gevonden. Vraag een nieuwe mail aan en klik die direct aan.'
+                  : 'Geen geldige resetlink gevonden. Vraag een nieuwe resetlink aan en klik hem direct aan.'}
+              </p>
               <Button variant="outline" className="w-full" onClick={() => navigate('/auth')}>
                 Terug naar inloggen
               </Button>
