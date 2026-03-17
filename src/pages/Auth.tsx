@@ -103,8 +103,9 @@ const Auth = () => {
       } else {
         toast({
           title: "Registratie succesvol",
-          description: "Check je email voor bevestiging",
+          description: "Je account is actief. Probeer nu in te loggen",
         });
+        navigate('/');
       }
     } catch (error) {
       console.error('Onbekende fout bij registreren:', error);
