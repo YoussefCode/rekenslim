@@ -24,7 +24,7 @@ const AuthConfirm = () => {
           <div className="flex flex-col items-center space-y-3">
             <CheckCircle2 className="h-12 w-12 text-green-500" />
             <p className="text-sm text-muted-foreground">
-              Zodra je via de e-mail bevestigt, krijg je toegang tot al het Rekenslim lesmateriaal.
+              Je hebt nu toegang tot al het Rekenslim lesmateriaal.
             </p>
           </div>
           <Button className="w-full" onClick={() => navigate('/auth')}>
