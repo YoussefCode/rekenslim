@@ -103,7 +103,7 @@ const Auth = () => {
       } else {
         toast({
           title: "Registratie succesvol",
-          description: "Je account is actief. Probeer nu in te loggen",
+          description: "Je account is actief.Je wordt doorgestuurd naar de startpagina.",
         });
         navigate('/');
       }
