@@ -10,7 +10,7 @@ const AuthConfirm = () => {
   const verified = Boolean(location.state?.verified);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 to-secondary/5 p-4 gap-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-2xl font-bold">Account bevestigd</CardTitle>
@@ -32,7 +32,7 @@ const AuthConfirm = () => {
           </Button>
         </CardContent>
       </Card>
-      <div className="mt-4 text-center">
+      <div className="text-center">
         <Button variant="ghost" onClick={() => navigate('/')}> 
           <ArrowLeft className="mr-2 h-4 w-4" /> Terug naar home
         </Button>
