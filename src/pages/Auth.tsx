@@ -32,6 +32,11 @@ const Auth = () => {
     checkUser();
   }, [navigate]);
 
+  const handleResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await handleResetLink();
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -138,9 +143,13 @@ const Auth = () => {
 
       if (error) {
         console.error('Resetlink versturen mislukt:', error);
+        let errorDescription = 'Wacht even en probeer het opnieuw.';
+        if (error.message?.toLowerCase().includes('security')) {
+          errorDescription = 'Om veiligheidsredenen kun je slechts af en toe een resetlink aanvragen. Probeer het zo dadelijk opnieuw.';
+        }
         toast({
           title: 'Resetlink versturen mislukt',
-          description: error.message || 'Wacht even en probeer het opnieuw.',
+          description: errorDescription,
           variant: 'destructive',
         });
       } else {
@@ -178,73 +187,76 @@ const Auth = () => {
             </TabsList>
             
             <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="password">Wachtwoord</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Bezig met inloggen...' : 'Inloggen'}
-                </Button>
-                <div className="text-sm text-muted-foreground text-center space-y-2">
+              {forgotOpen ? (
+                <form onSubmit={handleResetSubmit} className="space-y-4">
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <p>Vul je e-mailadres in en we sturen direct een resetlink.</p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="forgot-email">E-mailadres</Label>
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      placeholder="naam@voorbeeld.nl"
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={resetLoading}>
+                    {resetLoading ? 'Versturen...' : 'Stuur resetlink'}
+                  </Button>
                   <Button
                     type="button"
-                    variant="link"
+                    variant="ghost"
                     className="w-full"
-                    onClick={() => {
-                      setForgotOpen((open) => {
-                        const next = !open;
-                        if (next && !forgotEmail) {
+                    onClick={() => setForgotOpen(false)}
+                  >
+                    Terug naar inloggen
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Wachtwoord</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? 'Bezig met inloggen...' : 'Inloggen'}
+                  </Button>
+                  <div className="text-sm text-muted-foreground text-center space-y-2">
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="w-full"
+                      onClick={() => {
+                        if (!forgotEmail) {
                           setForgotEmail(email);
                         }
-                        return next;
-                      });
-                    }}
-                  >
-                    Wachtwoord resetten?
-                  </Button>
-
-                  {forgotOpen && (
-                    <div className="space-y-2">
-                      <div className="space-y-1 text-left">
-                        <Label htmlFor="forgot-email">E-mailadres voor reset</Label>
-                        <Input
-                          id="forgot-email"
-                          type="email"
-                          value={forgotEmail}
-                          onChange={(e) => setForgotEmail(e.target.value)}
-                          placeholder="naam@voorbeeld.nl"
-                          required
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        className="w-full"
-                        disabled={resetLoading}
-                        onClick={handleResetLink}
-                      >
-                        {resetLoading ? 'Versturen...' : 'Stuur resetlink'}
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </form>
+                        setForgotOpen(true);
+                      }}
+                    >
+                      Wachtwoord resetten?
+                    </Button>
+                  </div>
+                </form>
+              )}
             </TabsContent>
             
             <TabsContent value="signup">
