@@ -230,7 +230,7 @@ const Auth = () => {
                   <div className="space-y-2">
                     <Label htmlFor="password">Wachtwoord</Label>
                     <Input
-                      id="password"
+                      id="password" 
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
