@@ -28,10 +28,12 @@ interface Student {
 interface StudentDomain {
   id: string;
   student_id: string;
+  class_domain_id: string | null;
   domain_name: string;
   description: string | null;
   html_file_url: string | null;
   created_at: string;
+  classroom_name?: string | null;
 }
 
 interface DomainResult {
@@ -223,7 +225,48 @@ const AdminStudents = () => {
       return;
     }
     const domainList = (data as StudentDomain[]) || [];
-    setDomains(domainList);
+
+    const classDomainIds = [
+      ...new Set(
+        domainList
+          .map((domain) => domain.class_domain_id)
+          .filter((value): value is string => Boolean(value))
+      ),
+    ];
+
+    let classroomByClassDomainId = new Map<string, string>();
+
+    if (classDomainIds.length > 0) {
+      const { data: classDomainRows } = await supabase
+        .from("class_domains")
+        .select("id, class_id")
+        .in("id", classDomainIds);
+
+      const classDomainsWithClass = (classDomainRows || []) as Array<{ id: string; class_id: string }>;
+      const classIds = [...new Set(classDomainsWithClass.map((row) => row.class_id))];
+
+      if (classIds.length > 0) {
+        const { data: classRows } = await supabase
+          .from("classes")
+          .select("id, name")
+          .in("id", classIds);
+
+        const classNameById = new Map(
+          ((classRows as Array<{ id: string; name: string }> | null) || []).map((row) => [row.id, row.name])
+        );
+
+        classroomByClassDomainId = new Map(
+          classDomainsWithClass.map((row) => [row.id, classNameById.get(row.class_id) || "Onbekend klaslokaal"])
+        );
+      }
+    }
+
+    const enrichedDomains = domainList.map((domain) => ({
+      ...domain,
+      classroom_name: domain.class_domain_id ? classroomByClassDomainId.get(domain.class_domain_id) || null : null,
+    }));
+
+    setDomains(enrichedDomains);
 
     // Fetch results for all domains
     if (domainList.length > 0) {
@@ -1078,7 +1121,10 @@ const AdminStudents = () => {
                                 <div className="flex items-center gap-3">
                                   <BookOpen className="h-5 w-5 text-primary" />
                                   <div>
-                                    <p className="font-medium">{d.domain_name}</p>
+                                    <p className="font-medium">
+                                      {d.domain_name}
+                                      {d.classroom_name ? ` • Klaslokaal: ${d.classroom_name}` : ""}
+                                    </p>
                                     {d.description && (
                                       <p className="text-xs text-muted-foreground">{d.description}</p>
                                     )}
