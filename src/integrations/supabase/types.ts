@@ -14,6 +14,100 @@ export type Database = {
   }
   public: {
     Tables: {
+      class_domains: {
+        Row: {
+          class_id: string
+          created_at: string
+          description: string | null
+          domain_name: string
+          html_file_url: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          description?: string | null
+          domain_name: string
+          html_file_url?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          description?: string | null
+          domain_name?: string
+          html_file_url?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_domains_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      class_students: {
+        Row: {
+          class_id: string
+          created_at: string
+          id: string
+          student_id: string
+        }
+        Insert: {
+          class_id: string
+          created_at?: string
+          id?: string
+          student_id: string
+        }
+        Update: {
+          class_id?: string
+          created_at?: string
+          id?: string
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_students_class_id_fkey"
+            columns: ["class_id"]
+            isOneToOne: false
+            referencedRelation: "classes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      classes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       content: {
         Row: {
           created_at: string
@@ -263,6 +357,7 @@ export type Database = {
       }
       student_domains: {
         Row: {
+          class_domain_id: string | null
           created_at: string
           description: string | null
           domain_name: string
@@ -272,6 +367,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          class_domain_id?: string | null
           created_at?: string
           description?: string | null
           domain_name: string
@@ -281,6 +377,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          class_domain_id?: string | null
           created_at?: string
           description?: string | null
           domain_name?: string
@@ -289,7 +386,15 @@ export type Database = {
           student_id?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "student_domains_class_domain_id_fkey"
+            columns: ["class_domain_id"]
+            isOneToOne: false
+            referencedRelation: "class_domains"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       student_materials: {
         Row: {

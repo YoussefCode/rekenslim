@@ -41,6 +41,22 @@ interface DomainResult {
   submitted_at: string;
 }
 
+interface SchoolClass {
+  id: string;
+  name: string;
+  description: string | null;
+  created_at: string;
+}
+
+interface ClassDomain {
+  id: string;
+  class_id: string;
+  domain_name: string;
+  description: string | null;
+  html_file_url: string | null;
+  created_at: string;
+}
+
 const AdminStudents = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -72,6 +88,21 @@ const AdminStudents = () => {
   const [newStudentFirstName, setNewStudentFirstName] = useState("");
   const [newStudentLastName, setNewStudentLastName] = useState("");
 
+  const [classes, setClasses] = useState<SchoolClass[]>([]);
+  const [selectedClass, setSelectedClass] = useState<SchoolClass | null>(null);
+  const [classStudents, setClassStudents] = useState<Student[]>([]);
+  const [classDomains, setClassDomains] = useState<ClassDomain[]>([]);
+  const [newClassName, setNewClassName] = useState("");
+  const [newClassDescription, setNewClassDescription] = useState("");
+  const [selectedStudentForClass, setSelectedStudentForClass] = useState("");
+  const [newClassDomainName, setNewClassDomainName] = useState("");
+  const [newClassDomainDescription, setNewClassDomainDescription] = useState("");
+  const [newClassDomainHtmlFile, setNewClassDomainHtmlFile] = useState<File | null>(null);
+  const [creatingClass, setCreatingClass] = useState(false);
+  const [addingStudentToClass, setAddingStudentToClass] = useState(false);
+  const [creatingClassDomain, setCreatingClassDomain] = useState(false);
+  const [deletingClassDomainId, setDeletingClassDomainId] = useState<string | null>(null);
+
   const formatLastLogin = (value: string | null) => {
     if (!value) return "Nog nooit ingelogd";
 
@@ -100,6 +131,7 @@ const AdminStudents = () => {
       return;
     }
     fetchStudents();
+    fetchClasses();
   }, [profile]);
 
   const fetchStudents = async () => {
@@ -186,7 +218,290 @@ const AdminStudents = () => {
     }
   }, [toast]);
 
+  const fetchClasses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("classes")
+        .select("id, name, description, created_at")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setClasses((data as SchoolClass[]) || []);
+    } catch (error) {
+      console.error("Fout bij laden klassen:", error);
+      toast({ title: "Fout bij laden klassen", variant: "destructive" });
+    }
+  };
+
+  const fetchClassStudents = async (classId: string) => {
+    const { data: links, error: linksError } = await supabase
+      .from("class_students")
+      .select("student_id")
+      .eq("class_id", classId);
+
+    if (linksError) {
+      toast({ title: "Fout bij laden klasleerlingen", variant: "destructive" });
+      return;
+    }
+
+    const ids = ((links as { student_id: string }[]) || []).map((x) => x.student_id);
+    if (ids.length === 0) {
+      setClassStudents([]);
+      return;
+    }
+
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("user_id, email, role, first_name, last_name, last_login_at")
+      .in("user_id", ids)
+      .eq("role", "student");
+
+    if (profilesError) {
+      toast({ title: "Fout bij laden klasleerlingen", variant: "destructive" });
+      return;
+    }
+
+    setClassStudents((profilesData as Student[]) || []);
+  };
+
+  const fetchClassDomains = async (classId: string) => {
+    const { data, error } = await supabase
+      .from("class_domains")
+      .select("id, class_id, domain_name, description, html_file_url, created_at")
+      .eq("class_id", classId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      toast({ title: "Fout bij laden klasdomeinen", variant: "destructive" });
+      return;
+    }
+
+    setClassDomains((data as ClassDomain[]) || []);
+  };
+
+  const selectClass = (schoolClass: SchoolClass) => {
+    setSelectedStudent(null);
+    setDomains([]);
+    setDomainResults({});
+    setSelectedClass(schoolClass);
+    fetchClassStudents(schoolClass.id);
+    fetchClassDomains(schoolClass.id);
+  };
+
+  const createClass = async () => {
+    const name = newClassName.trim();
+    const description = newClassDescription.trim();
+    if (!name) {
+      toast({ title: "Klasnaam is verplicht", variant: "destructive" });
+      return;
+    }
+
+    setCreatingClass(true);
+    try {
+      const { data, error } = await supabase
+        .from("classes")
+        .insert({
+          name,
+          description: description || null,
+          created_by: user?.id ?? null,
+        })
+        .select("id, name, description, created_at")
+        .single();
+
+      if (error) throw error;
+
+      toast({ title: "Klas aangemaakt" });
+      setNewClassName("");
+      setNewClassDescription("");
+      fetchClasses();
+      if (data) {
+        selectClass(data as SchoolClass);
+      }
+    } catch (error) {
+      console.error("Fout bij aanmaken klas:", error);
+      toast({ title: "Fout bij aanmaken klas", variant: "destructive" });
+    } finally {
+      setCreatingClass(false);
+    }
+  };
+
+  const addStudentToSelectedClass = async () => {
+    if (!selectedClass || !selectedStudentForClass) return;
+
+    setAddingStudentToClass(true);
+    try {
+      const { error: linkError } = await supabase.from("class_students").insert({
+        class_id: selectedClass.id,
+        student_id: selectedStudentForClass,
+      });
+      if (linkError) throw linkError;
+
+      const { data: sourceDomains, error: sourceDomainsError } = await supabase
+        .from("class_domains")
+        .select("id, domain_name, description, html_file_url")
+        .eq("class_id", selectedClass.id);
+
+      if (sourceDomainsError) throw sourceDomainsError;
+
+      const fanoutRows = ((sourceDomains as any[]) || []).map((d) => ({
+        student_id: selectedStudentForClass,
+        class_domain_id: d.id,
+        domain_name: d.domain_name,
+        description: d.description,
+        html_file_url: d.html_file_url,
+      }));
+
+      if (fanoutRows.length > 0) {
+        const { error: fanoutError } = await supabase
+          .from("student_domains")
+          .upsert(fanoutRows, { onConflict: "student_id,class_domain_id" });
+        if (fanoutError) throw fanoutError;
+      }
+
+      toast({ title: "Leerling toegevoegd aan klas" });
+      setSelectedStudentForClass("");
+      fetchClassStudents(selectedClass.id);
+    } catch (error) {
+      console.error("Fout bij toevoegen leerling aan klas:", error);
+      toast({ title: "Fout bij toevoegen aan klas", variant: "destructive" });
+    } finally {
+      setAddingStudentToClass(false);
+    }
+  };
+
+  const removeStudentFromSelectedClass = async (studentId: string) => {
+    if (!selectedClass) return;
+    if (!confirm("Deze leerling uit de klas verwijderen?")) return;
+
+    try {
+      const { error: unlinkError } = await supabase
+        .from("class_students")
+        .delete()
+        .eq("class_id", selectedClass.id)
+        .eq("student_id", studentId);
+      if (unlinkError) throw unlinkError;
+
+      const classDomainIds = classDomains.map((d) => d.id);
+      if (classDomainIds.length > 0) {
+        const { error: cleanupError } = await supabase
+          .from("student_domains")
+          .delete()
+          .eq("student_id", studentId)
+          .in("class_domain_id", classDomainIds);
+        if (cleanupError) throw cleanupError;
+      }
+
+      toast({ title: "Leerling verwijderd uit klas" });
+      fetchClassStudents(selectedClass.id);
+    } catch (error) {
+      console.error("Fout bij verwijderen uit klas:", error);
+      toast({ title: "Fout bij verwijderen uit klas", variant: "destructive" });
+    }
+  };
+
+  const addClassDomain = async () => {
+    if (!selectedClass || !newClassDomainName.trim()) return;
+    setCreatingClassDomain(true);
+
+    try {
+      let htmlFileUrl: string | null = null;
+      if (newClassDomainHtmlFile) {
+        const filePath = `classes/${selectedClass.id}/${Date.now()}_${newClassDomainHtmlFile.name}`;
+        const { error: uploadError } = await supabase.storage
+          .from("student-files")
+          .upload(filePath, newClassDomainHtmlFile, { contentType: "text/html" });
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from("student-files")
+          .getPublicUrl(filePath);
+        htmlFileUrl = urlData.publicUrl;
+      }
+
+      const { data: createdDomain, error: createDomainError } = await supabase
+        .from("class_domains")
+        .insert({
+          class_id: selectedClass.id,
+          domain_name: newClassDomainName.trim(),
+          description: newClassDomainDescription.trim() || null,
+          html_file_url: htmlFileUrl,
+        })
+        .select("id, class_id, domain_name, description, html_file_url, created_at")
+        .single();
+
+      if (createDomainError || !createdDomain) throw createDomainError;
+
+      const { data: links, error: linksError } = await supabase
+        .from("class_students")
+        .select("student_id")
+        .eq("class_id", selectedClass.id);
+      if (linksError) throw linksError;
+
+      const rows = ((links as { student_id: string }[]) || []).map((x) => ({
+        student_id: x.student_id,
+        class_domain_id: createdDomain.id,
+        domain_name: createdDomain.domain_name,
+        description: createdDomain.description,
+        html_file_url: createdDomain.html_file_url,
+      }));
+
+      if (rows.length > 0) {
+        const { error: fanoutError } = await supabase
+          .from("student_domains")
+          .upsert(rows, { onConflict: "student_id,class_domain_id" });
+        if (fanoutError) throw fanoutError;
+      }
+
+      toast({ title: "Klasdomein toegevoegd" });
+      setNewClassDomainName("");
+      setNewClassDomainDescription("");
+      setNewClassDomainHtmlFile(null);
+      fetchClassDomains(selectedClass.id);
+    } catch (error) {
+      console.error("Fout bij toevoegen klasdomein:", error);
+      toast({
+        title: "Fout bij toevoegen klasdomein",
+        description: error instanceof Error ? error.message : "Probeer het opnieuw.",
+        variant: "destructive",
+      });
+    } finally {
+      setCreatingClassDomain(false);
+    }
+  };
+
+  const deleteClassDomain = async (classDomainId: string) => {
+    if (!selectedClass) return;
+    if (!confirm("Dit klasdomein verwijderen voor alle leerlingen in deze klas?")) return;
+
+    setDeletingClassDomainId(classDomainId);
+    try {
+      const { error: cleanupError } = await supabase
+        .from("student_domains")
+        .delete()
+        .eq("class_domain_id", classDomainId);
+      if (cleanupError) throw cleanupError;
+
+      const { error: deleteError } = await supabase
+        .from("class_domains")
+        .delete()
+        .eq("id", classDomainId)
+        .eq("class_id", selectedClass.id);
+      if (deleteError) throw deleteError;
+
+      toast({ title: "Klasdomein verwijderd" });
+      fetchClassDomains(selectedClass.id);
+    } catch (error) {
+      console.error("Fout bij verwijderen klasdomein:", error);
+      toast({ title: "Fout bij verwijderen klasdomein", variant: "destructive" });
+    } finally {
+      setDeletingClassDomainId(null);
+    }
+  };
+
   const selectStudent = (student: Student) => {
+    setSelectedClass(null);
+    setClassStudents([]);
+    setClassDomains([]);
     setSelectedStudent(student);
     setStudentFirstName(student.first_name || "");
     setStudentLastName(student.last_name || "");
@@ -519,19 +834,195 @@ const AdminStudents = () => {
                 )}
               </CardContent>
             </Card>
+
+            <Card className="mt-4">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Klas toevoegen</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Input
+                  value={newClassName}
+                  onChange={(e) => setNewClassName(e.target.value)}
+                  placeholder="Klasnaam"
+                />
+                <Textarea
+                  value={newClassDescription}
+                  onChange={(e) => setNewClassDescription(e.target.value)}
+                  placeholder="Beschrijving (optioneel)"
+                />
+                <Button className="w-full" onClick={createClass} disabled={creatingClass}>
+                  {creatingClass ? "Aanmaken..." : "Maak klas aan"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="mt-4">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Klassen</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-1">
+                {classes.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Nog geen klassen</p>
+                ) : (
+                  classes.map((c) => (
+                    <button
+                      key={c.id}
+                      onClick={() => selectClass(c)}
+                      className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                        selectedClass?.id === c.id ? "bg-secondary" : "hover:bg-muted"
+                      }`}
+                    >
+                      <span className="font-medium block">{c.name}</span>
+                      {c.description && (
+                        <span className="text-xs text-muted-foreground block">{c.description}</span>
+                      )}
+                      <span className="text-xs text-muted-foreground block">
+                        Toegevoegd op: {formatAddedAt(c.created_at)}
+                      </span>
+                    </button>
+                  ))
+                )}
+              </CardContent>
+            </Card>
           </div>
 
           {/* Domain Area */}
           <div className="lg:col-span-9">
-            {!selectedStudent ? (
-              <Card>
-                <CardContent className="py-12 text-center text-muted-foreground">
-                  <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Selecteer een leerling om te beginnen</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-4">
+            <div className="space-y-4">
+              {selectedClass ? (
+                <>
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">Klas: {selectedClass.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className="text-sm text-muted-foreground">
+                        {selectedClass.description || "Geen beschrijving"}
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+                        <div className="md:col-span-2">
+                          <Label htmlFor="class-student-select">Leerling toevoegen aan klas</Label>
+                          <select
+                            id="class-student-select"
+                            value={selectedStudentForClass}
+                            onChange={(e) => setSelectedStudentForClass(e.target.value)}
+                            className="w-full mt-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
+                          >
+                            <option value="">Kies leerling</option>
+                            {students
+                              .filter((s) => !classStudents.some((cs) => cs.user_id === s.user_id))
+                              .map((s) => (
+                                <option key={s.user_id} value={s.user_id}>
+                                  {(s.first_name || s.last_name)
+                                    ? `${s.first_name || ""} ${s.last_name || ""}`.trim()
+                                    : s.email}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+                        <Button onClick={addStudentToSelectedClass} disabled={addingStudentToClass || !selectedStudentForClass}>
+                          {addingStudentToClass ? "Toevoegen..." : "Toevoegen"}
+                        </Button>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Leerlingen in klas</Label>
+                        {classStudents.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">Nog geen leerlingen in deze klas</p>
+                        ) : (
+                          classStudents.map((s) => (
+                            <div key={s.user_id} className="flex items-center justify-between border rounded-md px-3 py-2">
+                              <button
+                                className="text-left flex-1"
+                                onClick={() => selectStudent(s)}
+                              >
+                                <p className="text-sm font-medium">
+                                  {(s.first_name || s.last_name)
+                                    ? `${s.first_name || ""} ${s.last_name || ""}`.trim()
+                                    : s.email}
+                                </p>
+                                <p className="text-xs text-muted-foreground">{s.email}</p>
+                              </button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeStudentFromSelectedClass(s.user_id)}
+                              >
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">Klaslokaal lesmateriaal</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <Input
+                          value={newClassDomainName}
+                          onChange={(e) => setNewClassDomainName(e.target.value)}
+                          placeholder="Naam lesmateriaal"
+                        />
+                        <Input
+                          type="file"
+                          accept=".html,.htm"
+                          onChange={(e) => setNewClassDomainHtmlFile(e.target.files?.[0] || null)}
+                        />
+                      </div>
+                      <Textarea
+                        value={newClassDomainDescription}
+                        onChange={(e) => setNewClassDomainDescription(e.target.value)}
+                        placeholder="Beschrijving (optioneel)"
+                      />
+                      <Button onClick={addClassDomain} disabled={creatingClassDomain}>
+                        {creatingClassDomain ? "Toevoegen..." : "Voeg lesmateriaal toe aan hele klas"}
+                      </Button>
+
+                      {classDomains.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">Nog geen klasmateriaal</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {classDomains.map((d) => (
+                            <div key={d.id} className="flex items-center justify-between border rounded-md px-3 py-2">
+                              <div>
+                                <p className="text-sm font-medium">{d.domain_name}</p>
+                                {d.description && (
+                                  <p className="text-xs text-muted-foreground">{d.description}</p>
+                                )}
+                                <p className="text-xs text-muted-foreground">
+                                  Toegevoegd op: {formatAddedAt(d.created_at)}
+                                </p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => deleteClassDomain(d.id)}
+                                disabled={deletingClassDomainId === d.id}
+                              >
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </>
+              ) : (
+                <Card>
+                  <CardContent className="py-8 text-center text-muted-foreground">
+                    <p>Selecteer een klas om leerlingen en klassikaal lesmateriaal te beheren.</p>
+                  </CardContent>
+                </Card>
+              )}
+
+              {selectedStudent ? (
+                <>
                 <Card>
                   <CardHeader className="pb-2 flex flex-row items-center justify-between">
                     <CardTitle className="text-lg">Leerlinggegevens</CardTitle>
@@ -750,8 +1241,16 @@ const AdminStudents = () => {
                     )}
                   </CardContent>
                 </Card>
-              </div>
-            )}
+              </>
+              ) : (
+                <Card>
+                  <CardContent className="py-8 text-center text-muted-foreground">
+                    <Users className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                    <p>Selecteer een leerling voor individueel lesmateriaal en resultaten.</p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           </div>
         </div>
       </div>

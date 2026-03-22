@@ -25,6 +25,7 @@ const StudentDashboard = () => {
   const [selectedDomain, setSelectedDomain] = useState<StudentDomain | null>(null);
   const [loading, setLoading] = useState(true);
   const [htmlContent, setHtmlContent] = useState<string | null>(null);
+  const [htmlSourceUrl, setHtmlSourceUrl] = useState<string | null>(null);
   const [loadingHtml, setLoadingHtml] = useState(false);
 
   useEffect(() => {
@@ -76,12 +77,29 @@ const StudentDashboard = () => {
 
   const fetchHtmlContent = async (url: string) => {
     setLoadingHtml(true);
+    setHtmlContent(null);
+    setHtmlSourceUrl(null);
     try {
-      const response = await fetch(url);
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 12000);
+
+      const response = await fetch(url, { signal: controller.signal });
+      window.clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
       const text = await response.text();
       setHtmlContent(text);
-    } catch {
-      toast({ title: "Fout bij laden HTML", variant: "destructive" });
+    } catch (error) {
+      // Fallback to direct URL in iframe if fetch/srcDoc path fails or times out.
+      setHtmlSourceUrl(url);
+      console.error("Fout bij laden HTML via fetch:", error);
+      toast({
+        title: "HTML laden duurt lang",
+        description: "We openen het materiaal direct in de viewer.",
+      });
       setHtmlContent(null);
     } finally {
       setLoadingHtml(false);
@@ -100,6 +118,7 @@ const StudentDashboard = () => {
   const handleBack = () => {
     setSelectedDomain(null);
     setHtmlContent(null);
+    setHtmlSourceUrl(null);
   };
 
   const formatAddedAt = (value: string) => {
@@ -138,6 +157,13 @@ const StudentDashboard = () => {
         ) : htmlContent ? (
           <iframe
             srcDoc={htmlContent}
+            className="flex-1 w-full border-0"
+            title={selectedDomain.domain_name}
+            sandbox="allow-scripts allow-same-origin"
+          />
+        ) : htmlSourceUrl ? (
+          <iframe
+            src={htmlSourceUrl}
             className="flex-1 w-full border-0"
             title={selectedDomain.domain_name}
             sandbox="allow-scripts allow-same-origin"
