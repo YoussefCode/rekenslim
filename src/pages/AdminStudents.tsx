@@ -226,6 +226,7 @@ const AdminStudents = () => {
     }
     const domainList = (data as StudentDomain[]) || [];
 
+    const domainIds = domainList.map((d) => d.id);
     const classDomainIds = [
       ...new Set(
         domainList
@@ -234,31 +235,31 @@ const AdminStudents = () => {
       ),
     ];
 
+    const classNameById = new Map(classes.map((c) => [c.id, c.name]));
+
+    const [classDomainResponse, resultsResponse] = await Promise.all([
+      classDomainIds.length > 0
+        ? supabase
+            .from("class_domains")
+            .select("id, class_id")
+            .in("id", classDomainIds)
+        : Promise.resolve({ data: [], error: null } as { data: any[]; error: null }),
+      domainIds.length > 0
+        ? supabase
+            .from("student_domain_results" as any)
+            .select("id, student_domain_id, result_data, submitted_at")
+            .in("student_domain_id", domainIds)
+            .order("submitted_at", { ascending: false })
+        : Promise.resolve({ data: [], error: null } as { data: any[]; error: null }),
+    ]);
+
     let classroomByClassDomainId = new Map<string, string>();
 
-    if (classDomainIds.length > 0) {
-      const { data: classDomainRows } = await supabase
-        .from("class_domains")
-        .select("id, class_id")
-        .in("id", classDomainIds);
-
-      const classDomainsWithClass = (classDomainRows || []) as Array<{ id: string; class_id: string }>;
-      const classIds = [...new Set(classDomainsWithClass.map((row) => row.class_id))];
-
-      if (classIds.length > 0) {
-        const { data: classRows } = await supabase
-          .from("classes")
-          .select("id, name")
-          .in("id", classIds);
-
-        const classNameById = new Map(
-          ((classRows as Array<{ id: string; name: string }> | null) || []).map((row) => [row.id, row.name])
-        );
-
-        classroomByClassDomainId = new Map(
-          classDomainsWithClass.map((row) => [row.id, classNameById.get(row.class_id) || "Onbekend klaslokaal"])
-        );
-      }
+    if (!classDomainResponse.error && classDomainIds.length > 0) {
+      const classDomainsWithClass = (classDomainResponse.data || []) as Array<{ id: string; class_id: string }>;
+      classroomByClassDomainId = new Map(
+        classDomainsWithClass.map((row) => [row.id, classNameById.get(row.class_id) || "Onbekend klaslokaal"])
+      );
     }
 
     const enrichedDomains = domainList.map((domain) => ({
@@ -268,15 +269,9 @@ const AdminStudents = () => {
 
     setDomains(enrichedDomains);
 
-    // Fetch results for all domains
-    if (domainList.length > 0) {
-      const domainIds = domainList.map((d) => d.id);
-      const { data: resultsData } = await supabase
-        .from("student_domain_results" as any)
-        .select("id, student_domain_id, result_data, submitted_at")
-        .in("student_domain_id", domainIds)
-        .order("submitted_at", { ascending: false });
-
+    // Results are loaded in parallel with classroom metadata.
+    if (domainIds.length > 0) {
+      const resultsData = (resultsResponse as any).data;
       const grouped: Record<string, DomainResult[]> = {};
       ((resultsData as any[]) || []).forEach((r: any) => {
         if (!grouped[r.student_domain_id]) grouped[r.student_domain_id] = [];
@@ -286,7 +281,7 @@ const AdminStudents = () => {
     } else {
       setDomainResults({});
     }
-  }, [toast]);
+  }, [toast, classes]);
 
   const fetchClasses = async () => {
     try {
