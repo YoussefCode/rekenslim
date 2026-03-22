@@ -352,21 +352,14 @@ const AdminStudents = () => {
         .order("submitted_at", { ascending: false });
       if (resultsError) throw resultsError;
 
-      const latestByStudentDomain = new Map<string, { result_data: Record<string, any>; submitted_at: string }>();
-      ((resultsData as any[]) || []).forEach((r) => {
-        if (!latestByStudentDomain.has(r.student_domain_id)) {
-          latestByStudentDomain.set(r.student_domain_id, {
-            result_data: r.result_data,
-            submitted_at: r.submitted_at,
-          });
-        }
-      });
+      const studentDomainById = new Map(
+        studentDomains.map((sd) => [sd.id, sd])
+      );
 
       const grouped: Record<string, ClassDomainStudentResult[]> = {};
-      studentDomains.forEach((sd) => {
-        if (!sd.class_domain_id) return;
-        const latest = latestByStudentDomain.get(sd.id);
-        if (!latest) return;
+      ((resultsData as any[]) || []).forEach((r) => {
+        const sd = studentDomainById.get(r.student_domain_id);
+        if (!sd || !sd.class_domain_id) return;
 
         const p = profileById.get(sd.student_id);
         const studentName = p && (p.first_name || p.last_name)
@@ -378,8 +371,8 @@ const AdminStudents = () => {
           student_id: sd.student_id,
           student_name: studentName,
           student_email: p?.email || "",
-          submitted_at: latest.submitted_at,
-          result_data: latest.result_data,
+          submitted_at: r.submitted_at,
+          result_data: r.result_data,
         });
       });
 
