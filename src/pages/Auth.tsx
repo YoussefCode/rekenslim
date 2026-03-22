@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,17 +21,6 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        navigate('/');
-      }
-    };
-    checkUser();
-  }, [navigate]);
-
   const handleResetSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await handleResetLink();
@@ -42,7 +31,7 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -55,6 +44,19 @@ const Auth = () => {
           variant: "destructive",
         });
       } else {
+        if (data.user?.id) {
+          // Fire-and-forget: AuthContext updates this too, this is an extra safeguard.
+          void supabase
+            .from('profiles')
+            .update({ last_login_at: new Date().toISOString() })
+            .eq('user_id', data.user.id)
+            .then(({ error: updateError }) => {
+              if (updateError) {
+                console.error('Kon last_login_at niet bijwerken na login:', updateError);
+              }
+            });
+        }
+
         toast({
           title: "Succesvol ingelogd",
           description: "Je wordt doorgestuurd...",

@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  ArrowLeft, Plus, Trash2, Edit, Users, BookOpen, Upload, FileCode, BarChart3, ChevronDown, ChevronUp
+  ArrowLeft, Plus, Trash2, Edit, Users, BookOpen, Upload, FileCode, BarChart3, ChevronDown, ChevronUp, UserPlus, UserX
 } from "lucide-react";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
@@ -22,6 +22,7 @@ interface Student {
   role: string;
   first_name: string;
   last_name: string;
+  last_login_at: string | null;
 }
 
 interface StudentDomain {
@@ -63,6 +64,35 @@ const AdminStudents = () => {
   const [editingDomain, setEditingDomain] = useState<StudentDomain | null>(null);
   const [htmlFile, setHtmlFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [creatingStudent, setCreatingStudent] = useState(false);
+  const [deletingStudent, setDeletingStudent] = useState(false);
+  const [newStudentEmail, setNewStudentEmail] = useState("");
+  const [newStudentPassword, setNewStudentPassword] = useState("");
+  const [newStudentPasswordConfirm, setNewStudentPasswordConfirm] = useState("");
+  const [newStudentFirstName, setNewStudentFirstName] = useState("");
+  const [newStudentLastName, setNewStudentLastName] = useState("");
+
+  const formatLastLogin = (value: string | null) => {
+    if (!value) return "Nog nooit ingelogd";
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "Onbekend";
+
+    return new Intl.DateTimeFormat("nl-NL", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(date);
+  };
+
+  const formatAddedAt = (value: string) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "Onbekend";
+
+    return new Intl.DateTimeFormat("nl-NL", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(date);
+  };
 
   useEffect(() => {
     if (profile?.role !== "admin") {
@@ -74,15 +104,50 @@ const AdminStudents = () => {
 
   const fetchStudents = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: rpcData, error: rpcError } = await supabase.rpc("get_students_with_last_login");
+      if (!rpcError) {
+        setStudents((rpcData as Student[] | null) || []);
+        return;
+      }
+
+      const { data: tableData, error: tableError } = await supabase
         .from("profiles")
-        .select("user_id, email, role, first_name, last_name")
+        .select("user_id, email, role, first_name, last_name, last_login_at")
         .eq("role", "student")
         .order("first_name");
-      if (error) throw error;
-      setStudents(data || []);
-    } catch {
-      toast({ title: "Fout bij laden leerlingen", variant: "destructive" });
+
+      if (!tableError) {
+        setStudents(tableData || []);
+        return;
+      }
+
+      // Last fallback for databases that do not have the new column.
+      if (tableError.code === "42703" || rpcError.code === "42883") {
+        const { data: basicData, error: basicError } = await supabase
+          .from("profiles")
+          .select("user_id, email, role, first_name, last_name")
+          .eq("role", "student")
+          .order("first_name");
+
+        if (basicError) throw basicError;
+
+        setStudents(
+          (basicData || []).map((s) => ({
+            ...s,
+            last_login_at: null,
+          }))
+        );
+        return;
+      }
+
+      throw tableError;
+    } catch (error) {
+      console.error("Fout bij laden leerlingen:", error);
+      toast({
+        title: "Fout bij laden leerlingen",
+        description: "Controleer of je rechten en database-migraties up-to-date zijn.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -93,7 +158,7 @@ const AdminStudents = () => {
       .from("student_domains")
       .select("*")
       .eq("student_id", studentId)
-      .order("created_at");
+      .order("created_at", { ascending: false });
     if (error) {
       toast({ title: "Fout bij laden domeinen", variant: "destructive" });
       return;
@@ -131,21 +196,148 @@ const AdminStudents = () => {
   const saveStudentName = async () => {
     if (!selectedStudent) return;
     try {
-      await supabase
+      const nextFirstName = studentFirstName.trim();
+      const nextLastName = studentLastName.trim();
+
+      const { data, error } = await supabase
         .from("profiles")
         .update({
-          first_name: studentFirstName.trim(),
-          last_name: studentLastName.trim(),
+          first_name: nextFirstName,
+          last_name: nextLastName,
         })
-        .eq("user_id", selectedStudent.user_id);
+        .eq("user_id", selectedStudent.user_id)
+        .select("user_id, first_name, last_name");
+
+      if (error) throw error;
+      if (!data || data.length === 0) {
+        throw new Error("Geen rechten om deze leerling te wijzigen.");
+      }
 
       toast({ title: "Naam bijgewerkt" });
       setSelectedStudent((prev) =>
-        prev ? { ...prev, first_name: studentFirstName, last_name: studentLastName } : prev
+        prev ? { ...prev, first_name: nextFirstName, last_name: nextLastName } : prev
+      );
+      setStudents((prev) =>
+        prev.map((s) =>
+          s.user_id === selectedStudent.user_id
+            ? { ...s, first_name: nextFirstName, last_name: nextLastName }
+            : s
+        )
       );
       fetchStudents();
-    } catch {
-      toast({ title: "Fout bij opslaan naam", variant: "destructive" });
+    } catch (error) {
+      console.error("Fout bij opslaan naam:", error);
+      toast({
+        title: "Fout bij opslaan naam",
+        description: error instanceof Error ? error.message : "Probeer het opnieuw.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const createStudent = async () => {
+    const email = newStudentEmail.trim().toLowerCase();
+    const password = newStudentPassword;
+    const firstName = newStudentFirstName.trim();
+    const lastName = newStudentLastName.trim();
+
+    if (!email || !password) {
+      toast({
+        title: "E-mail en wachtwoord zijn verplicht",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      toast({
+        title: "Wachtwoord te kort",
+        description: "Gebruik minimaal 6 tekens.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (password !== newStudentPasswordConfirm) {
+      toast({
+        title: "Wachtwoorden komen niet overeen",
+        description: "Controleer de bevestiging van het wachtwoord.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setCreatingStudent(true);
+    try {
+      const { error } = await supabase.functions.invoke("admin-create-student", {
+        body: {
+          email,
+          password,
+          firstName,
+          lastName,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Leerling aangemaakt",
+        description: "De leerling kan nu inloggen met e-mail en wachtwoord.",
+      });
+
+      setNewStudentEmail("");
+      setNewStudentPassword("");
+      setNewStudentPasswordConfirm("");
+      setNewStudentFirstName("");
+      setNewStudentLastName("");
+      fetchStudents();
+    } catch (error) {
+      console.error("Fout bij aanmaken leerling:", error);
+      toast({
+        title: "Fout bij aanmaken leerling",
+        description: error instanceof Error ? error.message : "Probeer het opnieuw.",
+        variant: "destructive",
+      });
+    } finally {
+      setCreatingStudent(false);
+    }
+  };
+
+  const deleteStudent = async () => {
+    if (!selectedStudent) return;
+
+    const displayName = selectedStudent.first_name || selectedStudent.last_name
+      ? `${selectedStudent.first_name || ""} ${selectedStudent.last_name || ""}`.trim()
+      : selectedStudent.email;
+
+    if (!confirm(`Deze leerling verwijderen?\n\n${displayName} (${selectedStudent.email})\n\nDit verwijdert ook gekoppelde domeinen en resultaten.`)) {
+      return;
+    }
+
+    setDeletingStudent(true);
+    try {
+      const { error } = await supabase.functions.invoke("admin-delete-student", {
+        body: {
+          userId: selectedStudent.user_id,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({ title: "Leerling verwijderd" });
+      setSelectedStudent(null);
+      setDomains([]);
+      setDomainResults({});
+      fetchStudents();
+    } catch (error) {
+      console.error("Fout bij verwijderen leerling:", error);
+      toast({
+        title: "Fout bij verwijderen leerling",
+        description: error instanceof Error ? error.message : "Probeer het opnieuw.",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingStudent(false);
     }
   };
 
@@ -250,6 +442,47 @@ const AdminStudents = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Student List */}
           <div className="lg:col-span-3">
+            <Card className="mb-4">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <UserPlus className="h-4 w-4" /> Leerling toevoegen
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Input
+                  type="email"
+                  value={newStudentEmail}
+                  onChange={(e) => setNewStudentEmail(e.target.value)}
+                  placeholder="E-mail"
+                />
+                <Input
+                  type="password"
+                  value={newStudentPassword}
+                  onChange={(e) => setNewStudentPassword(e.target.value)}
+                  placeholder="Wachtwoord"
+                />
+                <Input
+                  type="password"
+                  value={newStudentPasswordConfirm}
+                  onChange={(e) => setNewStudentPasswordConfirm(e.target.value)}
+                  placeholder="Bevestig wachtwoord"
+                />
+                <Input
+                  value={newStudentFirstName}
+                  onChange={(e) => setNewStudentFirstName(e.target.value)}
+                  placeholder="Voornaam (optioneel)"
+                />
+                <Input
+                  value={newStudentLastName}
+                  onChange={(e) => setNewStudentLastName(e.target.value)}
+                  placeholder="Achternaam (optioneel)"
+                />
+                <Button className="w-full" onClick={createStudent} disabled={creatingStudent}>
+                  {creatingStudent ? "Aanmaken..." : "Maak leerling aan"}
+                </Button>
+              </CardContent>
+            </Card>
+
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-lg flex items-center gap-2">
@@ -278,6 +511,9 @@ const AdminStudents = () => {
                       {(s.first_name || s.last_name) && (
                         <span className="block text-xs opacity-70">{s.email}</span>
                       )}
+                      <span className="block text-xs opacity-70">
+                        Laatste login: {formatLastLogin(s.last_login_at)}
+                      </span>
                     </button>
                   ))
                 )}
@@ -297,8 +533,17 @@ const AdminStudents = () => {
             ) : (
               <div className="space-y-4">
                 <Card>
-                  <CardHeader className="pb-2">
+                  <CardHeader className="pb-2 flex flex-row items-center justify-between">
                     <CardTitle className="text-lg">Leerlinggegevens</CardTitle>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={deleteStudent}
+                      disabled={deletingStudent}
+                    >
+                      <UserX className="h-4 w-4 mr-1" />
+                      {deletingStudent ? "Verwijderen..." : "Verwijder leerling"}
+                    </Button>
                   </CardHeader>
                   <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -405,6 +650,9 @@ const AdminStudents = () => {
                                     {d.description && (
                                       <p className="text-xs text-muted-foreground">{d.description}</p>
                                     )}
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      Toegevoegd op: {formatAddedAt(d.created_at)}
+                                    </p>
                                     <div className="flex items-center gap-2 mt-1">
                                       {d.html_file_url ? (
                                         <span className="text-xs text-green-600 flex items-center gap-1">

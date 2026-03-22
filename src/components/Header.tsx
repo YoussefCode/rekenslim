@@ -42,6 +42,20 @@ const Header = () => {
               </Link>
             )}
           </nav>
+
+          <div className="md:hidden">
+            {user ? (
+              <Button variant="secondary" size="sm" onClick={signOut}>
+                Uitloggen
+              </Button>
+            ) : (
+              <Link to="/auth">
+                <Button variant="secondary" size="sm">
+                  Inloggen
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </header>;

@@ -13,6 +13,7 @@ interface StudentDomain {
   domain_name: string;
   description: string | null;
   html_file_url: string | null;
+  created_at: string;
 }
 
 const StudentDashboard = () => {
@@ -38,9 +39,9 @@ const StudentDashboard = () => {
     try {
       const { data, error } = await supabase
         .from("student_domains")
-        .select("id, domain_name, description, html_file_url")
+        .select("id, domain_name, description, html_file_url, created_at")
         .eq("student_id", user!.id)
-        .order("created_at");
+        .order("created_at", { ascending: false });
       if (error) throw error;
       setDomains((data as StudentDomain[]) || []);
     } catch {
@@ -99,6 +100,16 @@ const StudentDashboard = () => {
   const handleBack = () => {
     setSelectedDomain(null);
     setHtmlContent(null);
+  };
+
+  const formatAddedAt = (value: string) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "Onbekend";
+
+    return new Intl.DateTimeFormat("nl-NL", {
+      dateStyle: "short",
+      timeStyle: "short",
+    }).format(date);
   };
 
   if (authLoading || loading) {
@@ -185,6 +196,9 @@ const StudentDashboard = () => {
                       {d.description && (
                         <p className="text-sm text-muted-foreground">{d.description}</p>
                       )}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Toegevoegd op: {formatAddedAt(d.created_at)}
+                      </p>
                     </div>
                   </div>
                   <ChevronRight className="h-5 w-5 text-muted-foreground" />
