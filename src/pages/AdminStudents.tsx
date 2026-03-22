@@ -1149,6 +1149,7 @@ const AdminStudents = () => {
                           const entries = classResultsByDomain[d.id] || [];
                           const attempts = entries.length;
                           const totalStudentsInClass = classStudents.length;
+                          const studentsWithResult = new Set(entries.map((e) => e.student_id)).size;
 
                           return (
                             <div key={`result-${d.id}`} className="border rounded-md p-3 space-y-2">
@@ -1156,7 +1157,7 @@ const AdminStudents = () => {
                                 <div>
                                   <p className="text-sm font-medium">{d.domain_name}</p>
                                   <p className="text-xs text-muted-foreground">
-                                    Pogingen: {attempts} van {totalStudentsInClass} leerlingen
+                                    Pogingen: {attempts} · Leerlingen met resultaat: {studentsWithResult}/{totalStudentsInClass}
                                   </p>
                                 </div>
                                 <Button
@@ -1178,7 +1179,7 @@ const AdminStudents = () => {
                                       <p className="text-sm font-medium">{entry.student_name}</p>
                                       <p className="text-xs text-muted-foreground">{entry.student_email}</p>
                                       <p className="text-xs text-muted-foreground">
-                                        Laatste poging: {formatAddedAt(entry.submitted_at)}
+                                        Poging op: {formatAddedAt(entry.submitted_at)}
                                       </p>
                                       <p className="text-xs">Score: {formatResultSummary(entry.result_data)}</p>
                                     </div>
