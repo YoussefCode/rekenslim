@@ -57,6 +57,14 @@ interface ClassDomain {
   created_at: string;
 }
 
+interface ClassDomainStudentResult {
+  student_id: string;
+  student_name: string;
+  student_email: string;
+  submitted_at: string;
+  result_data: Record<string, any>;
+}
+
 const AdminStudents = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -102,6 +110,9 @@ const AdminStudents = () => {
   const [addingStudentToClass, setAddingStudentToClass] = useState(false);
   const [creatingClassDomain, setCreatingClassDomain] = useState(false);
   const [deletingClassDomainId, setDeletingClassDomainId] = useState<string | null>(null);
+  const [classResultsByDomain, setClassResultsByDomain] = useState<Record<string, ClassDomainStudentResult[]>>({});
+  const [expandedClassResults, setExpandedClassResults] = useState<Record<string, boolean>>({});
+  const [loadingClassResults, setLoadingClassResults] = useState(false);
 
   const formatLastLogin = (value: string | null) => {
     if (!value) return "Nog nooit ingelogd";
@@ -123,6 +134,22 @@ const AdminStudents = () => {
       dateStyle: "short",
       timeStyle: "short",
     }).format(date);
+  };
+
+  const formatResultSummary = (resultData: Record<string, any>) => {
+    const percentage = resultData?.percentage;
+    if (typeof percentage === "number") {
+      return `${Math.round(percentage)}%`;
+    }
+
+    const score = resultData?.score;
+    const totalQuestions = resultData?.totalQuestions ?? resultData?.total_questions;
+    if (typeof score === "number" && typeof totalQuestions === "number" && totalQuestions > 0) {
+      const pct = Math.round((score / totalQuestions) * 100);
+      return `${score}/${totalQuestions} (${pct}%)`;
+    }
+
+    return "Resultaat beschikbaar";
   };
 
   useEffect(() => {
@@ -278,6 +305,108 @@ const AdminStudents = () => {
 
     setClassDomains((data as ClassDomain[]) || []);
   };
+
+  const fetchClassResults = async (classDomainIds: string[]) => {
+    if (classDomainIds.length === 0) {
+      setClassResultsByDomain({});
+      return;
+    }
+
+    setLoadingClassResults(true);
+    try {
+      const { data: studentDomainsData, error: studentDomainsError } = await supabase
+        .from("student_domains")
+        .select("id, class_domain_id, student_id")
+        .in("class_domain_id", classDomainIds);
+
+      if (studentDomainsError) throw studentDomainsError;
+
+      const studentDomains = (studentDomainsData || []) as Array<{
+        id: string;
+        class_domain_id: string | null;
+        student_id: string;
+      }>;
+
+      if (studentDomains.length === 0) {
+        setClassResultsByDomain({});
+        return;
+      }
+
+      const studentIds = [...new Set(studentDomains.map((sd) => sd.student_id))];
+      const studentDomainIds = studentDomains.map((sd) => sd.id);
+
+      const { data: profilesData, error: profilesError } = await supabase
+        .from("profiles")
+        .select("user_id, email, first_name, last_name")
+        .in("user_id", studentIds);
+      if (profilesError) throw profilesError;
+
+      const profileById = new Map(
+        ((profilesData as any[]) || []).map((p) => [p.user_id, p])
+      );
+
+      const { data: resultsData, error: resultsError } = await supabase
+        .from("student_domain_results" as any)
+        .select("student_domain_id, result_data, submitted_at")
+        .in("student_domain_id", studentDomainIds)
+        .order("submitted_at", { ascending: false });
+      if (resultsError) throw resultsError;
+
+      const latestByStudentDomain = new Map<string, { result_data: Record<string, any>; submitted_at: string }>();
+      ((resultsData as any[]) || []).forEach((r) => {
+        if (!latestByStudentDomain.has(r.student_domain_id)) {
+          latestByStudentDomain.set(r.student_domain_id, {
+            result_data: r.result_data,
+            submitted_at: r.submitted_at,
+          });
+        }
+      });
+
+      const grouped: Record<string, ClassDomainStudentResult[]> = {};
+      studentDomains.forEach((sd) => {
+        if (!sd.class_domain_id) return;
+        const latest = latestByStudentDomain.get(sd.id);
+        if (!latest) return;
+
+        const p = profileById.get(sd.student_id);
+        const studentName = p && (p.first_name || p.last_name)
+          ? `${p.first_name || ""} ${p.last_name || ""}`.trim()
+          : p?.email || sd.student_id;
+
+        if (!grouped[sd.class_domain_id]) grouped[sd.class_domain_id] = [];
+        grouped[sd.class_domain_id].push({
+          student_id: sd.student_id,
+          student_name: studentName,
+          student_email: p?.email || "",
+          submitted_at: latest.submitted_at,
+          result_data: latest.result_data,
+        });
+      });
+
+      Object.keys(grouped).forEach((domainId) => {
+        grouped[domainId].sort(
+          (a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()
+        );
+      });
+
+      setClassResultsByDomain(grouped);
+    } catch (error) {
+      console.error("Fout bij laden klasresultaten:", error);
+      toast({ title: "Fout bij laden klasresultaten", variant: "destructive" });
+    } finally {
+      setLoadingClassResults(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!selectedClass) {
+      setClassResultsByDomain({});
+      return;
+    }
+
+    const classDomainIds = classDomains.map((d) => d.id);
+    fetchClassResults(classDomainIds);
+  }, [selectedClass?.id, classDomains]);
 
   const selectClass = (schoolClass: SchoolClass) => {
     setSelectedStudent(null);
@@ -1009,6 +1138,63 @@ const AdminStudents = () => {
                             </div>
                           ))}
                         </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">Klasresultaten</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {loadingClassResults ? (
+                        <p className="text-sm text-muted-foreground">Resultaten laden...</p>
+                      ) : classDomains.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">Nog geen klasmateriaal om resultaten op te tonen.</p>
+                      ) : (
+                        classDomains.map((d) => {
+                          const entries = classResultsByDomain[d.id] || [];
+                          const attempts = entries.length;
+                          const totalStudentsInClass = classStudents.length;
+
+                          return (
+                            <div key={`result-${d.id}`} className="border rounded-md p-3 space-y-2">
+                              <div className="flex items-center justify-between gap-2">
+                                <div>
+                                  <p className="text-sm font-medium">{d.domain_name}</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    Pogingen: {attempts} van {totalStudentsInClass} leerlingen
+                                  </p>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setExpandedClassResults((prev) => ({ ...prev, [d.id]: !prev[d.id] }))}
+                                  disabled={attempts === 0}
+                                >
+                                  {expandedClassResults[d.id] ? "Verberg" : "Toon"}
+                                </Button>
+                              </div>
+
+                              {attempts === 0 ? (
+                                <p className="text-xs text-muted-foreground">Nog geen resultaten beschikbaar.</p>
+                              ) : expandedClassResults[d.id] ? (
+                                <div className="space-y-2">
+                                  {entries.map((entry) => (
+                                    <div key={`${d.id}-${entry.student_id}-${entry.submitted_at}`} className="rounded-md bg-muted/40 p-2">
+                                      <p className="text-sm font-medium">{entry.student_name}</p>
+                                      <p className="text-xs text-muted-foreground">{entry.student_email}</p>
+                                      <p className="text-xs text-muted-foreground">
+                                        Laatste poging: {formatAddedAt(entry.submitted_at)}
+                                      </p>
+                                      <p className="text-xs">Score: {formatResultSummary(entry.result_data)}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : null}
+                            </div>
+                          );
+                        })
                       )}
                     </CardContent>
                   </Card>
