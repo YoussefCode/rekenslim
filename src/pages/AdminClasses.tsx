@@ -801,6 +801,9 @@ const AdminClasses = () => {
 
                                     <div className="rounded-md border bg-muted/20 p-3">
                                       <p className="text-xs font-medium text-muted-foreground mb-2">Verdeling prestaties</p>
+                                      <p className="text-[11px] text-muted-foreground mb-2">
+                                        Aandacht betekent: leerling scoort onder 50% op de laatste poging in dit domein.
+                                      </p>
                                       <div className="h-56 w-full">
                                         <ResponsiveContainer width="100%" height="100%">
                                           <PieChart>
