@@ -96,6 +96,7 @@ const AdminClasses = () => {
 
   const [classResultsByDomain, setClassResultsByDomain] = useState<Record<string, ClassDomainStudentResult[]>>({});
   const [expandedClassResults, setExpandedClassResults] = useState<Record<string, boolean>>({});
+  const [expandedAttentionByDomain, setExpandedAttentionByDomain] = useState<Record<string, boolean>>({});
   const [loadingClassResults, setLoadingClassResults] = useState(false);
 
   const formatDate = (value: string) => {
@@ -752,6 +753,10 @@ const AdminClasses = () => {
                           },
                         ].filter((bucket) => bucket.value > 0);
 
+                        const attentionStudents = latestResults
+                          .filter((entry) => entry.percentage < 50)
+                          .sort((a, b) => a.percentage - b.percentage);
+
                         return (
                           <div key={`result-${d.id}`} className="border rounded-md p-3 space-y-2">
                             <div className="flex items-center justify-between gap-2">
@@ -827,6 +832,43 @@ const AdminClasses = () => {
                                     </div>
                                   </div>
                                 )}
+
+                                <div className="rounded-md border bg-muted/20 p-3 space-y-2">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <p className="text-xs font-medium text-muted-foreground">
+                                      Aandachtleerlingen in dit domein: {attentionStudents.length}
+                                    </p>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() =>
+                                        setExpandedAttentionByDomain((prev) => ({
+                                          ...prev,
+                                          [d.id]: !prev[d.id],
+                                        }))
+                                      }
+                                      disabled={attentionStudents.length === 0}
+                                    >
+                                      {expandedAttentionByDomain[d.id] ? "Verberg aandachtleerlingen" : "Toon aandachtleerlingen"}
+                                    </Button>
+                                  </div>
+
+                                  {expandedAttentionByDomain[d.id] && attentionStudents.length > 0 && (
+                                    <div className="space-y-2">
+                                      {attentionStudents.map((entry) => (
+                                        <div
+                                          key={`attention-${d.id}-${entry.student_id}-${entry.submitted_at}`}
+                                          className="rounded-md border bg-background px-3 py-2"
+                                        >
+                                          <p className="text-sm font-medium">{entry.student_name}</p>
+                                          <p className="text-xs text-muted-foreground">{entry.student_email}</p>
+                                          <p className="text-xs text-muted-foreground">Laatste poging: {formatDate(entry.submitted_at)}</p>
+                                          <p className="text-xs font-medium text-red-600">Score: {entry.percentage}%</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
 
                                 {expandedClassResults[d.id] && (
                               <div className="space-y-2">
