@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +9,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Trash2 } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 interface Student {
   user_id: string;
@@ -40,6 +52,23 @@ interface ClassDomainStudentResult {
   submitted_at: string;
   result_data: Record<string, any>;
 }
+
+const PERFORMANCE_BUCKET_COLORS = ["#16a34a", "#eab308", "#ef4444"];
+
+const getResultPercentage = (resultData: Record<string, any>) => {
+  const percentage = resultData?.percentage;
+  if (typeof percentage === "number") {
+    return Math.max(0, Math.min(100, Math.round(percentage)));
+  }
+
+  const score = resultData?.score;
+  const total = resultData?.total ?? resultData?.totalQuestions ?? resultData?.total_questions;
+  if (typeof score === "number" && typeof total === "number" && total > 0) {
+    return Math.max(0, Math.min(100, Math.round((score / total) * 100)));
+  }
+
+  return null;
+};
 
 const AdminClasses = () => {
   const navigate = useNavigate();
@@ -88,6 +117,43 @@ const AdminClasses = () => {
 
     return "Resultaat beschikbaar";
   };
+
+  const classOverview = useMemo(() => {
+    return classDomains
+      .map((domain) => {
+        const entries = classResultsByDomain[domain.id] || [];
+        if (entries.length === 0) return null;
+
+        const latestByStudent = new Map<string, ClassDomainStudentResult>();
+        entries.forEach((entry) => {
+          const prev = latestByStudent.get(entry.student_id);
+          if (!prev || new Date(entry.submitted_at).getTime() > new Date(prev.submitted_at).getTime()) {
+            latestByStudent.set(entry.student_id, entry);
+          }
+        });
+
+        const latestResults = Array.from(latestByStudent.values())
+          .map((entry) => ({ ...entry, percentage: getResultPercentage(entry.result_data) }))
+          .filter(
+            (entry): entry is ClassDomainStudentResult & { percentage: number } =>
+              typeof entry.percentage === "number"
+          );
+
+        if (latestResults.length === 0) return null;
+
+        const average = Math.round(
+          latestResults.reduce((sum, entry) => sum + entry.percentage, 0) / latestResults.length
+        );
+
+        return {
+          domainId: domain.id,
+          domainName: domain.domain_name,
+          average,
+          count: latestResults.length,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => Boolean(item));
+  }, [classDomains, classResultsByDomain]);
 
   useEffect(() => {
     if (profile?.role !== "admin") {
@@ -620,11 +686,71 @@ const AdminClasses = () => {
                     ) : classDomains.length === 0 ? (
                       <p className="text-sm text-muted-foreground">Nog geen klasmateriaal om resultaten op te tonen.</p>
                     ) : (
-                      classDomains.map((d) => {
+                      <div className="space-y-4">
+                        {classOverview.length > 0 && (
+                          <div className="rounded-md border p-3">
+                            <p className="text-sm font-semibold mb-2">Klasanalyse per domein</p>
+                            <div className="h-64 w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={classOverview} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+                                  <CartesianGrid strokeDasharray="3 3" />
+                                  <XAxis dataKey="domainName" tick={{ fontSize: 12 }} />
+                                  <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                                  <Tooltip formatter={(value) => [`${value}%`, "Gemiddelde"]} />
+                                  <Bar dataKey="average" name="Gemiddelde score" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
+                                </BarChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </div>
+                        )}
+
+                        {classDomains.map((d) => {
                         const entries = classResultsByDomain[d.id] || [];
                         const attempts = entries.length;
                         const totalStudentsInClass = classStudents.length;
                         const studentsWithResult = new Set(entries.map((e) => e.student_id)).size;
+
+                        const latestByStudent = new Map<string, ClassDomainStudentResult>();
+                        entries.forEach((entry) => {
+                          const previous = latestByStudent.get(entry.student_id);
+                          if (!previous || new Date(entry.submitted_at).getTime() > new Date(previous.submitted_at).getTime()) {
+                            latestByStudent.set(entry.student_id, entry);
+                          }
+                        });
+
+                        const latestResults = Array.from(latestByStudent.values())
+                          .map((entry) => ({
+                            ...entry,
+                            percentage: getResultPercentage(entry.result_data),
+                          }))
+                          .filter(
+                            (entry): entry is ClassDomainStudentResult & { percentage: number } =>
+                              typeof entry.percentage === "number"
+                          );
+
+                        const latestChartData = latestResults
+                          .map((entry) => ({
+                            leerling: entry.student_name,
+                            percentage: entry.percentage,
+                          }))
+                          .sort((a, b) => b.percentage - a.percentage);
+
+                        const performanceBuckets = [
+                          {
+                            name: "Sterk (>=70%)",
+                            value: latestResults.filter((entry) => entry.percentage >= 70).length,
+                          },
+                          {
+                            name: "Midden (50-69%)",
+                            value: latestResults.filter(
+                              (entry) => entry.percentage >= 50 && entry.percentage < 70
+                            ).length,
+                          },
+                          {
+                            name: "Aandacht (<50%)",
+                            value: latestResults.filter((entry) => entry.percentage < 50).length,
+                          },
+                        ].filter((bucket) => bucket.value > 0);
 
                         return (
                           <div key={`result-${d.id}`} className="border rounded-md p-3 space-y-2">
@@ -647,7 +773,59 @@ const AdminClasses = () => {
 
                             {attempts === 0 ? (
                               <p className="text-xs text-muted-foreground">Nog geen resultaten beschikbaar.</p>
-                            ) : expandedClassResults[d.id] ? (
+                            ) : (
+                              <div className="space-y-3">
+                                {latestChartData.length > 0 && (
+                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                    <div className="rounded-md border bg-muted/20 p-3">
+                                      <p className="text-xs font-medium text-muted-foreground mb-2">Laatste score per leerling</p>
+                                      <div className="h-56 w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                          <BarChart data={latestChartData} margin={{ top: 8, right: 8, left: 0, bottom: 24 }}>
+                                            <CartesianGrid strokeDasharray="3 3" />
+                                            <XAxis
+                                              dataKey="leerling"
+                                              interval={0}
+                                              angle={-25}
+                                              textAnchor="end"
+                                              height={54}
+                                              tick={{ fontSize: 11 }}
+                                            />
+                                            <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                                            <Tooltip formatter={(value) => [`${value}%`, "Score"]} />
+                                            <Bar dataKey="percentage" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
+                                          </BarChart>
+                                        </ResponsiveContainer>
+                                      </div>
+                                    </div>
+
+                                    <div className="rounded-md border bg-muted/20 p-3">
+                                      <p className="text-xs font-medium text-muted-foreground mb-2">Verdeling prestaties</p>
+                                      <div className="h-56 w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                          <PieChart>
+                                            <Pie
+                                              data={performanceBuckets}
+                                              dataKey="value"
+                                              nameKey="name"
+                                              cx="50%"
+                                              cy="50%"
+                                              outerRadius={72}
+                                              label
+                                            >
+                                              {performanceBuckets.map((bucket, index) => (
+                                                <Cell key={`${d.id}-${bucket.name}`} fill={PERFORMANCE_BUCKET_COLORS[index % PERFORMANCE_BUCKET_COLORS.length]} />
+                                              ))}
+                                            </Pie>
+                                            <Tooltip />
+                                          </PieChart>
+                                        </ResponsiveContainer>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+
+                                {expandedClassResults[d.id] && (
                               <div className="space-y-2">
                                 {entries.map((entry) => (
                                   <div key={`${d.id}-${entry.student_id}-${entry.submitted_at}`} className="rounded-md bg-muted/40 p-2">
@@ -658,10 +836,13 @@ const AdminClasses = () => {
                                   </div>
                                 ))}
                               </div>
-                            ) : null}
+                                )}
+                              </div>
+                            )}
                           </div>
                         );
-                      })
+                        })}
+                      </div>
                     )}
                   </CardContent>
                 </Card>

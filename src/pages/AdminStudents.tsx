@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,18 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   ArrowLeft, Plus, Trash2, Edit, Users, BookOpen, Upload, FileCode, BarChart3, ChevronDown, ChevronUp, UserPlus, UserX
 } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
@@ -66,6 +78,21 @@ interface ClassDomainStudentResult {
   submitted_at: string;
   result_data: Record<string, any>;
 }
+
+const getResultPercentage = (resultData: Record<string, any>) => {
+  const percentage = resultData?.percentage;
+  if (typeof percentage === "number") {
+    return Math.max(0, Math.min(100, Math.round(percentage)));
+  }
+
+  const score = resultData?.score;
+  const total = resultData?.total ?? resultData?.totalQuestions ?? resultData?.total_questions;
+  if (typeof score === "number" && typeof total === "number" && total > 0) {
+    return Math.max(0, Math.min(100, Math.round((score / total) * 100)));
+  }
+
+  return null;
+};
 
 const AdminStudents = () => {
   const navigate = useNavigate();
@@ -153,6 +180,53 @@ const AdminStudents = () => {
 
     return "Resultaat beschikbaar";
   };
+
+  const studentDomainOverview = useMemo(() => {
+    return domains
+      .map((domain) => {
+        const attempts = (domainResults[domain.id] || []).map((entry) => ({
+          ...entry,
+          percentage: getResultPercentage(entry.result_data),
+        }));
+
+        const attemptsWithScore = attempts.filter(
+          (entry): entry is DomainResult & { percentage: number } =>
+            typeof entry.percentage === "number"
+        );
+
+        if (attemptsWithScore.length === 0) {
+          return null;
+        }
+
+        const percentages = attemptsWithScore.map((entry) => entry.percentage);
+        const latest = attemptsWithScore[0]?.percentage ?? 0;
+        const average = Math.round(
+          percentages.reduce((sum, value) => sum + value, 0) / percentages.length
+        );
+        const best = Math.max(...percentages);
+
+        return {
+          domainId: domain.id,
+          domainName: domain.domain_name,
+          attempts: attemptsWithScore.length,
+          latest,
+          average,
+          best,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => Boolean(item));
+  }, [domains, domainResults]);
+
+  const domainOverviewChartData = useMemo(
+    () =>
+      studentDomainOverview.map((entry) => ({
+        domein: entry.domainName,
+        gemiddeld: entry.average,
+        beste: entry.best,
+        laatste: entry.latest,
+      })),
+    [studentDomainOverview]
+  );
 
   useEffect(() => {
     if (profile?.role !== "admin") {
@@ -1108,7 +1182,33 @@ const AdminStudents = () => {
                     {domains.length === 0 ? (
                       <p className="text-sm text-muted-foreground">Nog geen domeinen toegevoegd</p>
                     ) : (
-                      <div className="grid grid-cols-1 gap-3">
+                      <div className="space-y-4">
+                        {domainOverviewChartData.length > 0 && (
+                          <Card className="border">
+                            <CardContent className="py-4 space-y-4">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm font-semibold">Analyse-overzicht leerling</p>
+                                <p className="text-xs text-muted-foreground">Gemiddelde, beste en laatste score per domein</p>
+                              </div>
+                              <div className="h-64 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                  <BarChart data={domainOverviewChartData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="domein" tick={{ fontSize: 12 }} />
+                                    <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                                    <Tooltip formatter={(value) => [`${value}%`, ""]} />
+                                    <Legend />
+                                    <Bar dataKey="gemiddeld" name="Gemiddeld" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="beste" name="Beste" fill="#16a34a" radius={[4, 4, 0, 0]} />
+                                    <Bar dataKey="laatste" name="Laatste" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                                  </BarChart>
+                                </ResponsiveContainer>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        )}
+
+                        <div className="grid grid-cols-1 gap-3">
                         {domains.map((d) => (
                           <Card key={d.id} className="border">
                             <CardContent className="py-4">
@@ -1195,6 +1295,40 @@ const AdminStudents = () => {
                               {/* Results section */}
                               {(domainResults[d.id] || []).length > 0 && (
                                 <div className="mt-3 border-t pt-3">
+                                  <div className="mb-3 rounded-md border bg-muted/20 p-3">
+                                    <p className="text-xs font-medium text-muted-foreground mb-2">Trend per poging</p>
+                                    <div className="h-44 w-full">
+                                      <ResponsiveContainer width="100%" height="100%">
+                                        <LineChart
+                                          data={(domainResults[d.id] || [])
+                                            .slice()
+                                            .sort(
+                                              (a, b) =>
+                                                new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime()
+                                            )
+                                            .map((result, index) => ({
+                                              poging: index + 1,
+                                              percentage: getResultPercentage(result.result_data),
+                                            }))
+                                            .filter((entry) => typeof entry.percentage === "number")}
+                                          margin={{ top: 8, right: 8, left: 0, bottom: 8 }}
+                                        >
+                                          <CartesianGrid strokeDasharray="3 3" />
+                                          <XAxis dataKey="poging" allowDecimals={false} tick={{ fontSize: 12 }} />
+                                          <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                                          <Tooltip formatter={(value) => [`${value}%`, "Score"]} />
+                                          <Line
+                                            type="monotone"
+                                            dataKey="percentage"
+                                            stroke="#1d4ed8"
+                                            strokeWidth={2}
+                                            dot={{ r: 3 }}
+                                            activeDot={{ r: 5 }}
+                                          />
+                                        </LineChart>
+                                      </ResponsiveContainer>
+                                    </div>
+                                  </div>
                                   <button
                                     className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
                                     onClick={() => setExpandedResults((prev) => ({ ...prev, [d.id]: !prev[d.id] }))}
@@ -1219,6 +1353,7 @@ const AdminStudents = () => {
                             </CardContent>
                           </Card>
                         ))}
+                        </div>
                       </div>
                     )}
                   </CardContent>
