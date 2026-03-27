@@ -99,7 +99,7 @@ const getResultPercentage = (resultData: Record<string, any>) => {
 const AdminStudents = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, profile } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
 
   const [students, setStudents] = useState<Student[]>([]);
   const [studentSearch, setStudentSearch] = useState("");
@@ -253,13 +253,17 @@ const AdminStudents = () => {
   }, [studentSearch, students]);
 
   useEffect(() => {
+    // Wait for auth/profile to finish loading before deciding to redirect.
+    if (authLoading) return;
+
     if (profile?.role !== "admin") {
       navigate("/");
       return;
     }
+
     fetchStudents();
     fetchClasses();
-  }, [profile]);
+  }, [profile, authLoading]);
 
   const fetchStudents = async () => {
     try {
