@@ -890,7 +890,11 @@ const AdminStudents = () => {
       setMessageBody("");
     } catch (error) {
       console.error("Fout bij verzenden bericht:", error);
-      toast({ title: "Fout bij verzenden bericht", variant: "destructive" });
+      toast({
+        title: "Fout bij verzenden bericht",
+        description: error instanceof Error ? error.message : "Probeer het opnieuw.",
+        variant: "destructive",
+      });
     } finally {
       setSendingMessage(false);
     }
