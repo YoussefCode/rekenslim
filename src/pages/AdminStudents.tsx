@@ -1264,14 +1264,13 @@ const AdminStudents = () => {
 
           {/* Domain Area */}
           <div className="lg:col-span-9">
-              {selectedStudent ? (
-                <Tabs defaultValue="gegevens" className="w-full">
+            <Tabs defaultValue="gegevens" className="w-full">
                   <TabsList className="w-full justify-start">
-                    <TabsTrigger value="gegevens">Gegevens</TabsTrigger>
-                    <TabsTrigger value="klassen">Klassen ({studentClasses.length})</TabsTrigger>
-                    <TabsTrigger value="domeinen">Domeinen ({domains.length})</TabsTrigger>
-                    <TabsTrigger value="analyse">Analyse</TabsTrigger>
-                    <TabsTrigger value="berichten">
+                    <TabsTrigger value="gegevens" disabled={!selectedStudent}>Gegevens</TabsTrigger>
+                    <TabsTrigger value="klassen" disabled={!selectedStudent}>Klassen ({studentClasses.length})</TabsTrigger>
+                    <TabsTrigger value="domeinen" disabled={!selectedStudent}>Domeinen ({domains.length})</TabsTrigger>
+                    <TabsTrigger value="analyse" disabled={!selectedStudent}>Analyse</TabsTrigger>
+                    <TabsTrigger value="berichten" disabled={!selectedStudent}>
                       <Mail className="h-3.5 w-3.5 mr-1" /> Berichten
                     </TabsTrigger>
                     <TabsTrigger value="dagoverzicht">Dagoverzicht</TabsTrigger>
@@ -1691,14 +1690,7 @@ const AdminStudents = () => {
                     </Card>
                   </TabsContent>
                 </Tabs>
-              ) : (
-                <Card>
-                  <CardContent className="py-8 text-center text-muted-foreground">
-                    <Users className="h-10 w-10 mx-auto mb-3 opacity-50" />
-                    <p>Selecteer een leerling voor individueel lesmateriaal en resultaten.</p>
-                  </CardContent>
-                </Card>
-              )}
+            </Tabs>
           </div>
         </div>
       </div>
