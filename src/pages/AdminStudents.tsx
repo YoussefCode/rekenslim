@@ -145,6 +145,11 @@ const AdminStudents = () => {
   const [expandedClassResults, setExpandedClassResults] = useState<Record<string, boolean>>({});
   const [loadingClassResults, setLoadingClassResults] = useState(false);
 
+  // Student-class membership
+  const [studentClasses, setStudentClasses] = useState<SchoolClass[]>([]);
+  const [addingStudentToClassId, setAddingStudentToClassId] = useState("");
+  const [addingStudentToClassLoading, setAddingStudentToClassLoading] = useState(false);
+
   const formatLastLogin = (value: string | null) => {
     if (!value) return "Nog nooit ingelogd";
 
@@ -745,6 +750,115 @@ const AdminStudents = () => {
     }
   };
 
+  const fetchStudentClasses = async (studentId: string) => {
+    const { data: links, error: linksError } = await supabase
+      .from("class_students")
+      .select("class_id")
+      .eq("student_id", studentId);
+
+    if (linksError) {
+      toast({ title: "Fout bij laden klassen van leerling", variant: "destructive" });
+      return;
+    }
+
+    const classIds = ((links as { class_id: string }[]) || []).map((x) => x.class_id);
+    if (classIds.length === 0) {
+      setStudentClasses([]);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("classes")
+      .select("id, name, description, created_at")
+      .in("id", classIds);
+
+    if (error) {
+      toast({ title: "Fout bij laden klassen", variant: "destructive" });
+      return;
+    }
+
+    setStudentClasses((data as SchoolClass[]) || []);
+  };
+
+  const addStudentToClassFromDetail = async () => {
+    if (!selectedStudent || !addingStudentToClassId) return;
+
+    setAddingStudentToClassLoading(true);
+    try {
+      const { error: linkError } = await supabase.from("class_students").insert({
+        class_id: addingStudentToClassId,
+        student_id: selectedStudent.user_id,
+      });
+      if (linkError) throw linkError;
+
+      // Fan out class domains to student
+      const { data: sourceDomains } = await supabase
+        .from("class_domains")
+        .select("id, domain_name, description, html_file_url")
+        .eq("class_id", addingStudentToClassId);
+
+      const fanoutRows = ((sourceDomains as any[]) || []).map((d) => ({
+        student_id: selectedStudent.user_id,
+        class_domain_id: d.id,
+        domain_name: d.domain_name,
+        description: d.description,
+        html_file_url: d.html_file_url,
+      }));
+
+      if (fanoutRows.length > 0) {
+        await supabase
+          .from("student_domains")
+          .upsert(fanoutRows, { onConflict: "student_id,class_domain_id" });
+      }
+
+      toast({ title: "Leerling toegevoegd aan klas" });
+      setAddingStudentToClassId("");
+      fetchStudentClasses(selectedStudent.user_id);
+      fetchDomains(selectedStudent.user_id);
+    } catch (error) {
+      console.error("Fout bij toevoegen aan klas:", error);
+      toast({ title: "Fout bij toevoegen aan klas", variant: "destructive" });
+    } finally {
+      setAddingStudentToClassLoading(false);
+    }
+  };
+
+  const removeStudentFromClassFromDetail = async (classId: string) => {
+    if (!selectedStudent) return;
+    if (!confirm("Deze leerling uit de klas verwijderen?")) return;
+
+    try {
+      const { error: unlinkError } = await supabase
+        .from("class_students")
+        .delete()
+        .eq("class_id", classId)
+        .eq("student_id", selectedStudent.user_id);
+      if (unlinkError) throw unlinkError;
+
+      // Clean up student_domains linked to class_domains of that class
+      const { data: cDomains } = await supabase
+        .from("class_domains")
+        .select("id")
+        .eq("class_id", classId);
+
+      const cDomainIds = ((cDomains as { id: string }[]) || []).map((d) => d.id);
+      if (cDomainIds.length > 0) {
+        await supabase
+          .from("student_domains")
+          .delete()
+          .eq("student_id", selectedStudent.user_id)
+          .in("class_domain_id", cDomainIds);
+      }
+
+      toast({ title: "Leerling uit klas verwijderd" });
+      fetchStudentClasses(selectedStudent.user_id);
+      fetchDomains(selectedStudent.user_id);
+    } catch (error) {
+      console.error("Fout bij verwijderen uit klas:", error);
+      toast({ title: "Fout bij verwijderen uit klas", variant: "destructive" });
+    }
+  };
+
   const selectStudent = (student: Student) => {
     setSelectedClass(null);
     setClassStudents([]);
@@ -752,7 +866,9 @@ const AdminStudents = () => {
     setSelectedStudent(student);
     setStudentFirstName(student.first_name || "");
     setStudentLastName(student.last_name || "");
+    setAddingStudentToClassId("");
     fetchDomains(student.user_id);
+    fetchStudentClasses(student.user_id);
   };
 
   const saveStudentName = async () => {
@@ -1099,6 +1215,7 @@ const AdminStudents = () => {
                 <Tabs defaultValue="gegevens" className="w-full">
                   <TabsList className="w-full justify-start">
                     <TabsTrigger value="gegevens">Gegevens</TabsTrigger>
+                    <TabsTrigger value="klassen">Klassen ({studentClasses.length})</TabsTrigger>
                     <TabsTrigger value="domeinen">Domeinen ({domains.length})</TabsTrigger>
                     <TabsTrigger value="analyse">Analyse</TabsTrigger>
                   </TabsList>
@@ -1142,6 +1259,58 @@ const AdminStudents = () => {
                             Sla naam op
                           </Button>
                         </div>
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  {/* Tab: Klassen */}
+                  <TabsContent value="klassen">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">Klassen</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+                          <div className="md:col-span-2">
+                            <Label>Toevoegen aan klas</Label>
+                            <select
+                              value={addingStudentToClassId}
+                              onChange={(e) => setAddingStudentToClassId(e.target.value)}
+                              className="w-full mt-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            >
+                              <option value="">Kies klas</option>
+                              {classes
+                                .filter((c) => !studentClasses.some((sc) => sc.id === c.id))
+                                .map((c) => (
+                                  <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                            </select>
+                          </div>
+                          <Button
+                            onClick={addStudentToClassFromDetail}
+                            disabled={addingStudentToClassLoading || !addingStudentToClassId}
+                          >
+                            {addingStudentToClassLoading ? "Toevoegen..." : "Toevoegen"}
+                          </Button>
+                        </div>
+
+                        {studentClasses.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">Deze leerling zit nog in geen enkele klas.</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {studentClasses.map((c) => (
+                              <div key={c.id} className="flex items-center justify-between border rounded-md px-3 py-2">
+                                <div>
+                                  <p className="text-sm font-medium">{c.name}</p>
+                                  {c.description && <p className="text-xs text-muted-foreground">{c.description}</p>}
+                                </div>
+                                <Button variant="ghost" size="sm" onClick={() => removeStudentFromClassFromDetail(c.id)}>
+                                  <Trash2 className="h-3 w-3 text-destructive" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </TabsContent>
