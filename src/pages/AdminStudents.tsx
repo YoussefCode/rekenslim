@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import AdminStudentsDayOverview from "./AdminStudentsDayOverview";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -99,14 +98,13 @@ const getResultPercentage = (resultData: Record<string, any>) => {
 const AdminStudents = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { user, profile, loading: authLoading } = useAuth();
+  const { user, profile } = useAuth();
 
   const [students, setStudents] = useState<Student[]>([]);
   const [studentSearch, setStudentSearch] = useState("");
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [domains, setDomains] = useState<StudentDomain[]>([]);
   const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
   const [studentFirstName, setStudentFirstName] = useState("");
   const [studentLastName, setStudentLastName] = useState("");
   const [domainResults, setDomainResults] = useState<Record<string, DomainResult[]>>({});
@@ -254,27 +252,20 @@ const AdminStudents = () => {
   }, [studentSearch, students]);
 
   useEffect(() => {
-    // Wait for auth/profile to finish loading before deciding to redirect.
-    if (authLoading) return;
-
     if (profile?.role !== "admin") {
       navigate("/");
       return;
     }
-
     fetchStudents();
     fetchClasses();
-  }, [profile, authLoading]);
+  }, [profile]);
 
   const fetchStudents = async () => {
     try {
-      setFetchError(null);
       const { data: rpcData, error: rpcError } = await supabase.rpc("get_students_with_last_login");
       if (!rpcError) {
         setStudents((rpcData as Student[] | null) || []);
         return;
-      } else {
-        console.debug("RPC get_students_with_last_login error:", rpcError);
       }
 
       const { data: tableData, error: tableError } = await supabase
@@ -286,12 +277,10 @@ const AdminStudents = () => {
       if (!tableError) {
         setStudents(tableData || []);
         return;
-      } else {
-        console.debug("profiles table query error:", tableError);
       }
 
       // Last fallback for databases that do not have the new column.
-      if ((tableError && (tableError as any).code === "42703") || (rpcError && (rpcError as any).code === "42883")) {
+      if (tableError.code === "42703" || rpcError.code === "42883") {
         const { data: basicData, error: basicError } = await supabase
           .from("profiles")
           .select("user_id, email, role, first_name, last_name")
@@ -309,10 +298,9 @@ const AdminStudents = () => {
         return;
       }
 
-      throw tableError || rpcError;
+      throw tableError;
     } catch (error) {
       console.error("Fout bij laden leerlingen:", error);
-      setFetchError(error instanceof Error ? error.message : String(error));
       toast({
         title: "Fout bij laden leerlingen",
         description: "Controleer of je rechten en database-migraties up-to-date zijn.",
@@ -1182,16 +1170,6 @@ const AdminStudents = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Debug panel (temporary) */}
-          <div className="lg:col-span-12">
-            <div className="p-3 rounded-md border bg-white">
-              <div className="text-xs text-muted-foreground">Debug:</div>
-              <div className="text-sm">
-                Auth loading: {String(authLoading)} — Profile role: {profile?.role ?? "(none)"} — Page loading: {String(loading)} — Students: {students.length}
-              </div>
-              {fetchError && <div className="text-sm text-red-600">Fout: {fetchError}</div>}
-            </div>
-          </div>
           {/* Student List */}
           <div className="lg:col-span-3">
             <Card className="mb-4">
@@ -1285,21 +1263,17 @@ const AdminStudents = () => {
 
           {/* Domain Area */}
           <div className="lg:col-span-9">
-            <Tabs defaultValue="gegevens" className="w-full">
+              {selectedStudent ? (
+                <Tabs defaultValue="gegevens" className="w-full">
                   <TabsList className="w-full justify-start">
-                    <TabsTrigger value="gegevens" disabled={!selectedStudent}>Gegevens</TabsTrigger>
-                    <TabsTrigger value="klassen" disabled={!selectedStudent}>Klassen ({studentClasses.length})</TabsTrigger>
-                    <TabsTrigger value="domeinen" disabled={!selectedStudent}>Domeinen ({domains.length})</TabsTrigger>
-                    <TabsTrigger value="analyse" disabled={!selectedStudent}>Analyse</TabsTrigger>
-                    <TabsTrigger value="berichten" disabled={!selectedStudent}>
+                    <TabsTrigger value="gegevens">Gegevens</TabsTrigger>
+                    <TabsTrigger value="klassen">Klassen ({studentClasses.length})</TabsTrigger>
+                    <TabsTrigger value="domeinen">Domeinen ({domains.length})</TabsTrigger>
+                    <TabsTrigger value="analyse">Analyse</TabsTrigger>
+                    <TabsTrigger value="berichten">
                       <Mail className="h-3.5 w-3.5 mr-1" /> Berichten
                     </TabsTrigger>
-                    <TabsTrigger value="dagoverzicht">Dagoverzicht</TabsTrigger>
                   </TabsList>
-                  {/* Tab: Dagoverzicht */}
-                  <TabsContent value="dagoverzicht">
-                    <AdminStudentsDayOverview showBackButton onBack={() => navigate("/admin")}/>
-                  </TabsContent>
 
                   {/* Tab: Gegevens */}
                   <TabsContent value="gegevens">
@@ -1711,6 +1685,14 @@ const AdminStudents = () => {
                     </Card>
                   </TabsContent>
                 </Tabs>
+              ) : (
+                <Card>
+                  <CardContent className="py-8 text-center text-muted-foreground">
+                    <Users className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                    <p>Selecteer een leerling voor individueel lesmateriaal en resultaten.</p>
+                  </CardContent>
+                </Card>
+              )}
           </div>
         </div>
       </div>
