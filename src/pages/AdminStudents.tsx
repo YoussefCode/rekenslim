@@ -26,6 +26,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger
 } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DomainResultCard from "@/components/DomainResultCard";
 
 interface Student {
@@ -1094,292 +1095,322 @@ const AdminStudents = () => {
 
           {/* Domain Area */}
           <div className="lg:col-span-9">
-            <div className="space-y-4">
               {selectedStudent ? (
-                <>
-                <Card>
-                  <CardHeader className="pb-2 flex flex-row items-center justify-between">
-                    <CardTitle className="text-lg">Leerlinggegevens</CardTitle>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={deleteStudent}
-                      disabled={deletingStudent}
-                    >
-                      <UserX className="h-4 w-4 mr-1" />
-                      {deletingStudent ? "Verwijderen..." : "Verwijder leerling"}
-                    </Button>
-                  </CardHeader>
-                  <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="student-first-name">Voornaam</Label>
-                      <Input
-                        id="student-first-name"
-                        value={studentFirstName}
-                        onChange={(e) => setStudentFirstName(e.target.value)}
-                        placeholder="Voornaam"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="student-last-name">Achternaam</Label>
-                      <Input
-                        id="student-last-name"
-                        value={studentLastName}
-                        onChange={(e) => setStudentLastName(e.target.value)}
-                        placeholder="Achternaam"
-                      />
-                    </div>
-                    <div className="md:col-span-2 flex justify-end">
-                      <Button onClick={saveStudentName}>
-                        Sla naam op
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                <Tabs defaultValue="gegevens" className="w-full">
+                  <TabsList className="w-full justify-start">
+                    <TabsTrigger value="gegevens">Gegevens</TabsTrigger>
+                    <TabsTrigger value="domeinen">Domeinen ({domains.length})</TabsTrigger>
+                    <TabsTrigger value="analyse">Analyse</TabsTrigger>
+                  </TabsList>
 
-                <Card>
-                  <CardHeader className="pb-3 flex flex-row items-center justify-between">
-                    <CardTitle className="text-lg">
-                      Domeinen van {selectedStudent.first_name || selectedStudent.last_name
-                        ? `${selectedStudent.first_name} ${selectedStudent.last_name}`.trim()
-                        : selectedStudent.email}
-                    </CardTitle>
-                    <Dialog open={domainDialogOpen} onOpenChange={setDomainDialogOpen}>
-                      <DialogTrigger asChild>
+                  {/* Tab: Gegevens */}
+                  <TabsContent value="gegevens">
+                    <Card>
+                      <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                        <CardTitle className="text-lg">Leerlinggegevens</CardTitle>
                         <Button
+                          variant="destructive"
                           size="sm"
-                          onClick={() => {
-                            setEditingDomain(null);
-                            setDomainName("");
-                            setDomainDesc("");
-                            setHtmlFile(null);
-                          }}
+                          onClick={deleteStudent}
+                          disabled={deletingStudent}
                         >
-                          <Plus className="h-4 w-4 mr-1" /> Domein
+                          <UserX className="h-4 w-4 mr-1" />
+                          {deletingStudent ? "Verwijderen..." : "Verwijder leerling"}
                         </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>
-                            {editingDomain ? "Domein bewerken" : "Nieuw domein"}
-                          </DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <Label>Naam *</Label>
-                            <Input
-                              value={domainName}
-                              onChange={(e) => setDomainName(e.target.value)}
-                              placeholder="bijv. Breuken"
-                            />
-                          </div>
-                          <div>
-                            <Label>Beschrijving</Label>
-                            <Textarea
-                              value={domainDesc}
-                              onChange={(e) => setDomainDesc(e.target.value)}
-                              placeholder="Korte beschrijving van het domein"
-                            />
-                          </div>
-                          <div>
-                            <Label>HTML bestand (vragen + uitleg)</Label>
-                            <Input
-                              type="file"
-                              accept=".html,.htm"
-                              onChange={(e) => setHtmlFile(e.target.files?.[0] || null)}
-                            />
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Upload een HTML bestand met daarin de vragen en uitleg
-                            </p>
-                          </div>
-                          <Button onClick={saveDomain} className="w-full" disabled={uploading}>
-                            {uploading ? "Uploaden..." : "Opslaan"}
+                      </CardHeader>
+                      <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="student-first-name">Voornaam</Label>
+                          <Input
+                            id="student-first-name"
+                            value={studentFirstName}
+                            onChange={(e) => setStudentFirstName(e.target.value)}
+                            placeholder="Voornaam"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="student-last-name">Achternaam</Label>
+                          <Input
+                            id="student-last-name"
+                            value={studentLastName}
+                            onChange={(e) => setStudentLastName(e.target.value)}
+                            placeholder="Achternaam"
+                          />
+                        </div>
+                        <div className="md:col-span-2 flex justify-end">
+                          <Button onClick={saveStudentName}>
+                            Sla naam op
                           </Button>
                         </div>
-                      </DialogContent>
-                    </Dialog>
-                  </CardHeader>
-                  <CardContent>
-                    {domains.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">Nog geen domeinen toegevoegd</p>
-                    ) : (
-                      <div className="space-y-4">
-                        {domainOverviewChartData.length > 0 && (
-                          <Card className="border">
-                            <CardContent className="py-4 space-y-4">
-                              <div className="flex items-center justify-between">
-                                <p className="text-sm font-semibold">Analyse-overzicht leerling</p>
-                                <p className="text-xs text-muted-foreground">Gemiddelde, beste en laatste score per domein</p>
-                              </div>
-                              <div className="h-64 w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                  <BarChart data={domainOverviewChartData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
-                                    <CartesianGrid strokeDasharray="3 3" />
-                                    <XAxis dataKey="domein" tick={{ fontSize: 12 }} />
-                                    <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-                                    <Tooltip formatter={(value) => [`${value}%`, ""]} />
-                                    <Legend />
-                                    <Bar dataKey="gemiddeld" name="Gemiddeld" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
-                                    <Bar dataKey="beste" name="Beste" fill="#16a34a" radius={[4, 4, 0, 0]} />
-                                    <Bar dataKey="laatste" name="Laatste" fill="#f59e0b" radius={[4, 4, 0, 0]} />
-                                  </BarChart>
-                                </ResponsiveContainer>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
 
-                        <div className="grid grid-cols-1 gap-3">
-                        {domains.map((d) => (
-                          <Card key={d.id} className="border">
-                            <CardContent className="py-4">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <BookOpen className="h-5 w-5 text-primary" />
-                                  <div>
-                                    <p className="font-medium">
-                                      {d.domain_name}
-                                      {d.classroom_name ? ` • Klaslokaal: ${d.classroom_name}` : ""}
-                                    </p>
-                                    {d.description && (
-                                      <p className="text-xs text-muted-foreground">{d.description}</p>
-                                    )}
-                                    <p className="text-xs text-muted-foreground mt-1">
-                                      Toegevoegd op: {formatAddedAt(d.created_at)}
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-1">
-                                      {d.html_file_url ? (
-                                        <span className="text-xs text-green-600 flex items-center gap-1">
-                                          <FileCode className="h-3 w-3" /> HTML bestand gekoppeld
-                                        </span>
-                                      ) : (
-                                        <span className="text-xs text-muted-foreground">Geen HTML bestand</span>
-                                      )}
+                  {/* Tab: Domeinen */}
+                  <TabsContent value="domeinen">
+                    <Card>
+                      <CardHeader className="pb-3 flex flex-row items-center justify-between">
+                        <CardTitle className="text-lg">
+                          Domeinen van {selectedStudent.first_name || selectedStudent.last_name
+                            ? `${selectedStudent.first_name} ${selectedStudent.last_name}`.trim()
+                            : selectedStudent.email}
+                        </CardTitle>
+                        <Dialog open={domainDialogOpen} onOpenChange={setDomainDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                setEditingDomain(null);
+                                setDomainName("");
+                                setDomainDesc("");
+                                setHtmlFile(null);
+                              }}
+                            >
+                              <Plus className="h-4 w-4 mr-1" /> Domein
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                {editingDomain ? "Domein bewerken" : "Nieuw domein"}
+                              </DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div>
+                                <Label>Naam *</Label>
+                                <Input
+                                  value={domainName}
+                                  onChange={(e) => setDomainName(e.target.value)}
+                                  placeholder="bijv. Breuken"
+                                />
+                              </div>
+                              <div>
+                                <Label>Beschrijving</Label>
+                                <Textarea
+                                  value={domainDesc}
+                                  onChange={(e) => setDomainDesc(e.target.value)}
+                                  placeholder="Korte beschrijving van het domein"
+                                />
+                              </div>
+                              <div>
+                                <Label>HTML bestand (vragen + uitleg)</Label>
+                                <Input
+                                  type="file"
+                                  accept=".html,.htm"
+                                  onChange={(e) => setHtmlFile(e.target.files?.[0] || null)}
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  Upload een HTML bestand met daarin de vragen en uitleg
+                                </p>
+                              </div>
+                              <Button onClick={saveDomain} className="w-full" disabled={uploading}>
+                                {uploading ? "Uploaden..." : "Opslaan"}
+                              </Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                      </CardHeader>
+                      <CardContent>
+                        {domains.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">Nog geen domeinen toegevoegd</p>
+                        ) : (
+                          <div className="grid grid-cols-1 gap-3">
+                            {domains.map((d) => (
+                              <Card key={d.id} className="border">
+                                <CardContent className="py-4">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <BookOpen className="h-5 w-5 text-primary" />
+                                      <div>
+                                        <p className="font-medium">
+                                          {d.domain_name}
+                                          {d.classroom_name ? ` • Klaslokaal: ${d.classroom_name}` : ""}
+                                        </p>
+                                        {d.description && (
+                                          <p className="text-xs text-muted-foreground">{d.description}</p>
+                                        )}
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                          Toegevoegd op: {formatAddedAt(d.created_at)}
+                                        </p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                          {d.html_file_url ? (
+                                            <span className="text-xs text-green-600 flex items-center gap-1">
+                                              <FileCode className="h-3 w-3" /> HTML bestand gekoppeld
+                                            </span>
+                                          ) : (
+                                            <span className="text-xs text-muted-foreground">Geen HTML bestand</span>
+                                          )}
+                                        </div>
+                                      </div>
                                     </div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  {/* Upload/replace HTML */}
-                                  <label className="cursor-pointer">
-                                    <input
-                                      type="file"
-                                      accept=".html,.htm"
-                                      className="hidden"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) uploadHtmlForDomain(d, file);
-                                        e.target.value = "";
-                                      }}
-                                    />
-                                    <Button variant="ghost" size="sm" asChild>
-                                      <span>
-                                        <Upload className="h-3 w-3" />
-                                      </span>
-                                    </Button>
-                                  </label>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      setEditingDomain(d);
-                                      setDomainName(d.domain_name);
-                                      setDomainDesc(d.description || "");
-                                      setHtmlFile(null);
-                                      setDomainDialogOpen(true);
-                                    }}
-                                  >
-                                    <Edit className="h-3 w-3" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => deleteDomain(d.id)}
-                                  >
-                                    <Trash2 className="h-3 w-3 text-destructive" />
-                                  </Button>
-                                </div>
-                              </div>
-
-                              {d.html_file_url && (
-                                <div className="mt-3">
-                                  <a
-                                    href={d.html_file_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-xs text-primary hover:underline"
-                                  >
-                                    Bekijk HTML bestand →
-                                  </a>
-                                </div>
-                              )}
-
-                              {/* Results section */}
-                              {(domainResults[d.id] || []).length > 0 && (
-                                <div className="mt-3 border-t pt-3">
-                                  <div className="mb-3 rounded-md border bg-muted/20 p-3">
-                                    <p className="text-xs font-medium text-muted-foreground mb-2">Trend per poging</p>
-                                    <div className="h-44 w-full">
-                                      <ResponsiveContainer width="100%" height="100%">
-                                        <LineChart
-                                          data={(domainResults[d.id] || [])
-                                            .slice()
-                                            .sort(
-                                              (a, b) =>
-                                                new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime()
-                                            )
-                                            .map((result, index) => ({
-                                              poging: index + 1,
-                                              percentage: getResultPercentage(result.result_data),
-                                            }))
-                                            .filter((entry) => typeof entry.percentage === "number")}
-                                          margin={{ top: 8, right: 8, left: 0, bottom: 8 }}
-                                        >
-                                          <CartesianGrid strokeDasharray="3 3" />
-                                          <XAxis dataKey="poging" allowDecimals={false} tick={{ fontSize: 12 }} />
-                                          <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-                                          <Tooltip formatter={(value) => [`${value}%`, "Score"]} />
-                                          <Line
-                                            type="monotone"
-                                            dataKey="percentage"
-                                            stroke="#1d4ed8"
-                                            strokeWidth={2}
-                                            dot={{ r: 3 }}
-                                            activeDot={{ r: 5 }}
-                                          />
-                                        </LineChart>
-                                      </ResponsiveContainer>
-                                    </div>
-                                  </div>
-                                  <button
-                                    className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
-                                    onClick={() => setExpandedResults((prev) => ({ ...prev, [d.id]: !prev[d.id] }))}
-                                  >
-                                    <BarChart3 className="h-3 w-3" />
-                                    {domainResults[d.id].length} resultaat{domainResults[d.id].length !== 1 ? 'en' : ''}
-                                    {expandedResults[d.id] ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                                  </button>
-                                  {expandedResults[d.id] && (
-                                    <div className="mt-2 space-y-2 max-h-96 overflow-y-auto">
-                                      {domainResults[d.id].map((r) => (
-                                        <DomainResultCard
-                                          key={r.id}
-                                          resultData={r.result_data}
-                                          submittedAt={r.submitted_at}
+                                    <div className="flex items-center gap-1">
+                                      <label className="cursor-pointer">
+                                        <input
+                                          type="file"
+                                          accept=".html,.htm"
+                                          className="hidden"
+                                          onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) uploadHtmlForDomain(d, file);
+                                            e.target.value = "";
+                                          }}
                                         />
-                                      ))}
+                                        <Button variant="ghost" size="sm" asChild>
+                                          <span>
+                                            <Upload className="h-3 w-3" />
+                                          </span>
+                                        </Button>
+                                      </label>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => {
+                                          setEditingDomain(d);
+                                          setDomainName(d.domain_name);
+                                          setDomainDesc(d.description || "");
+                                          setHtmlFile(null);
+                                          setDomainDialogOpen(true);
+                                        }}
+                                      >
+                                        <Edit className="h-3 w-3" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => deleteDomain(d.id)}
+                                      >
+                                        <Trash2 className="h-3 w-3 text-destructive" />
+                                      </Button>
+                                    </div>
+                                  </div>
+
+                                  {d.html_file_url && (
+                                    <div className="mt-3">
+                                      <a
+                                        href={d.html_file_url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-xs text-primary hover:underline"
+                                      >
+                                        Bekijk HTML bestand →
+                                      </a>
                                     </div>
                                   )}
+                                </CardContent>
+                              </Card>
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+
+                  {/* Tab: Analyse */}
+                  <TabsContent value="analyse">
+                    <div className="space-y-4">
+                      {domainOverviewChartData.length > 0 && (
+                        <Card>
+                          <CardHeader className="pb-2">
+                            <CardTitle className="text-lg">Overzicht per domein</CardTitle>
+                            <p className="text-xs text-muted-foreground">Gemiddelde, beste en laatste score per domein</p>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="h-64 w-full">
+                              <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={domainOverviewChartData} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+                                  <CartesianGrid strokeDasharray="3 3" />
+                                  <XAxis dataKey="domein" tick={{ fontSize: 12 }} />
+                                  <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                                  <Tooltip formatter={(value) => [`${value}%`, ""]} />
+                                  <Legend />
+                                  <Bar dataKey="gemiddeld" name="Gemiddeld" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
+                                  <Bar dataKey="beste" name="Beste" fill="#16a34a" radius={[4, 4, 0, 0]} />
+                                  <Bar dataKey="laatste" name="Laatste" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+                                </BarChart>
+                              </ResponsiveContainer>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {domains.filter((d) => (domainResults[d.id] || []).length > 0).length === 0 && domainOverviewChartData.length === 0 && (
+                        <Card>
+                          <CardContent className="py-8 text-center text-muted-foreground">
+                            <BarChart3 className="h-10 w-10 mx-auto mb-3 opacity-50" />
+                            <p>Nog geen resultaten beschikbaar voor analyse.</p>
+                          </CardContent>
+                        </Card>
+                      )}
+
+                      {domains.map((d) => {
+                        const results = domainResults[d.id] || [];
+                        if (results.length === 0) return null;
+                        return (
+                          <Card key={`analyse-${d.id}`}>
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-base">{d.domain_name}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <div className="rounded-md border bg-muted/20 p-3">
+                                <p className="text-xs font-medium text-muted-foreground mb-2">Trend per poging</p>
+                                <div className="h-44 w-full">
+                                  <ResponsiveContainer width="100%" height="100%">
+                                    <LineChart
+                                      data={results
+                                        .slice()
+                                        .sort(
+                                          (a, b) =>
+                                            new Date(a.submitted_at).getTime() - new Date(b.submitted_at).getTime()
+                                        )
+                                        .map((result, index) => ({
+                                          poging: index + 1,
+                                          percentage: getResultPercentage(result.result_data),
+                                        }))
+                                        .filter((entry) => typeof entry.percentage === "number")}
+                                      margin={{ top: 8, right: 8, left: 0, bottom: 8 }}
+                                    >
+                                      <CartesianGrid strokeDasharray="3 3" />
+                                      <XAxis dataKey="poging" allowDecimals={false} tick={{ fontSize: 12 }} />
+                                      <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                                      <Tooltip formatter={(value) => [`${value}%`, "Score"]} />
+                                      <Line
+                                        type="monotone"
+                                        dataKey="percentage"
+                                        stroke="#1d4ed8"
+                                        strokeWidth={2}
+                                        dot={{ r: 3 }}
+                                        activeDot={{ r: 5 }}
+                                      />
+                                    </LineChart>
+                                  </ResponsiveContainer>
+                                </div>
+                              </div>
+                              <button
+                                className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors"
+                                onClick={() => setExpandedResults((prev) => ({ ...prev, [d.id]: !prev[d.id] }))}
+                              >
+                                <BarChart3 className="h-3 w-3" />
+                                {results.length} resultaat{results.length !== 1 ? 'en' : ''}
+                                {expandedResults[d.id] ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                              </button>
+                              {expandedResults[d.id] && (
+                                <div className="mt-2 space-y-2 max-h-96 overflow-y-auto">
+                                  {results.map((r) => (
+                                    <DomainResultCard
+                                      key={r.id}
+                                      resultData={r.result_data}
+                                      submittedAt={r.submitted_at}
+                                    />
+                                  ))}
                                 </div>
                               )}
                             </CardContent>
                           </Card>
-                        ))}
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </>
+                        );
+                      })}
+                    </div>
+                  </TabsContent>
+                </Tabs>
               ) : (
                 <Card>
                   <CardContent className="py-8 text-center text-muted-foreground">
@@ -1388,7 +1419,6 @@ const AdminStudents = () => {
                   </CardContent>
                 </Card>
               )}
-            </div>
           </div>
         </div>
       </div>

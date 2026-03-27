@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Trash2 } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Bar,
   BarChart,
@@ -84,6 +85,8 @@ const AdminClasses = () => {
 
   const [newClassName, setNewClassName] = useState("");
   const [newClassDescription, setNewClassDescription] = useState("");
+  const [classSearch, setClassSearch] = useState("");
+  const [classStudentSearch, setClassStudentSearch] = useState("");
   const [selectedStudentForClass, setSelectedStudentForClass] = useState("");
   const [newClassDomainName, setNewClassDomainName] = useState("");
   const [newClassDomainDescription, setNewClassDomainDescription] = useState("");
@@ -155,6 +158,28 @@ const AdminClasses = () => {
       })
       .filter((item): item is NonNullable<typeof item> => Boolean(item));
   }, [classDomains, classResultsByDomain]);
+
+  const filteredClasses = useMemo(() => {
+    const query = classSearch.trim().toLowerCase();
+    if (!query) return classes;
+
+    return classes.filter((schoolClass) => {
+      const name = schoolClass.name.toLowerCase();
+      const description = (schoolClass.description || "").toLowerCase();
+      return name.includes(query) || description.includes(query);
+    });
+  }, [classSearch, classes]);
+
+  const filteredClassStudents = useMemo(() => {
+    const query = classStudentSearch.trim().toLowerCase();
+    if (!query) return classStudents;
+
+    return classStudents.filter((student) => {
+      const fullName = `${student.first_name || ""} ${student.last_name || ""}`.trim().toLowerCase();
+      const email = (student.email || "").toLowerCase();
+      return fullName.includes(query) || email.includes(query);
+    });
+  }, [classStudentSearch, classStudents]);
 
   useEffect(() => {
     if (profile?.role !== "admin") {
@@ -563,10 +588,18 @@ const AdminClasses = () => {
                 <CardTitle className="text-base">Klassen</CardTitle>
               </CardHeader>
               <CardContent className="space-y-1">
+                <Input
+                  value={classSearch}
+                  onChange={(e) => setClassSearch(e.target.value)}
+                  placeholder="Zoek klas"
+                  className="mb-2"
+                />
                 {classes.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Nog geen klassen</p>
+                ) : filteredClasses.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Geen klassen gevonden</p>
                 ) : (
-                  classes.map((c) => (
+                  filteredClasses.map((c) => (
                     <button
                       key={c.id}
                       onClick={() => selectClass(c)}
@@ -590,308 +623,340 @@ const AdminClasses = () => {
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Klas: {selectedClass.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <p className="text-sm text-muted-foreground">{selectedClass.description || "Geen beschrijving"}</p>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
-                      <div className="md:col-span-2">
-                        <Label htmlFor="class-student-select">Leerling toevoegen aan klas</Label>
-                        <select
-                          id="class-student-select"
-                          value={selectedStudentForClass}
-                          onChange={(e) => setSelectedStudentForClass(e.target.value)}
-                          className="w-full mt-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
-                        >
-                          <option value="">Kies leerling</option>
-                          {students
-                            .filter((s) => !classStudents.some((cs) => cs.user_id === s.user_id))
-                            .map((s) => (
-                              <option key={s.user_id} value={s.user_id}>
-                                {(s.first_name || s.last_name) ? `${s.first_name || ""} ${s.last_name || ""}`.trim() : s.email}
-                              </option>
-                            ))}
-                        </select>
+              <Tabs defaultValue="leerlingen" className="w-full">
+                <TabsList className="w-full justify-start">
+                  <TabsTrigger value="leerlingen">Leerlingen ({classStudents.length})</TabsTrigger>
+                  <TabsTrigger value="lesmateriaal">Lesmateriaal ({classDomains.length})</TabsTrigger>
+                  <TabsTrigger value="resultaten">Resultaten</TabsTrigger>
+                </TabsList>
+
+                {/* Tab: Leerlingen */}
+                <TabsContent value="leerlingen">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">Klas: {selectedClass.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <p className="text-sm text-muted-foreground">{selectedClass.description || "Geen beschrijving"}</p>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-2 items-end">
+                        <div className="md:col-span-2">
+                          <Label htmlFor="class-student-select">Leerling toevoegen aan klas</Label>
+                          <select
+                            id="class-student-select"
+                            value={selectedStudentForClass}
+                            onChange={(e) => setSelectedStudentForClass(e.target.value)}
+                            className="w-full mt-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
+                          >
+                            <option value="">Kies leerling</option>
+                            {students
+                              .filter((s) => !classStudents.some((cs) => cs.user_id === s.user_id))
+                              .map((s) => (
+                                <option key={s.user_id} value={s.user_id}>
+                                  {(s.first_name || s.last_name) ? `${s.first_name || ""} ${s.last_name || ""}`.trim() : s.email}
+                                </option>
+                              ))}
+                          </select>
+                        </div>
+                        <Button onClick={addStudentToSelectedClass} disabled={addingStudentToClass || !selectedStudentForClass}>
+                          {addingStudentToClass ? "Toevoegen..." : "Toevoegen"}
+                        </Button>
                       </div>
-                      <Button onClick={addStudentToSelectedClass} disabled={addingStudentToClass || !selectedStudentForClass}>
-                        {addingStudentToClass ? "Toevoegen..." : "Toevoegen"}
-                      </Button>
-                    </div>
 
-                    <div className="space-y-2">
-                      <Label>Leerlingen in klas</Label>
-                      {classStudents.length === 0 ? (
-                        <p className="text-sm text-muted-foreground">Nog geen leerlingen in deze klas</p>
-                      ) : (
-                        classStudents.map((s) => (
-                          <div key={s.user_id} className="flex items-center justify-between border rounded-md px-3 py-2">
-                            <div>
-                              <p className="text-sm font-medium">{(s.first_name || s.last_name) ? `${s.first_name || ""} ${s.last_name || ""}`.trim() : s.email}</p>
-                              <p className="text-xs text-muted-foreground">{s.email}</p>
-                            </div>
-                            <Button variant="ghost" size="sm" onClick={() => removeStudentFromSelectedClass(s.user_id)}>
-                              <Trash2 className="h-3 w-3 text-destructive" />
-                            </Button>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Klaslokaal lesmateriaal</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <Input value={newClassDomainName} onChange={(e) => setNewClassDomainName(e.target.value)} placeholder="Naam lesmateriaal" />
-                      <Input type="file" accept=".html,.htm" onChange={(e) => setNewClassDomainHtmlFile(e.target.files?.[0] || null)} />
-                    </div>
-                    <Textarea value={newClassDomainDescription} onChange={(e) => setNewClassDomainDescription(e.target.value)} placeholder="Beschrijving (optioneel)" />
-                    <Button onClick={addClassDomain} disabled={creatingClassDomain}>
-                      {creatingClassDomain ? "Toevoegen..." : "Voeg lesmateriaal toe aan hele klas"}
-                    </Button>
-
-                    {classDomains.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">Nog geen klasmateriaal</p>
-                    ) : (
                       <div className="space-y-2">
-                        {classDomains.map((d) => (
-                          <div key={d.id} className="flex items-center justify-between border rounded-md px-3 py-2">
-                            <div>
-                              <p className="text-sm font-medium">{d.domain_name}</p>
-                              {d.description && <p className="text-xs text-muted-foreground">{d.description}</p>}
-                              <p className="text-xs text-muted-foreground">Toegevoegd op: {formatDate(d.created_at)}</p>
+                        <Label>Leerlingen in klas</Label>
+                        <Input
+                          value={classStudentSearch}
+                          onChange={(e) => setClassStudentSearch(e.target.value)}
+                          placeholder="Zoek leerling in deze klas"
+                        />
+                        {classStudents.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">Nog geen leerlingen in deze klas</p>
+                        ) : filteredClassStudents.length === 0 ? (
+                          <p className="text-sm text-muted-foreground">Geen leerlingen gevonden voor je zoekopdracht</p>
+                        ) : (
+                          filteredClassStudents.map((s) => (
+                            <div key={s.user_id} className="flex items-center justify-between border rounded-md px-3 py-2">
+                              <div>
+                                <p className="text-sm font-medium">{(s.first_name || s.last_name) ? `${s.first_name || ""} ${s.last_name || ""}`.trim() : s.email}</p>
+                                <p className="text-xs text-muted-foreground">{s.email}</p>
+                              </div>
+                              <Button variant="ghost" size="sm" onClick={() => removeStudentFromSelectedClass(s.user_id)}>
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
                             </div>
-                            <Button variant="ghost" size="sm" onClick={() => deleteClassDomain(d.id)} disabled={deletingClassDomainId === d.id}>
-                              <Trash2 className="h-3 w-3 text-destructive" />
-                            </Button>
-                          </div>
-                        ))}
+                          ))
+                        )}
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </TabsContent>
 
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg">Klasresultaten</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    {loadingClassResults ? (
-                      <p className="text-sm text-muted-foreground">Resultaten laden...</p>
-                    ) : classDomains.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">Nog geen klasmateriaal om resultaten op te tonen.</p>
-                    ) : (
-                      <div className="space-y-4">
-                        {classOverview.length > 0 && (
-                          <div className="rounded-md border p-3">
-                            <p className="text-sm font-semibold mb-2">Klasanalyse per domein</p>
-                            <div className="h-64 w-full">
-                              <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={classOverview} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
-                                  <CartesianGrid strokeDasharray="3 3" />
-                                  <XAxis dataKey="domainName" tick={{ fontSize: 12 }} />
-                                  <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-                                  <Tooltip formatter={(value) => [`${value}%`, "Gemiddelde"]} />
-                                  <Bar dataKey="average" name="Gemiddelde score" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
-                                </BarChart>
-                              </ResponsiveContainer>
+                {/* Tab: Lesmateriaal */}
+                <TabsContent value="lesmateriaal">
+                  <Card>
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg">Klaslokaal lesmateriaal</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <Input value={newClassDomainName} onChange={(e) => setNewClassDomainName(e.target.value)} placeholder="Naam lesmateriaal" />
+                        <Input type="file" accept=".html,.htm" onChange={(e) => setNewClassDomainHtmlFile(e.target.files?.[0] || null)} />
+                      </div>
+                      <Textarea value={newClassDomainDescription} onChange={(e) => setNewClassDomainDescription(e.target.value)} placeholder="Beschrijving (optioneel)" />
+                      <Button onClick={addClassDomain} disabled={creatingClassDomain}>
+                        {creatingClassDomain ? "Toevoegen..." : "Voeg lesmateriaal toe aan hele klas"}
+                      </Button>
+
+                      {classDomains.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">Nog geen klasmateriaal</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {classDomains.map((d) => (
+                            <div key={d.id} className="flex items-center justify-between border rounded-md px-3 py-2">
+                              <div>
+                                <p className="text-sm font-medium">{d.domain_name}</p>
+                                {d.description && <p className="text-xs text-muted-foreground">{d.description}</p>}
+                                <p className="text-xs text-muted-foreground">Toegevoegd op: {formatDate(d.created_at)}</p>
+                              </div>
+                              <Button variant="ghost" size="sm" onClick={() => deleteClassDomain(d.id)} disabled={deletingClassDomainId === d.id}>
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
                             </div>
-                          </div>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                {/* Tab: Resultaten */}
+                <TabsContent value="resultaten">
+                  <div className="space-y-4">
+                    {loadingClassResults ? (
+                      <Card>
+                        <CardContent className="py-8 text-center text-muted-foreground">
+                          Resultaten laden...
+                        </CardContent>
+                      </Card>
+                    ) : classDomains.length === 0 ? (
+                      <Card>
+                        <CardContent className="py-8 text-center text-muted-foreground">
+                          Nog geen klasmateriaal om resultaten op te tonen.
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <>
+                        {classOverview.length > 0 && (
+                          <Card>
+                            <CardHeader className="pb-2">
+                              <CardTitle className="text-lg">Klasanalyse per domein</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                              <div className="h-64 w-full">
+                                <ResponsiveContainer width="100%" height="100%">
+                                  <BarChart data={classOverview} margin={{ top: 8, right: 8, left: 0, bottom: 8 }}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="domainName" tick={{ fontSize: 12 }} />
+                                    <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                                    <Tooltip formatter={(value) => [`${value}%`, "Gemiddelde"]} />
+                                    <Bar dataKey="average" name="Gemiddelde score" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
+                                  </BarChart>
+                                </ResponsiveContainer>
+                              </div>
+                            </CardContent>
+                          </Card>
                         )}
 
                         {classDomains.map((d) => {
-                        const entries = classResultsByDomain[d.id] || [];
-                        const attempts = entries.length;
-                        const totalStudentsInClass = classStudents.length;
-                        const studentsWithResult = new Set(entries.map((e) => e.student_id)).size;
+                          const entries = classResultsByDomain[d.id] || [];
+                          const attempts = entries.length;
+                          const totalStudentsInClass = classStudents.length;
+                          const studentsWithResult = new Set(entries.map((e) => e.student_id)).size;
 
-                        const latestByStudent = new Map<string, ClassDomainStudentResult>();
-                        entries.forEach((entry) => {
-                          const previous = latestByStudent.get(entry.student_id);
-                          if (!previous || new Date(entry.submitted_at).getTime() > new Date(previous.submitted_at).getTime()) {
-                            latestByStudent.set(entry.student_id, entry);
-                          }
-                        });
+                          const latestByStudent = new Map<string, ClassDomainStudentResult>();
+                          entries.forEach((entry) => {
+                            const previous = latestByStudent.get(entry.student_id);
+                            if (!previous || new Date(entry.submitted_at).getTime() > new Date(previous.submitted_at).getTime()) {
+                              latestByStudent.set(entry.student_id, entry);
+                            }
+                          });
 
-                        const latestResults = Array.from(latestByStudent.values())
-                          .map((entry) => ({
-                            ...entry,
-                            percentage: getResultPercentage(entry.result_data),
-                          }))
-                          .filter(
-                            (entry): entry is ClassDomainStudentResult & { percentage: number } =>
-                              typeof entry.percentage === "number"
-                          );
+                          const latestResults = Array.from(latestByStudent.values())
+                            .map((entry) => ({
+                              ...entry,
+                              percentage: getResultPercentage(entry.result_data),
+                            }))
+                            .filter(
+                              (entry): entry is ClassDomainStudentResult & { percentage: number } =>
+                                typeof entry.percentage === "number"
+                            );
 
-                        const latestChartData = latestResults
-                          .map((entry) => ({
-                            leerling: entry.student_name,
-                            percentage: entry.percentage,
-                          }))
-                          .sort((a, b) => b.percentage - a.percentage);
+                          const latestChartData = latestResults
+                            .map((entry) => ({
+                              leerling: entry.student_name,
+                              percentage: entry.percentage,
+                            }))
+                            .sort((a, b) => b.percentage - a.percentage);
 
-                        const performanceBuckets = [
-                          {
-                            name: "Sterk (>=70%)",
-                            value: latestResults.filter((entry) => entry.percentage >= 70).length,
-                          },
-                          {
-                            name: "Midden (50-69%)",
-                            value: latestResults.filter(
-                              (entry) => entry.percentage >= 50 && entry.percentage < 70
-                            ).length,
-                          },
-                          {
-                            name: "Aandacht (<50%)",
-                            value: latestResults.filter((entry) => entry.percentage < 50).length,
-                          },
-                        ].filter((bucket) => bucket.value > 0);
+                          const performanceBuckets = [
+                            {
+                              name: "Sterk (>=70%)",
+                              value: latestResults.filter((entry) => entry.percentage >= 70).length,
+                            },
+                            {
+                              name: "Midden (50-69%)",
+                              value: latestResults.filter(
+                                (entry) => entry.percentage >= 50 && entry.percentage < 70
+                              ).length,
+                            },
+                            {
+                              name: "Aandacht (<50%)",
+                              value: latestResults.filter((entry) => entry.percentage < 50).length,
+                            },
+                          ].filter((bucket) => bucket.value > 0);
 
-                        const attentionStudents = latestResults
-                          .filter((entry) => entry.percentage < 50)
-                          .sort((a, b) => a.percentage - b.percentage);
+                          const attentionStudents = latestResults
+                            .filter((entry) => entry.percentage < 50)
+                            .sort((a, b) => a.percentage - b.percentage);
 
-                        return (
-                          <div key={`result-${d.id}`} className="border rounded-md p-3 space-y-2">
-                            <div className="flex items-center justify-between gap-2">
-                              <div>
-                                <p className="text-sm font-medium">{d.domain_name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                  Pogingen: {attempts} · Leerlingen met resultaat: {studentsWithResult}/{totalStudentsInClass}
-                                </p>
-                              </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setExpandedClassResults((prev) => ({ ...prev, [d.id]: !prev[d.id] }))}
-                                disabled={attempts === 0}
-                              >
-                                {expandedClassResults[d.id] ? "Verberg" : "Toon"}
-                              </Button>
-                            </div>
-
-                            {attempts === 0 ? (
-                              <p className="text-xs text-muted-foreground">Nog geen resultaten beschikbaar.</p>
-                            ) : (
-                              <div className="space-y-3">
-                                {latestChartData.length > 0 && (
-                                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                                    <div className="rounded-md border bg-muted/20 p-3">
-                                      <p className="text-xs font-medium text-muted-foreground mb-2">Laatste score per leerling</p>
-                                      <div className="h-56 w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                          <BarChart data={latestChartData} margin={{ top: 8, right: 8, left: 0, bottom: 24 }}>
-                                            <CartesianGrid strokeDasharray="3 3" />
-                                            <XAxis
-                                              dataKey="leerling"
-                                              interval={0}
-                                              angle={-25}
-                                              textAnchor="end"
-                                              height={54}
-                                              tick={{ fontSize: 11 }}
-                                            />
-                                            <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
-                                            <Tooltip formatter={(value) => [`${value}%`, "Score"]} />
-                                            <Bar dataKey="percentage" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
-                                          </BarChart>
-                                        </ResponsiveContainer>
-                                      </div>
-                                    </div>
-
-                                    <div className="rounded-md border bg-muted/20 p-3">
-                                      <p className="text-xs font-medium text-muted-foreground mb-2">Verdeling prestaties</p>
-                                      <p className="text-[11px] text-muted-foreground mb-2">
-                                        Aandacht betekent: leerling scoort onder 50% op de laatste poging in dit domein.
-                                      </p>
-                                      <div className="h-56 w-full">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                          <PieChart>
-                                            <Pie
-                                              data={performanceBuckets}
-                                              dataKey="value"
-                                              nameKey="name"
-                                              cx="50%"
-                                              cy="50%"
-                                              outerRadius={72}
-                                              label
-                                            >
-                                              {performanceBuckets.map((bucket, index) => (
-                                                <Cell key={`${d.id}-${bucket.name}`} fill={PERFORMANCE_BUCKET_COLORS[index % PERFORMANCE_BUCKET_COLORS.length]} />
-                                              ))}
-                                            </Pie>
-                                            <Tooltip />
-                                          </PieChart>
-                                        </ResponsiveContainer>
-                                      </div>
-                                    </div>
+                          return (
+                            <Card key={`result-${d.id}`}>
+                              <CardHeader className="pb-2">
+                                <div className="flex items-center justify-between">
+                                  <CardTitle className="text-base">{d.domain_name}</CardTitle>
+                                  <div className="text-xs text-muted-foreground">
+                                    Pogingen: {attempts} · Leerlingen met resultaat: {studentsWithResult}/{totalStudentsInClass}
                                   </div>
-                                )}
-
-                                <div className="rounded-md border bg-muted/20 p-3 space-y-2">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <p className="text-xs font-medium text-muted-foreground">
-                                      Aandachtleerlingen in dit domein: {attentionStudents.length}
-                                    </p>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() =>
-                                        setExpandedAttentionByDomain((prev) => ({
-                                          ...prev,
-                                          [d.id]: !prev[d.id],
-                                        }))
-                                      }
-                                      disabled={attentionStudents.length === 0}
-                                    >
-                                      {expandedAttentionByDomain[d.id] ? "Verberg aandachtleerlingen" : "Toon aandachtleerlingen"}
-                                    </Button>
-                                  </div>
-
-                                  {expandedAttentionByDomain[d.id] && attentionStudents.length > 0 && (
-                                    <div className="space-y-2">
-                                      {attentionStudents.map((entry) => (
-                                        <div
-                                          key={`attention-${d.id}-${entry.student_id}-${entry.submitted_at}`}
-                                          className="rounded-md border bg-background px-3 py-2"
-                                        >
-                                          <p className="text-sm font-medium">{entry.student_name}</p>
-                                          <p className="text-xs text-muted-foreground">{entry.student_email}</p>
-                                          <p className="text-xs text-muted-foreground">Laatste poging: {formatDate(entry.submitted_at)}</p>
-                                          <p className="text-xs font-medium text-red-600">Score: {entry.percentage}%</p>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
                                 </div>
+                              </CardHeader>
+                              <CardContent className="space-y-3">
+                                {attempts === 0 ? (
+                                  <p className="text-xs text-muted-foreground">Nog geen resultaten beschikbaar.</p>
+                                ) : (
+                                  <>
+                                    {latestChartData.length > 0 && (
+                                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                                        <div className="rounded-md border bg-muted/20 p-3">
+                                          <p className="text-xs font-medium text-muted-foreground mb-2">Laatste score per leerling</p>
+                                          <div className="h-56 w-full">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                              <BarChart data={latestChartData} margin={{ top: 8, right: 8, left: 0, bottom: 24 }}>
+                                                <CartesianGrid strokeDasharray="3 3" />
+                                                <XAxis
+                                                  dataKey="leerling"
+                                                  interval={0}
+                                                  angle={-25}
+                                                  textAnchor="end"
+                                                  height={54}
+                                                  tick={{ fontSize: 11 }}
+                                                />
+                                                <YAxis domain={[0, 100]} tick={{ fontSize: 12 }} />
+                                                <Tooltip formatter={(value) => [`${value}%`, "Score"]} />
+                                                <Bar dataKey="percentage" fill="#1d4ed8" radius={[4, 4, 0, 0]} />
+                                              </BarChart>
+                                            </ResponsiveContainer>
+                                          </div>
+                                        </div>
 
-                                {expandedClassResults[d.id] && (
-                              <div className="space-y-2">
-                                {entries.map((entry) => (
-                                  <div key={`${d.id}-${entry.student_id}-${entry.submitted_at}`} className="rounded-md bg-muted/40 p-2">
-                                    <p className="text-sm font-medium">{entry.student_name}</p>
-                                    <p className="text-xs text-muted-foreground">{entry.student_email}</p>
-                                    <p className="text-xs text-muted-foreground">Poging op: {formatDate(entry.submitted_at)}</p>
-                                    <p className="text-xs">Score: {formatResultSummary(entry.result_data)}</p>
-                                  </div>
-                                ))}
-                              </div>
+                                        <div className="rounded-md border bg-muted/20 p-3">
+                                          <p className="text-xs font-medium text-muted-foreground mb-2">Verdeling prestaties</p>
+                                          <p className="text-[11px] text-muted-foreground mb-2">
+                                            Aandacht betekent: leerling scoort onder 50% op de laatste poging in dit domein.
+                                          </p>
+                                          <div className="h-56 w-full">
+                                            <ResponsiveContainer width="100%" height="100%">
+                                              <PieChart>
+                                                <Pie
+                                                  data={performanceBuckets}
+                                                  dataKey="value"
+                                                  nameKey="name"
+                                                  cx="50%"
+                                                  cy="50%"
+                                                  outerRadius={72}
+                                                  label
+                                                >
+                                                  {performanceBuckets.map((bucket, index) => (
+                                                    <Cell key={`${d.id}-${bucket.name}`} fill={PERFORMANCE_BUCKET_COLORS[index % PERFORMANCE_BUCKET_COLORS.length]} />
+                                                  ))}
+                                                </Pie>
+                                                <Tooltip />
+                                              </PieChart>
+                                            </ResponsiveContainer>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {attentionStudents.length > 0 && (
+                                      <div className="rounded-md border bg-muted/20 p-3 space-y-2">
+                                        <div className="flex items-center justify-between gap-2">
+                                          <p className="text-xs font-medium text-muted-foreground">
+                                            Aandachtleerlingen in dit domein: {attentionStudents.length}
+                                          </p>
+                                          <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() =>
+                                              setExpandedAttentionByDomain((prev) => ({
+                                                ...prev,
+                                                [d.id]: !prev[d.id],
+                                              }))
+                                            }
+                                          >
+                                            {expandedAttentionByDomain[d.id] ? "Verberg aandachtleerlingen" : "Toon aandachtleerlingen"}
+                                          </Button>
+                                        </div>
+
+                                        {expandedAttentionByDomain[d.id] && (
+                                          <div className="space-y-2">
+                                            {attentionStudents.map((entry) => (
+                                              <div
+                                                key={`attention-${d.id}-${entry.student_id}-${entry.submitted_at}`}
+                                                className="rounded-md border bg-background px-3 py-2"
+                                              >
+                                                <p className="text-sm font-medium">{entry.student_name}</p>
+                                                <p className="text-xs text-muted-foreground">{entry.student_email}</p>
+                                                <p className="text-xs text-muted-foreground">Laatste poging: {formatDate(entry.submitted_at)}</p>
+                                                <p className="text-xs font-medium text-red-600">Score: {entry.percentage}%</p>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    )}
+
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => setExpandedClassResults((prev) => ({ ...prev, [d.id]: !prev[d.id] }))}
+                                      disabled={attempts === 0}
+                                    >
+                                      {expandedClassResults[d.id] ? "Verberg alle pogingen" : "Toon alle pogingen"}
+                                    </Button>
+
+                                    {expandedClassResults[d.id] && (
+                                      <div className="space-y-2 max-h-96 overflow-y-auto">
+                                        {entries.map((entry) => (
+                                          <div key={`${d.id}-${entry.student_id}-${entry.submitted_at}`} className="rounded-md bg-muted/40 p-2">
+                                            <p className="text-sm font-medium">{entry.student_name}</p>
+                                            <p className="text-xs text-muted-foreground">{entry.student_email}</p>
+                                            <p className="text-xs text-muted-foreground">Poging op: {formatDate(entry.submitted_at)}</p>
+                                            <p className="text-xs">Score: {formatResultSummary(entry.result_data)}</p>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </>
                                 )}
-                              </div>
-                            )}
-                          </div>
-                        );
+                              </CardContent>
+                            </Card>
+                          );
                         })}
-                      </div>
+                      </>
                     )}
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             )}
           </div>
         </div>
