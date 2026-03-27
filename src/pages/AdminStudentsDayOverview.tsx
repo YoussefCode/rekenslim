@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "../components/ui/Card";
-import { Calendar as SimpleCalendar } from "../components/ui/Calendar"; // placeholder, fallback below
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Calendar as SimpleCalendar } from "@/components/ui/calendar"; // placeholder, fallback below
 
 // Minimal inline calendar if project doesn't have Calendar component
 const InlineCalendar: React.FC<{
