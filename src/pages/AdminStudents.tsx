@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
+import AdminStudentsDayOverview from "./AdminStudentsDayOverview";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -1273,7 +1274,12 @@ const AdminStudents = () => {
                     <TabsTrigger value="berichten">
                       <Mail className="h-3.5 w-3.5 mr-1" /> Berichten
                     </TabsTrigger>
+                    <TabsTrigger value="dagoverzicht">Dagoverzicht</TabsTrigger>
                   </TabsList>
+                  {/* Tab: Dagoverzicht */}
+                  <TabsContent value="dagoverzicht">
+                    <AdminStudentsDayOverview showBackButton onBack={() => navigate("/admin")}/>
+                  </TabsContent>
 
                   {/* Tab: Gegevens */}
                   <TabsContent value="gegevens">

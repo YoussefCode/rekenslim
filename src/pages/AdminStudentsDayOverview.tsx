@@ -42,7 +42,12 @@ type LoginRecord = {
   last_login_at: string | null;
 };
 
-export default function AdminStudentsDayOverview() {
+interface Props {
+  showBackButton?: boolean;
+  onBack?: () => void;
+}
+
+export default function AdminStudentsDayOverview({ showBackButton, onBack }: Props) {
   const today = new Date().toISOString().slice(0, 10);
   const [selectedDate, setSelectedDate] = useState<string>(today);
   const [records, setRecords] = useState<LoginRecord[]>([]);
@@ -125,7 +130,17 @@ export default function AdminStudentsDayOverview() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Dagoverzicht: ingelogde leerlingen</h1>
+      <div className="flex items-center gap-4 mb-4">
+        {showBackButton && (
+          <button
+            className="px-3 py-1 rounded bg-muted text-foreground border hover:bg-primary/10 transition"
+            onClick={onBack}
+          >
+            Ga terug
+          </button>
+        )}
+        <h1 className="text-2xl font-bold">Dagoverzicht: ingelogde leerlingen</h1>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
