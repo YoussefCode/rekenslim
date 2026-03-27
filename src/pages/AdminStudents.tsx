@@ -876,14 +876,23 @@ const AdminStudents = () => {
 
     setSendingMessage(true);
     try {
-      const { error } = await supabase.functions.invoke("send-student-message", {
+      const { data, error } = await supabase.functions.invoke("send-student-message", {
         body: {
           to: selectedStudent.email,
           subject,
           message,
         },
       });
-      if (error) throw error;
+
+      if (error) {
+        const msg = typeof error === "object" && "message" in error ? error.message : String(error);
+        throw new Error(msg);
+      }
+
+      // The function returns JSON – check for application-level errors
+      if (data?.error) {
+        throw new Error(data.error);
+      }
 
       toast({ title: "Bericht verzonden", description: `E-mail verstuurd naar ${selectedStudent.email}` });
       setMessageSubject("");
@@ -1261,9 +1270,9 @@ const AdminStudents = () => {
                     <TabsTrigger value="klassen">Klassen ({studentClasses.length})</TabsTrigger>
                     <TabsTrigger value="domeinen">Domeinen ({domains.length})</TabsTrigger>
                     <TabsTrigger value="analyse">Analyse</TabsTrigger>
-                    <TabsTrigger value="berichten">
+                    {/* <TabsTrigger value="berichten">
                       <Mail className="h-3.5 w-3.5 mr-1" /> Berichten
-                    </TabsTrigger>
+                    </TabsTrigger> */}
                   </TabsList>
 
                   {/* Tab: Gegevens */}
@@ -1626,7 +1635,8 @@ const AdminStudents = () => {
                     </div>
                   </TabsContent>
 
-                  {/* Tab: Berichten */}
+                  {/* Tab: Berichten tijdelijk gedeactiveerd */}
+                  {/*
                   <TabsContent value="berichten">
                     <Card>
                       <CardHeader className="pb-2">
@@ -1675,6 +1685,7 @@ const AdminStudents = () => {
                       </CardContent>
                     </Card>
                   </TabsContent>
+                  */}
                 </Tabs>
               ) : (
                 <Card>
