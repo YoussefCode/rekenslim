@@ -1270,9 +1270,9 @@ const AdminStudents = () => {
                     <TabsTrigger value="klassen">Klassen ({studentClasses.length})</TabsTrigger>
                     <TabsTrigger value="domeinen">Domeinen ({domains.length})</TabsTrigger>
                     <TabsTrigger value="analyse">Analyse</TabsTrigger>
-                    {/* <TabsTrigger value="berichten">
+                    <TabsTrigger value="berichten">
                       <Mail className="h-3.5 w-3.5 mr-1" /> Berichten
-                    </TabsTrigger> */}
+                    </TabsTrigger>
                   </TabsList>
 
                   {/* Tab: Gegevens */}
@@ -1635,8 +1635,7 @@ const AdminStudents = () => {
                     </div>
                   </TabsContent>
 
-                  {/* Tab: Berichten tijdelijk gedeactiveerd */}
-                  {/*
+                  {/* Tab: Berichten */}
                   <TabsContent value="berichten">
                     <Card>
                       <CardHeader className="pb-2">
@@ -1685,7 +1684,6 @@ const AdminStudents = () => {
                       </CardContent>
                     </Card>
                   </TabsContent>
-                  */}
                 </Tabs>
               ) : (
                 <Card>
