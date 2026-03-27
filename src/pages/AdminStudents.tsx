@@ -1690,7 +1690,6 @@ const AdminStudents = () => {
                     </Card>
                   </TabsContent>
                 </Tabs>
-            </Tabs>
           </div>
         </div>
       </div>
