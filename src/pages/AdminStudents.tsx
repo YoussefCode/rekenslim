@@ -9,7 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  ArrowLeft, Plus, Trash2, Edit, Users, BookOpen, Upload, FileCode, BarChart3, ChevronDown, ChevronUp, UserPlus, UserX
+  ArrowLeft, Plus, Trash2, Edit, Users, BookOpen, Upload, FileCode, BarChart3, ChevronDown, ChevronUp, UserPlus, UserX, Mail, Send
 } from "lucide-react";
 import {
   BarChart,
@@ -149,6 +149,11 @@ const AdminStudents = () => {
   const [studentClasses, setStudentClasses] = useState<SchoolClass[]>([]);
   const [addingStudentToClassId, setAddingStudentToClassId] = useState("");
   const [addingStudentToClassLoading, setAddingStudentToClassLoading] = useState(false);
+
+  // Message state
+  const [messageSubject, setMessageSubject] = useState("");
+  const [messageBody, setMessageBody] = useState("");
+  const [sendingMessage, setSendingMessage] = useState(false);
 
   const formatLastLogin = (value: string | null) => {
     if (!value) return "Nog nooit ingelogd";
@@ -859,6 +864,38 @@ const AdminStudents = () => {
     }
   };
 
+  const sendMessageToStudent = async () => {
+    if (!selectedStudent) return;
+    const subject = messageSubject.trim();
+    const message = messageBody.trim();
+
+    if (!subject || !message) {
+      toast({ title: "Onderwerp en bericht zijn verplicht", variant: "destructive" });
+      return;
+    }
+
+    setSendingMessage(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-student-message", {
+        body: {
+          to: selectedStudent.email,
+          subject,
+          message,
+        },
+      });
+      if (error) throw error;
+
+      toast({ title: "Bericht verzonden", description: `E-mail verstuurd naar ${selectedStudent.email}` });
+      setMessageSubject("");
+      setMessageBody("");
+    } catch (error) {
+      console.error("Fout bij verzenden bericht:", error);
+      toast({ title: "Fout bij verzenden bericht", variant: "destructive" });
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
   const selectStudent = (student: Student) => {
     setSelectedClass(null);
     setClassStudents([]);
@@ -867,6 +904,8 @@ const AdminStudents = () => {
     setStudentFirstName(student.first_name || "");
     setStudentLastName(student.last_name || "");
     setAddingStudentToClassId("");
+    setMessageSubject("");
+    setMessageBody("");
     fetchDomains(student.user_id);
     fetchStudentClasses(student.user_id);
   };
@@ -1218,6 +1257,9 @@ const AdminStudents = () => {
                     <TabsTrigger value="klassen">Klassen ({studentClasses.length})</TabsTrigger>
                     <TabsTrigger value="domeinen">Domeinen ({domains.length})</TabsTrigger>
                     <TabsTrigger value="analyse">Analyse</TabsTrigger>
+                    <TabsTrigger value="berichten">
+                      <Mail className="h-3.5 w-3.5 mr-1" /> Berichten
+                    </TabsTrigger>
                   </TabsList>
 
                   {/* Tab: Gegevens */}
@@ -1578,6 +1620,56 @@ const AdminStudents = () => {
                         );
                       })}
                     </div>
+                  </TabsContent>
+
+                  {/* Tab: Berichten */}
+                  <TabsContent value="berichten">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-lg">Bericht sturen</CardTitle>
+                        <p className="text-sm text-muted-foreground">
+                          Stuur een e-mail naar {selectedStudent.first_name || selectedStudent.email}
+                        </p>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="msg-to">Aan</Label>
+                          <Input
+                            id="msg-to"
+                            value={selectedStudent.email}
+                            disabled
+                            className="bg-muted"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="msg-subject">Onderwerp</Label>
+                          <Input
+                            id="msg-subject"
+                            value={messageSubject}
+                            onChange={(e) => setMessageSubject(e.target.value)}
+                            placeholder="bijv. Huiswerk deze week"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="msg-body">Bericht</Label>
+                          <Textarea
+                            id="msg-body"
+                            value={messageBody}
+                            onChange={(e) => setMessageBody(e.target.value)}
+                            placeholder="Typ hier je bericht..."
+                            rows={6}
+                          />
+                        </div>
+                        <Button
+                          onClick={sendMessageToStudent}
+                          disabled={sendingMessage || !messageSubject.trim() || !messageBody.trim()}
+                          className="w-full sm:w-auto"
+                        >
+                          <Send className="h-4 w-4 mr-2" />
+                          {sendingMessage ? "Verzenden..." : "Verstuur e-mail"}
+                        </Button>
+                      </CardContent>
+                    </Card>
                   </TabsContent>
                 </Tabs>
               ) : (
