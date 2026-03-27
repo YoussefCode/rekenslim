@@ -293,6 +293,10 @@ const Admin = () => {
               <Users className="w-4 h-4 mr-2" />
               Leerling Beheer
             </Button>
+            <Button onClick={() => window.location.hash = '#/admin/leerlingen/dagoverzicht'} variant="outline">
+              <FileText className="w-4 h-4 mr-2" />
+              Dagoverzicht
+            </Button>
             <Button onClick={() => window.location.hash = '#/admin/klassen'} variant="outline">
               <School className="w-4 h-4 mr-2" />
               Klassen Beheer

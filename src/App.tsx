@@ -14,6 +14,7 @@ import PracticeDomain from "./pages/PracticeDomain";
 import PracticeQuestions from "./pages/PracticeQuestions";
 import DyscalculieTest from "./pages/DyscalculieTest";
 import AdminStudents from "./pages/AdminStudents";
+import AdminStudentsDayOverview from "./pages/AdminStudentsDayOverview";
 import AdminClasses from "./pages/AdminClasses";
 import AdminPractice from "./pages/AdminPractice";
 import StudentDashboard from "./pages/StudentDashboard";
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/oefenen/:domain/vragen" element={<PracticeQuestions />} />
             <Route path="/dyscalculie-test" element={<DyscalculieTest />} />
             <Route path="/admin/leerlingen" element={<AdminStudents />} />
+            <Route path="/admin/leerlingen/dagoverzicht" element={<AdminStudentsDayOverview />} />
             <Route path="/admin/klassen" element={<AdminClasses />} />
             <Route path="/admin/oefenvragen" element={<AdminPractice />} />
             <Route path="/mijn-omgeving" element={<StudentDashboard />} />
