@@ -100,6 +100,7 @@ const AdminStudents = () => {
   const { user, profile } = useAuth();
 
   const [students, setStudents] = useState<Student[]>([]);
+  const [studentSearch, setStudentSearch] = useState("");
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [domains, setDomains] = useState<StudentDomain[]>([]);
   const [loading, setLoading] = useState(true);
@@ -227,6 +228,17 @@ const AdminStudents = () => {
       })),
     [studentDomainOverview]
   );
+
+  const filteredStudents = useMemo(() => {
+    const query = studentSearch.trim().toLowerCase();
+    if (!query) return students;
+
+    return students.filter((student) => {
+      const fullName = `${student.first_name || ""} ${student.last_name || ""}`.trim().toLowerCase();
+      const email = (student.email || "").toLowerCase();
+      return fullName.includes(query) || email.includes(query);
+    });
+  }, [studentSearch, students]);
 
   useEffect(() => {
     if (profile?.role !== "admin") {
@@ -1039,10 +1051,19 @@ const AdminStudents = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-1">
+                <Input
+                  value={studentSearch}
+                  onChange={(e) => setStudentSearch(e.target.value)}
+                  placeholder="Zoek op naam of e-mail"
+                  className="mb-2"
+                />
+
                 {students.length === 0 ? (
                   <p className="text-sm text-muted-foreground">Geen leerlingen gevonden</p>
+                ) : filteredStudents.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">Geen resultaten voor je zoekopdracht</p>
                 ) : (
-                  students.map((s) => (
+                  filteredStudents.map((s) => (
                     <button
                       key={s.user_id}
                       onClick={() => selectStudent(s)}
