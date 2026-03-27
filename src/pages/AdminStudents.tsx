@@ -106,6 +106,7 @@ const AdminStudents = () => {
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [domains, setDomains] = useState<StudentDomain[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [studentFirstName, setStudentFirstName] = useState("");
   const [studentLastName, setStudentLastName] = useState("");
   const [domainResults, setDomainResults] = useState<Record<string, DomainResult[]>>({});
@@ -267,10 +268,13 @@ const AdminStudents = () => {
 
   const fetchStudents = async () => {
     try {
+      setFetchError(null);
       const { data: rpcData, error: rpcError } = await supabase.rpc("get_students_with_last_login");
       if (!rpcError) {
         setStudents((rpcData as Student[] | null) || []);
         return;
+      } else {
+        console.debug("RPC get_students_with_last_login error:", rpcError);
       }
 
       const { data: tableData, error: tableError } = await supabase
@@ -282,10 +286,12 @@ const AdminStudents = () => {
       if (!tableError) {
         setStudents(tableData || []);
         return;
+      } else {
+        console.debug("profiles table query error:", tableError);
       }
 
       // Last fallback for databases that do not have the new column.
-      if (tableError.code === "42703" || rpcError.code === "42883") {
+      if ((tableError && (tableError as any).code === "42703") || (rpcError && (rpcError as any).code === "42883")) {
         const { data: basicData, error: basicError } = await supabase
           .from("profiles")
           .select("user_id, email, role, first_name, last_name")
@@ -303,9 +309,10 @@ const AdminStudents = () => {
         return;
       }
 
-      throw tableError;
+      throw tableError || rpcError;
     } catch (error) {
       console.error("Fout bij laden leerlingen:", error);
+      setFetchError(error instanceof Error ? error.message : String(error));
       toast({
         title: "Fout bij laden leerlingen",
         description: "Controleer of je rechten en database-migraties up-to-date zijn.",
@@ -1175,6 +1182,16 @@ const AdminStudents = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Debug panel (temporary) */}
+          <div className="lg:col-span-12">
+            <div className="p-3 rounded-md border bg-white">
+              <div className="text-xs text-muted-foreground">Debug:</div>
+              <div className="text-sm">
+                Auth loading: {String(authLoading)} — Profile role: {profile?.role ?? "(none)"} — Page loading: {String(loading)} — Students: {students.length}
+              </div>
+              {fetchError && <div className="text-sm text-red-600">Fout: {fetchError}</div>}
+            </div>
+          </div>
           {/* Student List */}
           <div className="lg:col-span-3">
             <Card className="mb-4">
