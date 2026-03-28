@@ -109,6 +109,7 @@ const AdminStudents = () => {
   const [studentLastName, setStudentLastName] = useState("");
   const [domainResults, setDomainResults] = useState<Record<string, DomainResult[]>>({});
   const [expandedResults, setExpandedResults] = useState<Record<string, boolean>>({});
+  const [showResultRaw, setShowResultRaw] = useState<Record<string, boolean>>({});
 
   // Dialog states
   const [domainDialogOpen, setDomainDialogOpen] = useState(false);
@@ -1625,11 +1626,23 @@ const AdminStudents = () => {
                               {expandedResults[d.id] && (
                                 <div className="mt-2 space-y-2 max-h-96 overflow-y-auto">
                                   {results.map((r) => (
-                                    <DomainResultCard
-                                      key={r.id}
-                                      resultData={r.result_data}
-                                      submittedAt={r.submitted_at}
-                                    />
+                                    <div key={r.id} className="space-y-1">
+                                      <DomainResultCard
+                                        resultData={r.result_data}
+                                        submittedAt={r.submitted_at}
+                                      />
+                                      <div className="flex items-center gap-2">
+                                        <button
+                                          onClick={() => setShowResultRaw((prev) => ({ ...prev, [r.id]: !prev[r.id] }))}
+                                          className="text-xs text-muted-foreground hover:text-foreground"
+                                        >
+                                          {showResultRaw[r.id] ? "Verberg raw" : "Bekijk raw JSON"}
+                                        </button>
+                                      </div>
+                                      {showResultRaw[r.id] && (
+                                        <pre className="text-xs bg-gray-50 rounded p-2 overflow-x-auto">{JSON.stringify(r.result_data, null, 2)}</pre>
+                                      )}
+                                    </div>
                                   ))}
                                 </div>
                               )}
