@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -47,7 +48,8 @@ interface Props {
   onBack?: () => void;
 }
 
-export default function AdminStudentsDayOverview({ showBackButton, onBack }: Props) {
+export default function AdminStudentsDayOverview({ showBackButton = true, onBack }: Props) {
+  const navigate = useNavigate();
   const today = new Date().toISOString().slice(0, 10);
   const [selectedDate, setSelectedDate] = useState<string>(today);
   const [records, setRecords] = useState<LoginRecord[]>([]);
@@ -134,7 +136,7 @@ export default function AdminStudentsDayOverview({ showBackButton, onBack }: Pro
         {showBackButton && (
           <button
             className="px-3 py-1 rounded bg-muted text-foreground border hover:bg-primary/10 transition"
-            onClick={onBack}
+            onClick={() => (onBack ? onBack() : navigate("/admin/leerlingen"))}
           >
             Ga terug
           </button>
