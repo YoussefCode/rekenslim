@@ -20,6 +20,25 @@ const DomainResultCard: React.FC<DomainResultCardProps> = ({ resultData, submitt
 
   const hasScoreData = score !== null && total !== null;
 
+  // If details don't carry per-question correctness (e.g. details are booleans or absent)
+  // but we do have explicit `score` and `total`, derive counts from those values.
+  let derivedCorrect = correctCount;
+  let derivedIncorrect = incorrectCount;
+  if (hasScoreData) {
+    const totalNum = Number(total) || 0;
+    const scoreNum = Number(score) || 0;
+
+    const detailsContainCorrectFlag = details.some((d: any) => d && Object.prototype.hasOwnProperty.call(d, "correct"));
+
+    if (!detailsContainCorrectFlag) {
+      // Prefer to use `score` as number of correct answers when details lack flags.
+      derivedCorrect = Math.max(0, Math.min(totalNum, Math.round(scoreNum)));
+      // If skippedCount is available, exclude skipped from incorrect, otherwise compute as total - correct
+      const skipped = totalNum - answeredCount > 0 ? totalNum - answeredCount : 0;
+      derivedIncorrect = Math.max(0, totalNum - derivedCorrect - skipped);
+    }
+  }
+
   const getScoreColor = (pct: number) => {
     if (pct >= 70) return "text-green-600";
     if (pct >= 50) return "text-amber-600";
@@ -70,14 +89,14 @@ const DomainResultCard: React.FC<DomainResultCardProps> = ({ resultData, submitt
             <div className="bg-green-50 dark:bg-green-950/30 rounded-md p-2">
               <div className="flex items-center justify-center gap-1">
                 <CheckCircle className="h-3.5 w-3.5 text-green-600" />
-                <span className="text-sm font-semibold text-green-700 dark:text-green-400">{correctCount}</span>
+                <span className="text-sm font-semibold text-green-700 dark:text-green-400">{derivedCorrect}</span>
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5">Goed</p>
             </div>
             <div className="bg-red-50 dark:bg-red-950/30 rounded-md p-2">
               <div className="flex items-center justify-center gap-1">
                 <XCircle className="h-3.5 w-3.5 text-red-600" />
-                <span className="text-sm font-semibold text-red-700 dark:text-red-400">{incorrectCount}</span>
+                <span className="text-sm font-semibold text-red-700 dark:text-red-400">{derivedIncorrect}</span>
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5">Fout</p>
             </div>
