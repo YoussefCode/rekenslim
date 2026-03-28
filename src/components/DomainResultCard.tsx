@@ -39,6 +39,12 @@ const DomainResultCard: React.FC<DomainResultCardProps> = ({ resultData, submitt
     }
   }
 
+  // Compute average time per question (in seconds) when available in details
+  const timeValues = details
+    .map((d: any) => (d && (typeof d.time === "number" || !isNaN(Number(d.time))) ? Number(d.time) : null))
+    .filter((t: number | null) => t !== null) as number[];
+  const avgTimeSeconds = timeValues.length > 0 ? Math.round(timeValues.reduce((s, v) => s + v, 0) / timeValues.length) : null;
+
   const getScoreColor = (pct: number) => {
     if (pct >= 70) return "text-green-600";
     if (pct >= 50) return "text-amber-600";
@@ -85,7 +91,7 @@ const DomainResultCard: React.FC<DomainResultCardProps> = ({ resultData, submitt
           </div>
 
           {/* Stats row */}
-          <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="grid grid-cols-4 gap-2 text-center">
             <div className="bg-green-50 dark:bg-green-950/30 rounded-md p-2">
               <div className="flex items-center justify-center gap-1">
                 <CheckCircle className="h-3.5 w-3.5 text-green-600" />
@@ -106,6 +112,13 @@ const DomainResultCard: React.FC<DomainResultCardProps> = ({ resultData, submitt
                 <span className="text-sm font-semibold text-foreground">{score}/{total}</span>
               </div>
               <p className="text-[10px] text-muted-foreground mt-0.5">Score</p>
+            </div>
+            <div className="bg-muted/50 rounded-md p-2">
+              <div className="flex items-center justify-center gap-1">
+                <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-sm font-semibold text-foreground">{avgTimeSeconds !== null ? `${avgTimeSeconds}s` : "Niet bekend"}</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-0.5">Gem. tijd</p>
             </div>
           </div>
 
