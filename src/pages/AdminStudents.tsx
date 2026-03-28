@@ -1167,6 +1167,11 @@ const AdminStudents = () => {
             <h1 className="text-3xl font-bold text-foreground">Leerling Beheer</h1>
             <p className="text-muted-foreground">Beheer domeinen per leerling — upload een HTML bestand met vragen en uitleg</p>
           </div>
+          <div className="ml-auto">
+            <Button size="sm" onClick={() => navigate("/admin/leerlingen/dagoverzicht")}>
+              <BarChart3 className="h-4 w-4 mr-2" /> Dagoverzicht
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
