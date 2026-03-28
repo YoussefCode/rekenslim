@@ -8,10 +8,27 @@ interface DomainResultCardProps {
 }
 
 const DomainResultCard: React.FC<DomainResultCardProps> = ({ resultData, submittedAt }) => {
-  const score = resultData.score ?? null;
-  const total = resultData.total ?? null;
-  const percentage = resultData.percentage ?? (score !== null && total ? Math.round((score / total) * 100) : null);
-  const details = Array.isArray(resultData.details) ? resultData.details : [];
+  const raw: any = resultData || {};
+
+  // Normalize older/new result shapes:
+  // - new shape: { score, total, percentage, details: [...] }
+  // - older raport shape: { totaal, vragen, percentage, details: [...] }
+  const score = raw.score ?? raw.totaal ?? null;
+  const total = raw.total ?? raw.vragen ?? null;
+  const percentage = raw.percentage ?? (score !== null && total ? Math.round((Number(score) / Number(total)) * 100) : null);
+
+  const details = Array.isArray(raw.details)
+    ? raw.details.map((d: any) => {
+        if (!d || typeof d !== "object") return d;
+        return {
+          // per-question correctness flag normalization
+          correct: d.correct ?? d.isCorrect ?? (typeof d.status === "string" ? d.status.toLowerCase().startsWith("g") : undefined),
+          // preserve numeric time when provided
+          time: typeof d.time === "number" ? d.time : (d.time ? Number(d.time) : null),
+          ...d,
+        };
+      })
+    : [];
 
   const answeredCount = details.filter((d: any) => d !== null && d !== undefined).length;
   const correctCount = details.filter((d: any) => d && d.correct === true).length;
