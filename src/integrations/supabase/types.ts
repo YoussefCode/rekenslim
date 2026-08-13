@@ -212,8 +212,8 @@ export type Database = {
           email: string
           first_name: string | null
           id: string
-          last_name: string | null
           last_login_at: string | null
+          last_name: string | null
           role: string
           updated_at: string
           user_id: string
@@ -223,8 +223,8 @@ export type Database = {
           email: string
           first_name?: string | null
           id?: string
-          last_name?: string | null
           last_login_at?: string | null
+          last_name?: string | null
           role?: string
           updated_at?: string
           user_id: string
@@ -234,8 +234,8 @@ export type Database = {
           email?: string
           first_name?: string | null
           id?: string
-          last_name?: string | null
           last_login_at?: string | null
+          last_name?: string | null
           role?: string
           updated_at?: string
           user_id?: string
@@ -480,17 +480,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_students_with_last_login: {
-        Args: never
-        Returns: {
-          email: string
-          first_name: string | null
-          last_login_at: string | null
-          last_name: string | null
-          role: string
-          user_id: string
-        }[]
-      }
       get_quiz_questions:
         | {
             Args: never
@@ -516,6 +505,17 @@ export type Database = {
               updated_at: string
             }[]
           }
+      get_students_with_last_login: {
+        Args: never
+        Returns: {
+          email: string
+          first_name: string
+          last_login_at: string
+          last_name: string
+          role: string
+          user_id: string
+        }[]
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
