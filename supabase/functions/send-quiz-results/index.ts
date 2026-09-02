@@ -152,12 +152,11 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (emailError) {
-      console.error("Resend primary send failed:", emailError);
+      console.error("Resend primary send failed:", JSON.stringify(emailError));
       // If we're on a Resend testing plan, only the owner's email is allowed.
       // Fallback to the owner email so you still receive results while the domain is unverified.
-      if (emailError.statusCode === 403 &&
-          typeof emailError.error === 'string' &&
-          emailError.error.includes('You can only send testing emails')) {
+      const errText = `${emailError.error ?? ''} ${emailError.message ?? ''} ${JSON.stringify(emailError)}`;
+      if (errText.includes('only send testing emails') || errText.includes('verify a domain')) {
         const fallbackRecipient = "yelmourabit@outlook.com";
         const fallbackHtml = `
           <p><strong>LET OP:</strong> Fallback geactiveerd wegens Resend testlimiet. Bedoelde ontvanger: ${primaryRecipient}.</p>
