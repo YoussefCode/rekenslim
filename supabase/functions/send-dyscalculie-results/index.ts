@@ -62,8 +62,9 @@ const handler = async (req: Request): Promise<Response> => {
     });
 
     if (emailError) {
-      console.error("Resend primary send failed:", emailError);
-      if (emailError.statusCode === 403 && typeof emailError.error === "string" && emailError.error.includes("You can only send testing emails")) {
+      console.error("Resend primary send failed:", JSON.stringify(emailError));
+      const errText = `${emailError.error ?? ''} ${emailError.message ?? ''} ${JSON.stringify(emailError)}`;
+      if (errText.includes("only send testing emails") || errText.includes("verify a domain")) {
         const fallbackRecipient = "yelmourabit@outlook.com";
         const { error: fallbackError }: any = await resend.emails.send({
           from: "Rekenslim <onboarding@resend.dev>",
